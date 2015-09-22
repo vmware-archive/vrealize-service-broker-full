@@ -1,0 +1,54 @@
+{
+    "links": [],
+    "content": [
+        {
+            "@type": "ConsumerEntitledCatalogItemView",
+            "links": [
+                {
+                    "@type": "link",
+                    "rel": "GET: Request Template",
+                    "href": "https://$host/catalogservice/api/consumer/entitledCatalogItems/7c8275d6-1bd6-452a-97c4-d6c053e4baa4/requests/template"
+                },
+                {
+                    "@type": "link",
+                    "rel": "POST: Submit Request",
+                    "href": "https://$host/catalogservice/api/consumer/entitledCatalogItems/7c8275d6-1bd6-452a-97c4-d6c053e4baa4/requests"
+                }
+            ],
+            "entitledOrganizations": [
+                {
+                    "tenantRef": "mycompany",
+                    "tenantLabel": "mycompany",
+                    "subtenantRef": "c0683388-6db2-4cb5-9033-b24d15ad3766",
+                    "subtenantLabel": "Demo Group"
+                }
+            ],
+            "catalogItemId": "7c8275d6-1bd6-452a-97c4-d6c053e4baa4",
+            "name": "Linux",
+            "description": "Linux blueprint for API demo",
+            "isNoteworthy": false,
+            "dateCreated": "2015-07-29T03:54:28.141Z",
+            "lastUpdatedDate": "2015-07-29T12:46:56.405Z",
+            "iconId": "cafe_default_icon_genericCatalogItem",
+            "catalogItemTypeRef": {
+                "id": "com.vmware.csp.component.cafe.composition.blueprint",
+                "label": "Composite Blueprint"
+            },
+            "serviceRef": {
+                "id": "057d4095-95f1-47da-b14b-641ac9010c97",
+                "label": "Infrastructure Services"
+            },
+            "outputResourceTypeRef": {
+                "id": "composition.resource.type.deployment",
+                "label": "Deployment"
+            }
+        }
+    ],
+    "metadata": {
+        "size": 20,
+        "totalElements": 1,
+        "totalPages": 1,
+        "number": 1,
+        "offset": 0
+    }
+}
