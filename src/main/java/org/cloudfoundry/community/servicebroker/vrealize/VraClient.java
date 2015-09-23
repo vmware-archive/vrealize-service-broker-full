@@ -19,13 +19,19 @@ import org.cloudfoundry.community.servicebroker.model.ServiceInstanceBinding;
 import org.cloudfoundry.community.servicebroker.model.UpdateServiceInstanceRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+
 public class VraClient {
 
 	@Autowired
-	private Catalog catalog;
-	
-	@Autowired
 	private VraRepository vraRepository;
+
+	@Autowired
+	private VraCatalogRepo vraCatalogRepo;
+
+	@Autowired
+	Gson gson;
 
 	@Autowired
 	private String serviceUri;
@@ -53,7 +59,7 @@ public class VraClient {
 		ServiceDefinition serviceDefinition = null;
 		Plan plan = null;
 
-		for (ServiceDefinition def : catalog.getServiceDefinitions()) {
+		for (ServiceDefinition def : getCatalog().getServiceDefinitions()) {
 			if (def.getId().equals(request.getServiceDefinitionId())) {
 				serviceDefinition = def;
 				for (Plan p : def.getPlans()) {
@@ -161,5 +167,11 @@ public class VraClient {
 			return null;
 		}
 		return BINDINGS.get(id);
+	}
+
+	private Catalog getCatalog() {
+		return gson.fromJson(
+				gson.fromJson(vraCatalogRepo.getCatalog(), JsonElement.class),
+				Catalog.class);
 	}
 }
