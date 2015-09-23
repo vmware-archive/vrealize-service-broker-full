@@ -6,7 +6,6 @@ import static org.junit.Assert.assertNull;
 
 import java.util.Map;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,11 +16,13 @@ import com.vmware.cloudclient.domain.Creds;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = { Application.class })
-@Ignore
 public class VraRepositoryTest {
 
 	@Autowired
 	private VraRepository repo;
+
+	@Autowired
+	private VraCatalogRepo catRepo;
 
 	@Test
 	public void testGetToken() {
@@ -34,14 +35,16 @@ public class VraRepositoryTest {
 		assertNotNull(resp.get("id"));
 		assertEquals("tester", resp.get("tenant"));
 	}
-	
+
 	@Test
 	public void testCheckToken() {
 		assertNull(repo.checkToken("token"));
 	}
-	
+
 	@Test
 	public void testGetCatalog() {
-		assertNull(repo.getCatalog());
+		String s = catRepo.getCatalog();
+		assertNotNull(s);
+		assertEquals("nsumerEnti", s.subSequence(70, 80));
 	}
 }

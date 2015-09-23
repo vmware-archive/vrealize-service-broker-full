@@ -1,4 +1,4 @@
-package org.cloudfoundry.community.servicebroker.vrealize;
+package org.cloudfoundry.community.servicebroker.vrealize.domain;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;

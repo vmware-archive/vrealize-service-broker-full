@@ -21,10 +21,6 @@ public interface VraRepository {
 	@RequestLine("GET /identity/api/tokens/{token}")
 	public Map<String, String> checkToken(@Param(value = "token") String token);
 	
-	//@Headers({"Content-Type: application/json", "Authorization: Bearer {token}"})
-	@RequestLine("GET /catalog-service/api/consumer/entitledCatalogItemViews")
-	public Map<String, String> getCatalog();
-	
 	// @RequestLine("GET /")
 	// public List<Quote> findAll();
 	//

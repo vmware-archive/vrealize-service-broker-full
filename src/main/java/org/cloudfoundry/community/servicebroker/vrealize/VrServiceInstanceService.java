@@ -13,28 +13,28 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class HelloServiceInstanceService implements ServiceInstanceService {
+public class VrServiceInstanceService implements ServiceInstanceService {
 
 	@Autowired
-	VraClient helloClient;
+	VraClient vraClient;
 
 	@Override
 	public ServiceInstance getServiceInstance(String id) {
-		return helloClient.getInstance(id);
+		return vraClient.getInstance(id);
 	}
 
 	@Override
 	public ServiceInstance createServiceInstance(
 			CreateServiceInstanceRequest request)
 			throws ServiceInstanceExistsException, ServiceBrokerException {
-		return helloClient.createInstance(request);
+		return vraClient.createInstance(request);
 	}
 
 	@Override
 	public ServiceInstance deleteServiceInstance(
 			DeleteServiceInstanceRequest request) throws ServiceBrokerException {
 		try {
-			return helloClient.deleteInstance(request);
+			return vraClient.deleteInstance(request);
 		} catch (ServiceInstanceDoesNotExistException e) {
 			throw new ServiceBrokerException(e);
 		}
@@ -45,6 +45,6 @@ public class HelloServiceInstanceService implements ServiceInstanceService {
 			UpdateServiceInstanceRequest request)
 			throws ServiceInstanceUpdateNotSupportedException,
 			ServiceBrokerException, ServiceInstanceDoesNotExistException {
-		return helloClient.updateInstance(request);
+		return vraClient.updateInstance(request);
 	}
 }
