@@ -1,177 +1,102 @@
 package org.cloudfoundry.community.servicebroker.vrealize;
 
-import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.cloudfoundry.community.servicebroker.exception.ServiceBrokerException;
-import org.cloudfoundry.community.servicebroker.exception.ServiceInstanceBindingExistsException;
-import org.cloudfoundry.community.servicebroker.exception.ServiceInstanceDoesNotExistException;
-import org.cloudfoundry.community.servicebroker.exception.ServiceInstanceExistsException;
-import org.cloudfoundry.community.servicebroker.model.Catalog;
-import org.cloudfoundry.community.servicebroker.model.CreateServiceInstanceBindingRequest;
-import org.cloudfoundry.community.servicebroker.model.CreateServiceInstanceRequest;
-import org.cloudfoundry.community.servicebroker.model.DeleteServiceInstanceBindingRequest;
-import org.cloudfoundry.community.servicebroker.model.DeleteServiceInstanceRequest;
-import org.cloudfoundry.community.servicebroker.model.Plan;
-import org.cloudfoundry.community.servicebroker.model.ServiceDefinition;
-import org.cloudfoundry.community.servicebroker.model.ServiceInstance;
-import org.cloudfoundry.community.servicebroker.model.ServiceInstanceBinding;
-import org.cloudfoundry.community.servicebroker.model.UpdateServiceInstanceRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonElement;
+import feign.FeignException;
 
 public class VraClient {
+
+	private static final Logger LOG = Logger.getLogger(VraClient.class);
 
 	@Autowired
 	private VraRepository vraRepository;
 
-	@Autowired
-	private VraCatalogRepo vraCatalogRepo;
+	// @Autowired
+	// private VraCatalogRepository vraCatalogRepo;
 
-	@Autowired
-	Gson gson;
+	// @Autowired
+	// Gson gson;
 
-	@Autowired
-	private String serviceUri;
+	// @Autowired
+	// private String serviceUri;
 
-	private static final Map<String, ServiceInstanceBinding> BINDINGS = new HashMap<String, ServiceInstanceBinding>();
+	// public Catalog getCatalog() {
+	// return gson.fromJson(
+	// gson.fromJson(vraCatalogRepo.getCatalog(), JsonElement.class),
+	// Catalog.class);
+	// }
+	
+	public Map<String, Object> getCatalog(String token) {
+		return vraRepository.getCatalog("Bearer " + token);
+	}
 
-	private static final Map<String, ServiceInstance> INSTANCES = new HashMap<String, ServiceInstance>();
-
-	public ServiceInstanceBinding createBinding(
-			CreateServiceInstanceBindingRequest request)
-			throws ServiceBrokerException,
-			ServiceInstanceBindingExistsException {
-		if (request == null || request.getServiceDefinitionId() == null
-				|| request.getPlanId() == null
-				|| request.getBindingId() == null) {
-			throw new ServiceBrokerException(
-					"invalid CreateServiceInstanceBindingRequest object.");
+	public String getToken(Map<String, String> creds)
+			throws ServiceBrokerException {
+		if (creds == null || creds.size() < 3) {
+			throw new ServiceBrokerException("mising credentials.");
 		}
 
-		ServiceInstanceBinding binding = BINDINGS.get(request.getBindingId());
-		if (binding != null) {
-			throw new ServiceInstanceBindingExistsException(binding);
-		}
-
-		ServiceDefinition serviceDefinition = null;
-		Plan plan = null;
-
-		for (ServiceDefinition def : getCatalog().getServiceDefinitions()) {
-			if (def.getId().equals(request.getServiceDefinitionId())) {
-				serviceDefinition = def;
-				for (Plan p : def.getPlans()) {
-					if (p.getId().equals(request.getPlanId())) {
-						plan = p;
-					}
-				}
+		try {
+			Map<String, String> m = vraRepository.getToken(creds);
+			if (m.containsKey("id")) {
+				return m.get("id");
+			} else {
+				throw new ServiceBrokerException(
+						"unable to get token from response.");
 			}
+		} catch (FeignException e) {
+			LOG.error(e);
+			throw new ServiceBrokerException(e);
 		}
-
-		if (serviceDefinition == null) {
-			throw new ServiceBrokerException("service "
-					+ request.getServiceDefinitionId()
-					+ " not supported by this broker.");
-		}
-
-		if (plan == null) {
-			throw new ServiceBrokerException("service plan "
-					+ request.getPlanId() + " not supported by this broker.");
-		}
-
-		Map<String, Object> credentials = new HashMap<String, Object>();
-		credentials.put("uri",
-				serviceUri + "/" + plan.getMetadata().get("context"));
-
-		binding = new ServiceInstanceBinding(request.getBindingId(),
-				serviceDefinition.getId(), credentials, null,
-				request.getAppGuid());
-
-		BINDINGS.put(binding.getId(), binding);
-
-		return binding;
 	}
 
-	public ServiceInstanceBinding deleteBinding(
-			DeleteServiceInstanceBindingRequest request)
-			throws ServiceBrokerException, ServiceInstanceDoesNotExistException {
+	public boolean checkToken(String token) {
+		Map<String, String> resp = null;
 
-		if (request == null || request.getBindingId() == null) {
-			throw new ServiceBrokerException(
-					"invalid DeleteServiceInstanceRequest object.");
+		try {
+			resp = vraRepository.checkToken(token);
+
+		} catch (FeignException e) {
+			LOG.warn(e);
+			return false;
 		}
 
-		ServiceInstanceBinding i = getBinding(request.getBindingId());
-		if (i == null) {
-			throw new ServiceInstanceDoesNotExistException(
-					request.getBindingId());
+		if (resp == null) {
+			return false;
 		}
 
-		BINDINGS.remove(request.getBindingId());
-		return i;
+		return true;
 	}
 
-	public ServiceInstance createInstance(CreateServiceInstanceRequest request)
-			throws ServiceBrokerException, ServiceInstanceExistsException {
-		if (request == null || request.getServiceInstanceId() == null) {
-			throw new ServiceBrokerException(
-					"invalid CreateServiceInstanceRequest object.");
-		}
-
-		ServiceInstance instance = getInstance(request.getServiceInstanceId());
-		if (instance != null) {
-			throw new ServiceInstanceExistsException(INSTANCES.get(request
-					.getServiceInstanceId()));
-		}
-
-		instance = new ServiceInstance(request);
-		INSTANCES.put(request.getServiceInstanceId(), instance);
-
-		return instance;
-	}
-
-	public ServiceInstance deleteInstance(DeleteServiceInstanceRequest request)
-			throws ServiceInstanceDoesNotExistException, ServiceBrokerException {
-
-		if (request == null || request.getServiceInstanceId() == null) {
-			throw new ServiceBrokerException(
-					"invalid DeleteServiceInstanceRequest object.");
-		}
-
-		ServiceInstance i = getInstance(request.getServiceInstanceId());
-		if (i == null) {
-			throw new ServiceInstanceDoesNotExistException(
-					request.getServiceInstanceId());
-		}
-
-		INSTANCES.remove(request.getServiceInstanceId());
-		return i;
-	}
-
-	public ServiceInstance updateInstance(UpdateServiceInstanceRequest request) {
-		// not supported yet
-		return null;
-	}
-
-	public ServiceInstance getInstance(String id) {
-		if (id == null) {
-			return null;
-		}
-		return INSTANCES.get(id);
-	}
-
-	private ServiceInstanceBinding getBinding(String id) {
-		if (id == null) {
-			return null;
-		}
-		return BINDINGS.get(id);
-	}
-
-	private Catalog getCatalog() {
-		return gson.fromJson(
-				gson.fromJson(vraCatalogRepo.getCatalog(), JsonElement.class),
-				Catalog.class);
-	}
+	// public String getToken(CreateServiceInstanceBindingRequest request)
+	// throws ServiceBrokerException {
+	// if (request == null || request.getParameters() == null) {
+	// throw new ServiceBrokerException("invalid request");
+	// }
+	//
+	// // already have a token?
+	// Object o = request.getParameters().get("token");
+	// if (o != null) {
+	// // check it
+	// checkToken(o.toString());
+	// return o.toString();
+	// }
+	//
+	// // no existing token, try to get one.
+	// Object c = request.getParameters().get("credentials");
+	// if (c != null) {
+	// String token = getToken((Creds) request.getParameters().get(
+	// "credentials"));
+	// request.getParameters().put("token", token);
+	// request.getParameters().remove("credentials");
+	// return token;
+	//
+	// }
+	//
+	// throw new ServiceBrokerException("missing credentials.");
+	// }
 }
