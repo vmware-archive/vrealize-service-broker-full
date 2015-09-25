@@ -4,8 +4,6 @@ import java.util.Map;
 
 import org.springframework.stereotype.Repository;
 
-import com.vmware.cloudclient.domain.Creds;
-
 import feign.Headers;
 import feign.Param;
 import feign.RequestLine;
@@ -15,24 +13,18 @@ public interface VraRepository {
 
 	@Headers("Content-Type: application/json")
 	@RequestLine("POST /identity/api/tokens")
-	public Map<String, String> getToken(Creds creds);
-	
-	@Headers({"Content-Type: application/json", "Authorization: Bearer {token}"})
-	@RequestLine("GET /identity/api/tokens/{token}")
-	public Map<String, String> checkToken(@Param(value = "token") String token);
-	
-	// @RequestLine("GET /")
-	// public List<Quote> findAll();
-	//
-	// @RequestLine("GET /symbols")
-	// List<String> symbols();
-	//
-	// @RequestLine("GET /marketSummary")
-	// MarketSummary marketSummary();
-	//
-	// @RequestLine("GET /topGainers")
-	// List<Quote> topGainers();
-	//
-	// @RequestLine("GET /topLosers")
-	// List<Quote> topLosers();
+	public Map<String, String> getToken(Map<String, String> creds);
+
+	@RequestLine("HEAD /identity/api/tokens/{token}")
+	public Map<String, String> checkToken(@Param("token") String token);
+
+	@Headers({ "Content-Type: application/json", "Authorization: {token}" })
+	@RequestLine("GET /catalog-service/api/consumer/entitledCatalogItems")
+	public Map<String, Object> getCatalog(@Param("token") String token);
+
+	@Headers({ "Content-Type: application/json", "Authorization: {token}" })
+	@RequestLine("GET /service/api/consumer/entitledCatalogItems/{catalogId}/requests/template")
+	public Map<String, Object> getCatalogItem(@Param("token") String token,
+			@Param("catalogId") String catalogId);
+
 }

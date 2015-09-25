@@ -18,6 +18,7 @@ import com.google.gson.GsonBuilder;
 import feign.Feign;
 import feign.gson.GsonDecoder;
 import feign.gson.GsonEncoder;
+import feign.slf4j.Slf4jLogger;
 
 @Configuration
 public class Config {
@@ -31,13 +32,15 @@ public class Config {
 	public VraRepository vraRepository() {
 		return Feign.builder().encoder(new GsonEncoder())
 				.decoder(new GsonDecoder())
+				 .logger(new Slf4jLogger())
 				.target(VraRepository.class, serviceUri());
 	}
 
-	@Bean
-	public VraCatalogRepo vraCatalogRepo() {
-		return Feign.builder().target(VraCatalogRepo.class, serviceUri());
-	}
+//	@Bean
+//	public VraCatalogRepository vraCatalogRepo() {
+//		return Feign.builder().logger(new Slf4jLogger()).
+//				target(VraCatalogRepository.class, serviceUri());
+//	}
 
 	@Bean
 	public BrokerApiVersion brokerApiVersion() {
@@ -49,7 +52,7 @@ public class Config {
 
 	@Bean
 	public String serviceUri() {
-		return env.getProperty("SERVICE_URI", "http://localhost:8080");
+		return env.getProperty("SERVICE_URI", "https://vra.vra.lab");
 	}
 
 	@Bean

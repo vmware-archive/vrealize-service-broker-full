@@ -1,5 +1,8 @@
 package org.cloudfoundry.community.servicebroker.vrealize;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.cloudfoundry.community.servicebroker.exception.ServiceBrokerException;
 import org.cloudfoundry.community.servicebroker.exception.ServiceInstanceDoesNotExistException;
 import org.cloudfoundry.community.servicebroker.exception.ServiceInstanceExistsException;
@@ -18,26 +21,53 @@ public class VrServiceInstanceService implements ServiceInstanceService {
 	@Autowired
 	VraClient vraClient;
 
+	private static final Map<String, ServiceInstance> INSTANCES = new HashMap<String, ServiceInstance>();
+
 	@Override
 	public ServiceInstance getServiceInstance(String id) {
-		return vraClient.getInstance(id);
+		return getInstance(id);
 	}
 
 	@Override
 	public ServiceInstance createServiceInstance(
 			CreateServiceInstanceRequest request)
 			throws ServiceInstanceExistsException, ServiceBrokerException {
-		return vraClient.createInstance(request);
+
+		if (request == null || request.getServiceInstanceId() == null) {
+			throw new ServiceBrokerException(
+					"invalid CreateServiceInstanceRequest object.");
+		}
+
+		ServiceInstance instance = getInstance(request.getServiceInstanceId());
+		if (instance != null) {
+			throw new ServiceInstanceExistsException(INSTANCES.get(request
+					.getServiceInstanceId()));
+		}
+
+		instance = new ServiceInstance(request);
+		INSTANCES.put(request.getServiceInstanceId(), instance);
+
+		return instance;
 	}
 
 	@Override
 	public ServiceInstance deleteServiceInstance(
 			DeleteServiceInstanceRequest request) throws ServiceBrokerException {
-		try {
-			return vraClient.deleteInstance(request);
-		} catch (ServiceInstanceDoesNotExistException e) {
-			throw new ServiceBrokerException(e);
+
+		if (request == null || request.getServiceInstanceId() == null) {
+			throw new ServiceBrokerException(
+					"invalid DeleteServiceInstanceRequest object.");
 		}
+
+		ServiceInstance i = getInstance(request.getServiceInstanceId());
+		if (i == null) {
+			throw new ServiceBrokerException(
+					"Service instance does not exist: "
+							+ request.getServiceInstanceId());
+		}
+
+		INSTANCES.remove(request.getServiceInstanceId());
+		return i;
 	}
 
 	@Override
@@ -45,6 +75,18 @@ public class VrServiceInstanceService implements ServiceInstanceService {
 			UpdateServiceInstanceRequest request)
 			throws ServiceInstanceUpdateNotSupportedException,
 			ServiceBrokerException, ServiceInstanceDoesNotExistException {
-		return vraClient.updateInstance(request);
+		return updateInstance(request);
+	}
+
+	public ServiceInstance updateInstance(UpdateServiceInstanceRequest request) {
+		// not supported yet
+		return null;
+	}
+
+	public ServiceInstance getInstance(String id) {
+		if (id == null) {
+			return null;
+		}
+		return INSTANCES.get(id);
 	}
 }
