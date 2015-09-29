@@ -4,6 +4,8 @@ import java.util.Map;
 
 import org.springframework.stereotype.Repository;
 
+import com.google.gson.JsonElement;
+
 import feign.Headers;
 import feign.Param;
 import feign.RequestLine;
@@ -20,7 +22,7 @@ public interface VraRepository {
 
 	@Headers({ "Content-Type: application/json", "Authorization: {token}" })
 	@RequestLine("GET /catalog-service/api/catalogItems")
-	public Map<String, Object> getAllCatalogItems(@Param("token") String token);
+	public JsonElement getAllCatalogItems(@Param("token") String token);
 
 	@Headers({ "Content-Type: application/json", "Authorization: {token}" })
 	@RequestLine("GET /catalog-service/api/consumer/entitledCatalogItems")

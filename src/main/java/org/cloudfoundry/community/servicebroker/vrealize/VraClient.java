@@ -4,7 +4,10 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.cloudfoundry.community.servicebroker.exception.ServiceBrokerException;
+import org.cloudfoundry.community.servicebroker.model.Catalog;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import com.google.gson.Gson;
 
 import feign.FeignException;
 
@@ -15,23 +18,13 @@ public class VraClient {
 	@Autowired
 	private VraRepository vraRepository;
 
-	// @Autowired
-	// private VraCatalogRepository vraCatalogRepo;
+	@Autowired
+	Gson gson;
 
-	// @Autowired
-	// Gson gson;
-
-	// @Autowired
-	// private String serviceUri;
-
-	// public Catalog getCatalog() {
-	// return gson.fromJson(
-	// gson.fromJson(vraCatalogRepo.getCatalog(), JsonElement.class),
-	// Catalog.class);
-	// }
-
-	public Map<String, Object> getAllCatalogItems(String token) {
-		return vraRepository.getAllCatalogItems("Bearer " + token);
+	public Catalog getAllCatalogItems(String token) {
+		return gson.fromJson(
+				vraRepository.getAllCatalogItems("Bearer " + token),
+				Catalog.class);
 	}
 
 	public Map<String, Object> getEntitledCatalogItems(String token) {
