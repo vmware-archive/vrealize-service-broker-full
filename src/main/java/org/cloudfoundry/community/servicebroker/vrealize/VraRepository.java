@@ -15,7 +15,7 @@ public interface VraRepository {
 
 	@Headers("Content-Type: application/json")
 	@RequestLine("POST /identity/api/tokens")
-	public Map<String, String> getToken(Map<String, String> creds);
+	public Map<String, String> getToken(Creds creds);
 
 	@RequestLine("HEAD /identity/api/tokens/{token}")
 	public Map<String, String> checkToken(@Param("token") String token);
@@ -26,8 +26,7 @@ public interface VraRepository {
 
 	@Headers({ "Content-Type: application/json", "Authorization: {token}" })
 	@RequestLine("GET /catalog-service/api/consumer/entitledCatalogItems")
-	public Map<String, Object> getEntitledCatalogItems(
-			@Param("token") String token);
+	public JsonElement getEntitledCatalogItems(@Param("token") String token);
 
 	// @Headers({ "Content-Type: application/json", "Authorization: {token}" })
 	// @RequestLine("GET /service/api/consumer/entitledCatalogItems/{catalogId}/requests/template")

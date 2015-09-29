@@ -44,7 +44,7 @@ public class Config {
 
 	@Bean
 	public BrokerApiVersion brokerApiVersion() {
-		return new BrokerApiVersion("2.4");
+		return new BrokerApiVersion("2.6");
 	}
 
 	@Autowired
