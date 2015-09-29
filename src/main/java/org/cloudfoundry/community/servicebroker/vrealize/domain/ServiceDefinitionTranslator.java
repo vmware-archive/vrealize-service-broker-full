@@ -10,7 +10,6 @@ import org.cloudfoundry.community.servicebroker.model.Plan;
 import org.cloudfoundry.community.servicebroker.model.ServiceDefinition;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonArray;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
@@ -24,8 +23,8 @@ public class ServiceDefinitionTranslator implements
 
 	public ServiceDefinition deserialize(JsonElement json, Type typeOfT,
 			JsonDeserializationContext context) throws JsonParseException {
-		
-			return getSD(json);
+
+		return getSD(json);
 	}
 
 	public Gson getGson() {
@@ -37,14 +36,13 @@ public class ServiceDefinitionTranslator implements
 	}
 
 	private ServiceDefinition getSD(JsonElement json) {
-		JsonArray content = json.getAsJsonObject().get("content").getAsJsonArray();
-		JsonObject m2 = content.get(0).getAsJsonObject();
+		JsonObject jo = json.getAsJsonObject();
 
-		String name = m2.get("name").getAsString();
-		String description = m2.get("description").getAsString();
-		
+		String name = jo.get("name").getAsString();
+		String description = jo.get("description").getAsString();
+
 		List<Plan> plans = new ArrayList<Plan>();
-		plans.add( gson.fromJson(m2, Plan.class));
+		plans.add(gson.fromJson(jo, Plan.class));
 
 		ServiceDefinition sd = new ServiceDefinition(name, name, description,
 				true, plans);

@@ -25,7 +25,7 @@ public class PlanTranslator implements JsonDeserializer<Plan> {
 
 	private Plan getPlan(JsonElement json) {
 		JsonObject m2 = json.getAsJsonObject();
-		String id = m2.get("catalogItemId").getAsString();
+		String id = m2.get("id").getAsString();
 		String name = m2.get("name").getAsString();
 		String description = m2.get("description").getAsString();
 		return new Plan(id, name, description, getMetadata(m2, name), true);
@@ -58,11 +58,14 @@ public class PlanTranslator implements JsonDeserializer<Plan> {
 		planMetadata.put("costs", getCosts());
 		planMetadata.put("bullets", getBullets(name));
 
-		JsonArray o = json.get("links").getAsJsonArray();
-		for (int i = 0; i < o.size(); i++) {
-			JsonElement rel = o.get(i).getAsJsonObject().get("rel");
-			JsonElement href = o.get(i).getAsJsonObject().get("href");
-			planMetadata.put(rel.getAsString(), href.getAsString());
+		JsonElement je = json.get("links");
+		if (je != null) {
+			JsonArray o = je.getAsJsonArray();
+			for (int i = 0; i < o.size(); i++) {
+				JsonElement rel = o.get(i).getAsJsonObject().get("rel");
+				JsonElement href = o.get(i).getAsJsonObject().get("href");
+				planMetadata.put(rel.getAsString(), href.getAsString());
+			}
 		}
 
 		return planMetadata;

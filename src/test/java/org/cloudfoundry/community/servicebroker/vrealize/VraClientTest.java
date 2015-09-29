@@ -1,5 +1,6 @@
 package org.cloudfoundry.community.servicebroker.vrealize;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -8,6 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.cloudfoundry.community.servicebroker.exception.ServiceBrokerException;
+import org.cloudfoundry.community.servicebroker.model.Catalog;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -128,12 +130,13 @@ public class VraClientTest {
 		String token = client.getToken(getCredentials());
 		// System.out.println(token);
 		assertNotNull(token);
-		Map<String, Object> s = client.getAllCatalogItems(token);
-		assertNotNull(s);
-		System.out.println(s);
+		Catalog c = client.getAllCatalogItems(token);
+		assertNotNull(c);
+		assertEquals(17, c.getServiceDefinitions().size());
 	}
 
 	@Test
+	@Ignore
 	public void testGetEntitledCatalog() throws ServiceBrokerException {
 		String token = client.getToken(getCredentials());
 		// System.out.println(token);
@@ -143,7 +146,6 @@ public class VraClientTest {
 		System.out.println(s);
 	}
 
-	@Ignore
 	@Test
 	public void testGetToken() throws ServiceBrokerException {
 		String s = client.getToken(getCredentials());
