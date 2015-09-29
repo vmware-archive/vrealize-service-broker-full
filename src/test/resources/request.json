@@ -1,0 +1,38 @@
+{
+    "@type": "CatalogItemRequest",
+    "catalogItemRef": {
+        "id": "65fbca06-a28e-46f3-bced-c6e5fb3a66f9"
+    },
+    "organization": {
+        "tenantRef": "MYCOMPANY",
+        "subtenantRef": "cccd7a7e-5283-416b-beb0-45eb4e924dcb"
+    },
+    "requestedFor": "fritz@example.mycompany.com",
+    "state": "SUBMITTED",
+    "requestNumber": 0,
+    "requestData": {
+        "entries": [
+            {
+                "key": "provider-blueprintId",
+                "value": {
+                    "type": "string",
+                    "value": "e16edcf9-6a10-4bc7-98e2-a33361aeb857"
+                }
+            },
+            {
+                "key": "provider-__Notes",
+                "value": {
+                    "type": "string",
+                    "value": "MYCOMPANY machine"
+                }
+            },
+            {
+                "key": "provider-VirtualMachine.Disk0.Size",
+                "value": {
+                    "type": "string",
+                    "value": "1"
+                }
+            }
+        ]
+    }
+}

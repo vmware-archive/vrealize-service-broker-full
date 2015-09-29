@@ -5,6 +5,7 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.cloudfoundry.community.servicebroker.exception.ServiceBrokerException;
 import org.cloudfoundry.community.servicebroker.model.Catalog;
+import org.cloudfoundry.community.servicebroker.model.ServiceDefinition;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.google.gson.Gson;
@@ -27,13 +28,16 @@ public class VraClient {
 				Catalog.class);
 	}
 
-	public Map<String, Object> getEntitledCatalogItems(String token) {
-		return vraRepository.getEntitledCatalogItems("Bearer " + token);
+	//TODO point this to a working api endpoint
+	public Catalog getEntitledCatalogItems(String token) {
+//		return gson.fromJson(
+//				vraRepository.getEntitledCatalogItems("Bearer " + token),
+//				Catalog.class);
+		return getAllCatalogItems(token);
 	}
 
-	public String getToken(Map<String, String> creds)
-			throws ServiceBrokerException {
-		if (creds == null || creds.size() < 3) {
+	public String getToken(Creds creds) throws ServiceBrokerException {
+		if (creds == null) {
 			throw new ServiceBrokerException("mising credentials.");
 		}
 
@@ -96,4 +100,18 @@ public class VraClient {
 	//
 	// throw new ServiceBrokerException("missing credentials.");
 	// }
+
+	public ServiceDefinition getServiceDefinition(Catalog catalog,
+			String serviceDefinitionId) {
+		if (catalog == null || serviceDefinitionId == null) {
+			return null;
+		}
+
+		for (ServiceDefinition sd : catalog.getServiceDefinitions()) {
+			if (serviceDefinitionId.equals(sd.getId())) {
+				return sd;
+			}
+		}
+		return null;
+	}
 }

@@ -9,7 +9,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.cloudfoundry.community.servicebroker.exception.ServiceBrokerException;
+import org.cloudfoundry.community.servicebroker.exception.ServiceInstanceExistsException;
 import org.cloudfoundry.community.servicebroker.model.Catalog;
+import org.cloudfoundry.community.servicebroker.model.CreateServiceInstanceRequest;
+import org.cloudfoundry.community.servicebroker.model.ServiceDefinition;
+import org.cloudfoundry.community.servicebroker.model.ServiceInstance;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -23,6 +27,9 @@ public class VraClientTest {
 
 	@Autowired
 	private VraClient client;
+
+	@Autowired
+	VrServiceInstanceService vrServiceInstanceService;
 
 	// @Test
 	// public void testCreateBinding() throws ServiceBrokerException,
@@ -136,14 +143,12 @@ public class VraClientTest {
 	}
 
 	@Test
-	@Ignore
 	public void testGetEntitledCatalog() throws ServiceBrokerException {
 		String token = client.getToken(getCredentials());
 		// System.out.println(token);
 		assertNotNull(token);
-		Map<String, Object> s = client.getEntitledCatalogItems(token);
-		assertNotNull(s);
-		System.out.println(s);
+		Catalog c = client.getAllCatalogItems(token);
+		assertNotNull(c);
 	}
 
 	@Test
@@ -160,12 +165,38 @@ public class VraClientTest {
 		assertFalse(client.checkToken("foo"));
 	}
 
-	private Map<String, String> getCredentials() {
-		Map<String, String> credentials = new HashMap<String, String>();
-		credentials.put("username", "vdude01@vra.lab");
-		credentials.put("tenant", "LAB");
-		credentials.put("password", "P1v0t4l!");
+	@Test
+	@Ignore
+	public void testGetServiceDefinition() throws ServiceBrokerException {
+		Catalog catalog = client.getAllCatalogItems(client
+				.getToken(getCredentials()));
+		assertNotNull(catalog);
+		ServiceDefinition sd = client.getServiceDefinition(catalog,
+				"Amazon Machine");
+		assertNotNull(sd);
+	}
 
-		return credentials;
+	@Test
+	public void testCreateServiceInstance()
+			throws ServiceInstanceExistsException, ServiceBrokerException {
+		CreateServiceInstanceRequest request = new CreateServiceInstanceRequest();
+		request.setOrganizationGuid("anOrg");
+		request.setSpaceGuid("aSpace");
+		request.setServiceDefinitionId("Amazon Machine");
+		request.setPlanId("123");
+		request.withServiceInstanceId("12345");
+
+		Map<String, Object> parms = new HashMap<String, Object>();
+		parms.putAll(getCredentials().toMap());
+		request.setParameters(parms);
+
+		ServiceInstance si = vrServiceInstanceService
+				.createServiceInstance(request);
+		assertNotNull(si);
+		assertNotNull(si.getServiceInstanceId());
+	}
+
+	private Creds getCredentials() {
+		return new Creds("vdude01@vra.lab", "P1v0t4l!", "LAB");
 	}
 }
