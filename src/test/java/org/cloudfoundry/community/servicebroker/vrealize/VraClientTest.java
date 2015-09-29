@@ -122,13 +122,23 @@ public class VraClientTest {
 	// req.setParameters(parameters);
 	// return req;
 	// }
-	
+
 	@Test
-	public void testGetCatalog() throws ServiceBrokerException {
+	public void testGetAllCatalog() throws ServiceBrokerException {
 		String token = client.getToken(getCredentials());
-		System.out.println(token);
+		// System.out.println(token);
 		assertNotNull(token);
-		Map<String, Object> s = client.getCatalog(token);
+		Map<String, Object> s = client.getAllCatalogItems(token);
+		assertNotNull(s);
+		System.out.println(s);
+	}
+
+	@Test
+	public void testGetEntitledCatalog() throws ServiceBrokerException {
+		String token = client.getToken(getCredentials());
+		// System.out.println(token);
+		assertNotNull(token);
+		Map<String, Object> s = client.getEntitledCatalogItems(token);
 		assertNotNull(s);
 		System.out.println(s);
 	}
@@ -137,23 +147,23 @@ public class VraClientTest {
 	@Test
 	public void testGetToken() throws ServiceBrokerException {
 		String s = client.getToken(getCredentials());
-		//System.out.println(s);
+		// System.out.println(s);
 		assertNotNull(s);
 	}
-	
+
 	@Ignore
 	@Test
 	public void testCheckToken() throws ServiceBrokerException {
 		assertTrue(client.checkToken(client.getToken(getCredentials())));
 		assertFalse(client.checkToken("foo"));
 	}
-	
+
 	private Map<String, String> getCredentials() {
 		Map<String, String> credentials = new HashMap<String, String>();
-		credentials.put("username", "vdude1");
+		credentials.put("username", "vdude01@vra.lab");
 		credentials.put("tenant", "LAB");
 		credentials.put("password", "P1v0t4l!");
-		
+
 		return credentials;
 	}
 }

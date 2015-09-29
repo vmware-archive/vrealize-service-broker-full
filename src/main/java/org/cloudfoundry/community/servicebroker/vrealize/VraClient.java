@@ -29,9 +29,13 @@ public class VraClient {
 	// gson.fromJson(vraCatalogRepo.getCatalog(), JsonElement.class),
 	// Catalog.class);
 	// }
-	
-	public Map<String, Object> getCatalog(String token) {
-		return vraRepository.getCatalog("Bearer " + token);
+
+	public Map<String, Object> getAllCatalogItems(String token) {
+		return vraRepository.getAllCatalogItems("Bearer " + token);
+	}
+
+	public Map<String, Object> getEntitledCatalogItems(String token) {
+		return vraRepository.getEntitledCatalogItems("Bearer " + token);
 	}
 
 	public String getToken(Map<String, String> creds)
