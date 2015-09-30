@@ -12,8 +12,6 @@ import org.cloudfoundry.community.servicebroker.exception.ServiceInstanceUpdateN
 import org.cloudfoundry.community.servicebroker.model.Catalog;
 import org.cloudfoundry.community.servicebroker.model.CreateServiceInstanceRequest;
 import org.cloudfoundry.community.servicebroker.model.DeleteServiceInstanceRequest;
-import org.cloudfoundry.community.servicebroker.model.Plan;
-import org.cloudfoundry.community.servicebroker.model.ServiceDefinition;
 import org.cloudfoundry.community.servicebroker.model.ServiceInstance;
 import org.cloudfoundry.community.servicebroker.model.UpdateServiceInstanceRequest;
 import org.cloudfoundry.community.servicebroker.service.ServiceInstanceService;
@@ -58,32 +56,13 @@ public class VrServiceInstanceService implements ServiceInstanceService {
 					.getServiceInstanceId()));
 		}
 
-		// find the service description in the catalog
-		ServiceDefinition sd = vraClient.getServiceDefinition(catalog,
-				request.getServiceDefinitionId());
-
-		// find the plan in the sd
-		Plan plan = vraClient.getPlan(sd, request.getPlanId());
-
-		// submit request for service
-		String id = sd.getId();
-		String tenantRef = creds.getTenant();
-
-		// TODO get from entitlement response
-		// String subtenantRef = sd.getMetadata().get("groupId").toString();
-		String subtenantRef = null;
-
-		String bindingId = plan.getId();
-
-		// create and register service instance
-		String token = vraClient.getToken(creds);
+		String requestPayload = vraClient.createRequestPayload(request);
 
 		// TODO get some actual id from the vr response
 		request.withServiceInstanceId(UUID.randomUUID().toString());
 
 		// TODO submit and poll for response to request
-		LOG.info("request submitted, catId: " + id + " tenant: " + tenantRef
-				+ " groupId: " + subtenantRef + " planId: " + bindingId);
+		LOG.info("request submitted with payload: \n" + requestPayload);
 
 		ServiceInstance instance = new ServiceInstance(request);
 
