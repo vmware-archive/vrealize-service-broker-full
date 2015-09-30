@@ -2,6 +2,7 @@ package org.cloudfoundry.community.servicebroker.vrealize;
 
 import java.util.Map;
 
+import org.cloudfoundry.community.servicebroker.vrealize.domain.Creds;
 import org.springframework.stereotype.Repository;
 
 import com.google.gson.JsonElement;

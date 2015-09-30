@@ -5,6 +5,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import org.cloudfoundry.community.servicebroker.exception.ServiceBrokerException;
+import org.cloudfoundry.community.servicebroker.vrealize.service.TokenService;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;

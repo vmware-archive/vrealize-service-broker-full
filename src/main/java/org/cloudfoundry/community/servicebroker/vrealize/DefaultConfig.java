@@ -14,12 +14,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 @Configuration
-public class Config {
-
-	@Bean
-	public VraClient vraClient() {
-		return new VraClient();
-	}
+public class DefaultConfig {
 
 	@Bean
 	public BrokerApiVersion brokerApiVersion() {
