@@ -24,11 +24,20 @@ public class PlanTranslator implements JsonDeserializer<Plan> {
 	}
 
 	private Plan getPlan(JsonElement json) {
-		JsonObject m2 = json.getAsJsonObject();
-		String id = m2.get("id").getAsString();
-		String name = m2.get("name").getAsString();
-		String description = m2.get("description").getAsString();
-		return new Plan(id, name, description, getMetadata(m2, name), true);
+		JsonObject jo = json.getAsJsonObject();
+
+		JsonObject providerBinding = jo.get("providerBinding")
+				.getAsJsonObject();
+
+		// TODO, get correct id from entitlement payload
+		// JsonObject provideRef =
+		// providerBinding.get("providerRef").getAsJsonObject();
+		// String id = provideRef.get("id").getAsString();
+		String id = providerBinding.get("bindingId").getAsString();
+
+		String name = providerBinding.get("bindingId").getAsString();
+		String description = jo.get("description").getAsString();
+		return new Plan(id, name, description, getMetadata(jo, name), true);
 	}
 
 	private Map<String, Object> getCosts() {

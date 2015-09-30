@@ -5,9 +5,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.cloudfoundry.community.servicebroker.exception.ServiceBrokerException;
 import org.cloudfoundry.community.servicebroker.exception.ServiceInstanceExistsException;
 import org.cloudfoundry.community.servicebroker.model.Catalog;
@@ -154,7 +151,7 @@ public class VraClientTest {
 	@Test
 	public void testGetToken() throws ServiceBrokerException {
 		String s = client.getToken(getCredentials());
-		// System.out.println(s);
+		System.out.println(s);
 		assertNotNull(s);
 	}
 
@@ -182,13 +179,8 @@ public class VraClientTest {
 		CreateServiceInstanceRequest request = new CreateServiceInstanceRequest();
 		request.setOrganizationGuid("anOrg");
 		request.setSpaceGuid("aSpace");
-		request.setServiceDefinitionId("Amazon Machine");
-		request.setPlanId("123");
-		request.withServiceInstanceId("12345");
-
-		Map<String, Object> parms = new HashMap<String, Object>();
-		parms.putAll(getCredentials().toMap());
-		request.setParameters(parms);
+		request.setServiceDefinitionId("2ce37e80-e526-416a-bf68-a52176ced367");
+		request.setPlanId("Infrastructure.CatalogItem.Machine.Cloud.AmazonEC2");
 
 		ServiceInstance si = vrServiceInstanceService
 				.createServiceInstance(request);

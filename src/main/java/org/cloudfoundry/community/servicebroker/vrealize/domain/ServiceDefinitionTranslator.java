@@ -38,13 +38,14 @@ public class ServiceDefinitionTranslator implements
 	private ServiceDefinition getSD(JsonElement json) {
 		JsonObject jo = json.getAsJsonObject();
 
+		String id = jo.get("id").getAsString();
 		String name = jo.get("name").getAsString();
 		String description = jo.get("description").getAsString();
 
 		List<Plan> plans = new ArrayList<Plan>();
 		plans.add(gson.fromJson(jo, Plan.class));
 
-		ServiceDefinition sd = new ServiceDefinition(name, name, description,
+		ServiceDefinition sd = new ServiceDefinition(id, name, description,
 				true, plans);
 
 		Map<String, Object> sdMetadata = new HashMap<String, Object>();
