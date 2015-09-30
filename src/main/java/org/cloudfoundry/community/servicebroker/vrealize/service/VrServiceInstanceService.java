@@ -1,4 +1,4 @@
-package org.cloudfoundry.community.servicebroker.vrealize;
+package org.cloudfoundry.community.servicebroker.vrealize.service;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -15,6 +15,8 @@ import org.cloudfoundry.community.servicebroker.model.DeleteServiceInstanceReque
 import org.cloudfoundry.community.servicebroker.model.ServiceInstance;
 import org.cloudfoundry.community.servicebroker.model.UpdateServiceInstanceRequest;
 import org.cloudfoundry.community.servicebroker.service.ServiceInstanceService;
+import org.cloudfoundry.community.servicebroker.vrealize.VraClient;
+import org.cloudfoundry.community.servicebroker.vrealize.domain.Creds;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

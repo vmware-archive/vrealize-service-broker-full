@@ -10,6 +10,7 @@ import org.cloudfoundry.community.servicebroker.model.CreateServiceInstanceReque
 import org.cloudfoundry.community.servicebroker.model.DeleteServiceInstanceRequest;
 import org.cloudfoundry.community.servicebroker.model.ServiceInstance;
 import org.cloudfoundry.community.servicebroker.model.UpdateServiceInstanceRequest;
+import org.cloudfoundry.community.servicebroker.vrealize.service.VrServiceInstanceService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;

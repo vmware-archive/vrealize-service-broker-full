@@ -1,4 +1,4 @@
-package org.cloudfoundry.community.servicebroker.vrealize;
+package org.cloudfoundry.community.servicebroker.vrealize.service;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -12,6 +12,7 @@ import org.cloudfoundry.community.servicebroker.model.Plan;
 import org.cloudfoundry.community.servicebroker.model.ServiceDefinition;
 import org.cloudfoundry.community.servicebroker.model.ServiceInstanceBinding;
 import org.cloudfoundry.community.servicebroker.service.ServiceInstanceBindingService;
+import org.cloudfoundry.community.servicebroker.vrealize.VraClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

@@ -1,4 +1,4 @@
-package org.cloudfoundry.community.servicebroker.vrealize;
+package org.cloudfoundry.community.servicebroker.vrealize.domain;
 
 import java.util.HashMap;
 import java.util.Map;
