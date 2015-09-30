@@ -2,7 +2,9 @@ package org.cloudfoundry.community.servicebroker.vrealize;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
+import org.apache.log4j.Logger;
 import org.cloudfoundry.community.servicebroker.exception.ServiceBrokerException;
 import org.cloudfoundry.community.servicebroker.exception.ServiceInstanceDoesNotExistException;
 import org.cloudfoundry.community.servicebroker.exception.ServiceInstanceExistsException;
@@ -10,6 +12,8 @@ import org.cloudfoundry.community.servicebroker.exception.ServiceInstanceUpdateN
 import org.cloudfoundry.community.servicebroker.model.Catalog;
 import org.cloudfoundry.community.servicebroker.model.CreateServiceInstanceRequest;
 import org.cloudfoundry.community.servicebroker.model.DeleteServiceInstanceRequest;
+import org.cloudfoundry.community.servicebroker.model.Plan;
+import org.cloudfoundry.community.servicebroker.model.ServiceDefinition;
 import org.cloudfoundry.community.servicebroker.model.ServiceInstance;
 import org.cloudfoundry.community.servicebroker.model.UpdateServiceInstanceRequest;
 import org.cloudfoundry.community.servicebroker.service.ServiceInstanceService;
@@ -19,8 +23,17 @@ import org.springframework.stereotype.Service;
 @Service
 public class VrServiceInstanceService implements ServiceInstanceService {
 
+	private static final Logger LOG = Logger
+			.getLogger(VrServiceInstanceService.class);
+
 	@Autowired
 	VraClient vraClient;
+
+	@Autowired
+	Catalog catalog;
+
+	@Autowired
+	Creds creds;
 
 	private static final Map<String, ServiceInstance> INSTANCES = new HashMap<String, ServiceInstance>();
 
@@ -34,7 +47,7 @@ public class VrServiceInstanceService implements ServiceInstanceService {
 			CreateServiceInstanceRequest request)
 			throws ServiceInstanceExistsException, ServiceBrokerException {
 
-		if (request == null) {
+		if (request == null || request.getServiceDefinitionId() == null) {
 			throw new ServiceBrokerException(
 					"invalid CreateServiceInstanceRequest object.");
 		}
@@ -45,22 +58,35 @@ public class VrServiceInstanceService implements ServiceInstanceService {
 					.getServiceInstanceId()));
 		}
 
-		Creds creds = Creds.fromMap(request.getParameters());
-		String token = vraClient.getToken(creds);
+		// find the service description in the catalog
+		ServiceDefinition sd = vraClient.getServiceDefinition(catalog,
+				request.getServiceDefinitionId());
 
-		// save token for later use
-		request.getParameters().put("token", token);
-
-		// get vR catalog item for this request
-		Catalog catalog = vraClient.getEntitledCatalogItems(token);
+		// find the plan in the sd
+		Plan plan = vraClient.getPlan(sd, request.getPlanId());
 
 		// submit request for service
+		String id = sd.getId();
+		String tenantRef = creds.getTenant();
 
-		// poll for response to request
+		// TODO get from entitlement response
+		// String subtenantRef = sd.getMetadata().get("groupId").toString();
+		String subtenantRef = null;
+
+		String bindingId = plan.getId();
 
 		// create and register service instance
+		String token = vraClient.getToken(creds);
+
+		// TODO get some actual id from the vr response
+		request.withServiceInstanceId(UUID.randomUUID().toString());
+
+		// TODO submit and poll for response to request
+		LOG.info("request submitted, catId: " + id + " tenant: " + tenantRef
+				+ " groupId: " + subtenantRef + " planId: " + bindingId);
 
 		ServiceInstance instance = new ServiceInstance(request);
+
 		INSTANCES.put(request.getServiceInstanceId(), instance);
 
 		return instance;
@@ -91,15 +117,12 @@ public class VrServiceInstanceService implements ServiceInstanceService {
 			UpdateServiceInstanceRequest request)
 			throws ServiceInstanceUpdateNotSupportedException,
 			ServiceBrokerException, ServiceInstanceDoesNotExistException {
-		return updateInstance(request);
-	}
 
-	public ServiceInstance updateInstance(UpdateServiceInstanceRequest request) {
-		// not supported yet
+		// TODO not implemented yet
 		return null;
 	}
 
-	public ServiceInstance getInstance(String id) {
+	private ServiceInstance getInstance(String id) {
 		if (id == null) {
 			return null;
 		}

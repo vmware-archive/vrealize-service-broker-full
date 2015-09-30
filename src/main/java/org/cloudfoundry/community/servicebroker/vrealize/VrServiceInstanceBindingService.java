@@ -22,9 +22,6 @@ public class VrServiceInstanceBindingService implements
 	@Autowired
 	private VraClient vraClient;
 
-	@Autowired
-	private String serviceUri;
-
 	private static final Map<String, ServiceInstanceBinding> BINDINGS = new HashMap<String, ServiceInstanceBinding>();
 
 	@Override
@@ -102,7 +99,7 @@ public class VrServiceInstanceBindingService implements
 
 		Map<String, Object> credentials = new HashMap<String, Object>();
 		credentials.put("uri",
-				serviceUri + "/" + plan.getMetadata().get("context"));
+				"foo" + "/" + plan.getMetadata().get("context"));
 
 		binding = new ServiceInstanceBinding(request.getBindingId(),
 				serviceDefinition.getId(), credentials, null,

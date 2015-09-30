@@ -5,6 +5,7 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.cloudfoundry.community.servicebroker.exception.ServiceBrokerException;
 import org.cloudfoundry.community.servicebroker.model.Catalog;
+import org.cloudfoundry.community.servicebroker.model.Plan;
 import org.cloudfoundry.community.servicebroker.model.ServiceDefinition;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -22,17 +23,23 @@ public class VraClient {
 	@Autowired
 	Gson gson;
 
-	public Catalog getAllCatalogItems(String token) {
-		return gson.fromJson(
-				vraRepository.getAllCatalogItems("Bearer " + token),
-				Catalog.class);
+	public Catalog getAllCatalogItems(String token)
+			throws ServiceBrokerException {
+		try {
+			return gson.fromJson(
+					vraRepository.getAllCatalogItems("Bearer " + token),
+					Catalog.class);
+		} catch (FeignException e) {
+			throw new ServiceBrokerException("error retrieving catalog.", e);
+		}
 	}
 
-	//TODO point this to a working api endpoint
-	public Catalog getEntitledCatalogItems(String token) {
-//		return gson.fromJson(
-//				vraRepository.getEntitledCatalogItems("Bearer " + token),
-//				Catalog.class);
+	// TODO point this to a working api endpoint
+	public Catalog getEntitledCatalogItems(String token)
+			throws ServiceBrokerException {
+		// return gson.fromJson(
+		// vraRepository.getEntitledCatalogItems("Bearer " + token),
+		// Catalog.class);
 		return getAllCatalogItems(token);
 	}
 
@@ -73,45 +80,27 @@ public class VraClient {
 		return true;
 	}
 
-	// public String getToken(CreateServiceInstanceBindingRequest request)
-	// throws ServiceBrokerException {
-	// if (request == null || request.getParameters() == null) {
-	// throw new ServiceBrokerException("invalid request");
-	// }
-	//
-	// // already have a token?
-	// Object o = request.getParameters().get("token");
-	// if (o != null) {
-	// // check it
-	// checkToken(o.toString());
-	// return o.toString();
-	// }
-	//
-	// // no existing token, try to get one.
-	// Object c = request.getParameters().get("credentials");
-	// if (c != null) {
-	// String token = getToken((Creds) request.getParameters().get(
-	// "credentials"));
-	// request.getParameters().put("token", token);
-	// request.getParameters().remove("credentials");
-	// return token;
-	//
-	// }
-	//
-	// throw new ServiceBrokerException("missing credentials.");
-	// }
-
 	public ServiceDefinition getServiceDefinition(Catalog catalog,
-			String serviceDefinitionId) {
-		if (catalog == null || serviceDefinitionId == null) {
-			return null;
-		}
+			String serviceDefinitionId) throws ServiceBrokerException {
 
 		for (ServiceDefinition sd : catalog.getServiceDefinitions()) {
 			if (serviceDefinitionId.equals(sd.getId())) {
 				return sd;
 			}
 		}
-		return null;
+		throw new ServiceBrokerException("service definition: "
+				+ serviceDefinitionId + " not found in catalog.");
+	}
+
+	public Plan getPlan(ServiceDefinition serviceDefinition, String planId)
+			throws ServiceBrokerException {
+
+		for (Plan p : serviceDefinition.getPlans()) {
+			if (planId.equals(p.getId())) {
+				return p;
+			}
+		}
+		throw new ServiceBrokerException("plan: " + planId
+				+ " not found in service definition.");
 	}
 }
