@@ -1,13 +1,17 @@
 package org.cloudfoundry.community.servicebroker.vrealize;
 
-import java.util.Map;
+import java.io.IOException;
+import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
-import org.apache.log4j.Logger;
 import org.cloudfoundry.community.servicebroker.exception.ServiceBrokerException;
 import org.cloudfoundry.community.servicebroker.model.Catalog;
+import org.cloudfoundry.community.servicebroker.model.CreateServiceInstanceRequest;
 import org.cloudfoundry.community.servicebroker.model.Plan;
 import org.cloudfoundry.community.servicebroker.model.ServiceDefinition;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
 
 import com.google.gson.Gson;
 
@@ -15,13 +19,17 @@ import feign.FeignException;
 
 public class VraClient {
 
-	private static final Logger LOG = Logger.getLogger(VraClient.class);
-
 	@Autowired
 	private VraRepository vraRepository;
 
 	@Autowired
 	Gson gson;
+
+	@Autowired
+	Creds creds;
+
+	@Autowired
+	Catalog catalog;
 
 	public Catalog getAllCatalogItems(String token)
 			throws ServiceBrokerException {
@@ -43,45 +51,8 @@ public class VraClient {
 		return getAllCatalogItems(token);
 	}
 
-	public String getToken(Creds creds) throws ServiceBrokerException {
-		if (creds == null) {
-			throw new ServiceBrokerException("mising credentials.");
-		}
-
-		try {
-			Map<String, String> m = vraRepository.getToken(creds);
-			if (m.containsKey("id")) {
-				return m.get("id");
-			} else {
-				throw new ServiceBrokerException(
-						"unable to get token from response.");
-			}
-		} catch (FeignException e) {
-			LOG.error(e);
-			throw new ServiceBrokerException(e);
-		}
-	}
-
-	public boolean checkToken(String token) {
-		Map<String, String> resp = null;
-
-		try {
-			resp = vraRepository.checkToken(token);
-
-		} catch (FeignException e) {
-			LOG.warn(e);
-			return false;
-		}
-
-		if (resp == null) {
-			return false;
-		}
-
-		return true;
-	}
-
-	public ServiceDefinition getServiceDefinition(Catalog catalog,
-			String serviceDefinitionId) throws ServiceBrokerException {
+	private ServiceDefinition getServiceDefinition(String serviceDefinitionId)
+			throws ServiceBrokerException {
 
 		for (ServiceDefinition sd : catalog.getServiceDefinitions()) {
 			if (serviceDefinitionId.equals(sd.getId())) {
@@ -92,7 +63,7 @@ public class VraClient {
 				+ serviceDefinitionId + " not found in catalog.");
 	}
 
-	public Plan getPlan(ServiceDefinition serviceDefinition, String planId)
+	private Plan getPlan(ServiceDefinition serviceDefinition, String planId)
 			throws ServiceBrokerException {
 
 		for (Plan p : serviceDefinition.getPlans()) {
@@ -102,5 +73,31 @@ public class VraClient {
 		}
 		throw new ServiceBrokerException("plan: " + planId
 				+ " not found in service definition.");
+	}
+
+	public String createRequestPayload(CreateServiceInstanceRequest request)
+			throws ServiceBrokerException {
+
+		ServiceDefinition sd = getServiceDefinition(request
+				.getServiceDefinitionId());
+
+		Plan plan = getPlan(sd, request.getPlanId());
+
+		// TODO get from entitlement response
+		// String subtenantRef = sd.getMetadata().get("groupId").toString();
+		String subtenantRef = "1234567879";
+
+		return String.format(getContents("request.json"), sd.getId(),
+				creds.getTenant(), subtenantRef, creds.getUsername(),
+				plan.getId());
+	}
+
+	private String getContents(String fileName) throws ServiceBrokerException {
+		try {
+			URI u = new ClassPathResource(fileName).getURI();
+			return new String(Files.readAllBytes(Paths.get(u)));
+		} catch (IOException e) {
+			throw new ServiceBrokerException("error reading template.", e);
+		}
 	}
 }

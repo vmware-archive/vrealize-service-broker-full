@@ -1,0 +1,24 @@
+{
+    "@type": "CatalogItemRequest",
+    "catalogItemRef": {
+        "id": "%s"
+    },
+    "organization": {
+        "tenantRef": "%s",
+        "subtenantRef": "%s"
+    },
+    "requestedFor": "%s",
+    "state": "SUBMITTED",
+    "requestNumber": 0,
+    "requestData": {
+        "entries": [
+            {
+                "key": "provider-blueprintId",
+                "value": {
+                    "type": "string",
+                    "value": "%s"
+                }
+            }
+        ]
+    }
+}

@@ -6,17 +6,32 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import com.google.gson.Gson;
+
+import feign.FeignException;
+
 @Configuration
 public class CatalogConfig {
 
 	@Autowired
-	VraClient vraClient;
+	TokenService tokenService;
 
 	@Autowired
-	Creds creds;
+	private VraRepository vraRepository;
+
+	@Autowired
+	Gson gson;
 
 	@Bean
 	public Catalog catalog() throws ServiceBrokerException {
-		return vraClient.getEntitledCatalogItems(vraClient.getToken(creds));
+		String token = tokenService.getToken();
+
+		try {
+			return gson.fromJson(
+					vraRepository.getAllCatalogItems("Bearer " + token),
+					Catalog.class);
+		} catch (FeignException e) {
+			throw new ServiceBrokerException("error retrieving catalog.", e);
+		}
 	}
 }
