@@ -1,0 +1,18 @@
+{
+    "@type": "ResourceActionRequest",
+    "resourceRef": {
+        "id": "%s"
+    },
+    "resourceActionRef": {
+        "id": "%s"
+    },
+    "organization": {
+        "tenantRef": "%s",
+        "subtenantRef": "%s"
+    },
+    "state": "SUBMITTED",
+    "requestNumber": 0,
+    "requestData": {
+        "entries": []
+    }
+}

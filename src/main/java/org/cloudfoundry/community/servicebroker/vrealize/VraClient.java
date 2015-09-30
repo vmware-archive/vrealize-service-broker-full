@@ -8,6 +8,7 @@ import java.nio.file.Paths;
 import org.cloudfoundry.community.servicebroker.exception.ServiceBrokerException;
 import org.cloudfoundry.community.servicebroker.model.Catalog;
 import org.cloudfoundry.community.servicebroker.model.CreateServiceInstanceRequest;
+import org.cloudfoundry.community.servicebroker.model.DeleteServiceInstanceRequest;
 import org.cloudfoundry.community.servicebroker.model.Plan;
 import org.cloudfoundry.community.servicebroker.model.ServiceDefinition;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -87,9 +88,17 @@ public class VraClient {
 		// String subtenantRef = sd.getMetadata().get("groupId").toString();
 		String subtenantRef = "1234567879";
 
-		return String.format(getContents("request.json"), sd.getId(),
+		return String.format(getContents("createRequest.json"), sd.getId(),
 				creds.getTenant(), subtenantRef, creds.getUsername(),
 				plan.getId());
+	}
+
+	public String deleteRequestPayload(DeleteServiceInstanceRequest request)
+			throws ServiceBrokerException {
+
+		return String.format(getContents("deleteRequest.json"),
+				request.getServiceInstanceId(), "anActionId",
+				creds.getTenant(), "aGroupId");
 	}
 
 	private String getContents(String fileName) throws ServiceBrokerException {

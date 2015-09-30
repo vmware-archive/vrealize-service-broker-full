@@ -67,6 +67,8 @@ public class VrServiceInstanceService implements ServiceInstanceService {
 		ServiceInstance instance = new ServiceInstance(request);
 
 		INSTANCES.put(request.getServiceInstanceId(), instance);
+		LOG.info("registered service instance: "
+				+ instance.getServiceInstanceId());
 
 		return instance;
 	}
@@ -82,12 +84,15 @@ public class VrServiceInstanceService implements ServiceInstanceService {
 
 		ServiceInstance i = getInstance(request.getServiceInstanceId());
 		if (i == null) {
-			throw new ServiceBrokerException(
-					"Service instance does not exist: "
-							+ request.getServiceInstanceId());
+			return null;
 		}
 
+		String requestPayload = vraClient.deleteRequestPayload(request);
+		LOG.info("request submitted with payload: \n" + requestPayload);
+
 		INSTANCES.remove(request.getServiceInstanceId());
+		LOG.info("unregistered service instance: " + i.getServiceInstanceId());
+
 		return i;
 	}
 
@@ -97,8 +102,8 @@ public class VrServiceInstanceService implements ServiceInstanceService {
 			throws ServiceInstanceUpdateNotSupportedException,
 			ServiceBrokerException, ServiceInstanceDoesNotExistException {
 
-		// TODO not implemented yet
-		return null;
+		throw new ServiceInstanceUpdateNotSupportedException(
+				"vRealize services are not updatable.");
 	}
 
 	private ServiceInstance getInstance(String id) {
