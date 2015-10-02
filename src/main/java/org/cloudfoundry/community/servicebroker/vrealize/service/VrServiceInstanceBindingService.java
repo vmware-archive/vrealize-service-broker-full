@@ -31,8 +31,61 @@ public class VrServiceInstanceBindingService implements
 			throws ServiceInstanceBindingExistsException,
 			ServiceBrokerException {
 
-		// look at request and make sure we have a valid token
-		//String token = vraClient.getToken(request).get("id").toString();
+		if (request == null) {
+			throw new ServiceBrokerException("invalid binding request.");
+		}
+
+		if (request.getBindingId() != null
+				&& BINDINGS.containsKey(request.getBindingId())) {
+			throw new ServiceInstanceBindingExistsException(
+					BINDINGS.get(request.getBindingId()));
+		}
+
+		/*
+		 * get some info about the service from the service instance
+		 * 
+		 * TODO, speak with vR folks, what is returned when a vm is created? Can
+		 * we get back some connection info?
+		 * 
+		 * add "custom properties" to the blueprints?
+		 * 
+		 * Then return these via "resourceData" on API calls.
+		 * 
+		 * Can it be generic depending on the blueprint? for mysql, need to
+		 * create a connection string?
+		 * 
+		 * spring connector uses a URI connector for this.
+		 * 
+		 * spring.datasource.url=jdbc:mysql://localhost/test
+		 * spring.datasource.username=dbuser spring.datasource.password=dbpass
+		 * spring.datasource.driver-class-name=com.mysql.jdbc.Driver
+		 */
+
+		/*
+		 * do something like this....
+		 * 
+		 * request.getServiceInstanceId();
+		 * 
+		 * String database = serviceInstance.getId(); String username =
+		 * bindingId; // TODO Password Generator String password = "password";
+		 * 
+		 * // TODO check if user already exists in the DB
+		 * 
+		 * mongo.createUser(database, username, password);
+		 * 
+		 * Map<String,Object> credentials = new HashMap<String,Object>();
+		 * credentials.put("uri", mongo.getConnectionString(database, username,
+		 * password));
+		 * 
+		 * binding = new ServiceInstanceBinding(bindingId,
+		 * serviceInstance.getId(), credentials, null, appGuid);
+		 * repository.save(binding);
+		 * 
+		 * return binding;
+		 * 
+		 * // look at request and make sure we have a valid token //String token
+		 * = vraClient.getToken(request).get("id").toString();
+		 */
 
 		return createBinding(request, "foo");
 	}
@@ -63,10 +116,10 @@ public class VrServiceInstanceBindingService implements
 		if (authToken == null) {
 			throw new ServiceBrokerException("missing token.");
 		}
-//
-//		if (!tokenValid(authToken)) {
-//			throw new ServiceBrokerException("invalid or expired token.");
-//		}
+		//
+		// if (!tokenValid(authToken)) {
+		// throw new ServiceBrokerException("invalid or expired token.");
+		// }
 
 		ServiceInstanceBinding binding = BINDINGS.get(request.getBindingId());
 		if (binding != null) {
@@ -76,16 +129,17 @@ public class VrServiceInstanceBindingService implements
 		ServiceDefinition serviceDefinition = null;
 		Plan plan = null;
 
-//		for (ServiceDefinition def : vraClient.getCatalog().getServiceDefinitions()) {
-//			if (def.getId().equals(request.getServiceDefinitionId())) {
-//				serviceDefinition = def;
-//				for (Plan p : def.getPlans()) {
-//					if (p.getId().equals(request.getPlanId())) {
-//						plan = p;
-//					}
-//				}
-//			}
-//		}
+		// for (ServiceDefinition def :
+		// vraClient.getCatalog().getServiceDefinitions()) {
+		// if (def.getId().equals(request.getServiceDefinitionId())) {
+		// serviceDefinition = def;
+		// for (Plan p : def.getPlans()) {
+		// if (p.getId().equals(request.getPlanId())) {
+		// plan = p;
+		// }
+		// }
+		// }
+		// }
 
 		if (serviceDefinition == null) {
 			throw new ServiceBrokerException("service "
@@ -99,8 +153,7 @@ public class VrServiceInstanceBindingService implements
 		}
 
 		Map<String, Object> credentials = new HashMap<String, Object>();
-		credentials.put("uri",
-				"foo" + "/" + plan.getMetadata().get("context"));
+		credentials.put("uri", "foo" + "/" + plan.getMetadata().get("context"));
 
 		binding = new ServiceInstanceBinding(request.getBindingId(),
 				serviceDefinition.getId(), credentials, null,

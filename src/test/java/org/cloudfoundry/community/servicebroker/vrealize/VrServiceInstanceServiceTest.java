@@ -27,91 +27,13 @@ public class VrServiceInstanceServiceTest {
 	@Autowired
 	VrServiceInstanceService vrServiceInstanceService;
 
-	// @Test
-	// public void testCreateBinding() throws ServiceBrokerException,
-	// ServiceInstanceBindingExistsException {
-	// ServiceInstanceBinding b = client
-	// .createBinding(getCreateServiceInstanceBindingRequest());
-	// assertNotNull(b);
-	// assertEquals("app123", b.getAppGuid());
-	// Map<String, Object> m = b.getCredentials();
-	// assertNotNull(m);
-	// assertEquals("http://localhost:8080/hello/en", m.get("uri"));
-	// assertNotNull(b.getId());
-	// assertEquals("hello", b.getServiceInstanceId());
-	// }
-
-	// @Test
-	// public void testDeleteBinding() throws Exception {
-	//
-	// CreateServiceInstanceBindingRequest c =
-	// getCreateServiceInstanceBindingRequest();
-	// ServiceInstance si = client.getInstance(c.getServiceInstanceId());
-	//
-	// DeleteServiceInstanceBindingRequest req = new
-	// DeleteServiceInstanceBindingRequest(
-	// c.getBindingId(), si, c.getServiceDefinitionId(), c.getPlanId());
-	//
-	// assertNotNull(client.deleteBinding(req));
-	// }
-
-	// @Test
-	// public void testGetInstance() throws Exception {
-	// CreateServiceInstanceRequest req = getCreateServiceInstanceRequest();
-	// req.withServiceInstanceId("xyz");
-	// ServiceInstance si = client.createInstance(req);
-	// assertNotNull(si);
-	// assertNotNull(client.getInstance(si.getServiceInstanceId()));
-	// }
-
-	// @Test
-	// public void testUpdateInstance() {
-	// assertNull(client.updateInstance(null));
-	// }
-	//
-	// private CreateServiceInstanceRequest getCreateServiceInstanceRequest() {
-	// CreateServiceInstanceRequest req = new CreateServiceInstanceRequest();
-	// req.setOrganizationGuid("orgid");
-	// req.setPlanId("english");
-	// req.setServiceDefinitionId("hello");
-	// req.setSpaceGuid("spaceid");
-	// req.withServiceInstanceId("abc");
-	//
-	// return req;
-	// }
-
-	// private CreateServiceInstanceBindingRequest
-	// getCreateServiceInstanceBindingRequest() {
-	// Creds credentials = new Creds();
-	// credentials.Password = "secret";
-	// credentials.Tenant = "mycompany";
-	// credentials.Username = "tester";
-	//
-	// Map<String, Object> parameters = new HashMap<String,Object>();
-	// parameters.put("credentials", credentials);
-	//
-	// CreateServiceInstanceBindingRequest req = new
-	// CreateServiceInstanceBindingRequest("7c8275d6-1bd6-452a-97c4-d6c053e4baa4",
-	// "7c8275d6-1bd6-452a-97c4-d6c053e4baa4", "myApp", parameters);
-	// req.setAppGuid("myApp");
-	// req.setPlanId("7c8275d6-1bd6-452a-97c4-d6c053e4baa4");
-	// req.setServiceDefinitionId("7c8275d6-1bd6-452a-97c4-d6c053e4baa4");
-	// // req.withBindingId("abc");
-	// req.setParameters(parameters);
-	// return req;
-	// }
-
 	@Test
 	public void testCreateAndGetAndDeleteServiceInstance()
 			throws ServiceInstanceExistsException, ServiceBrokerException {
 
 		// create
-		CreateServiceInstanceRequest request = new CreateServiceInstanceRequest();
-		request.setOrganizationGuid("anOrg");
-		request.setSpaceGuid("aSpace");
-		request.setServiceDefinitionId(SERVICE_DEF_ID);
-		request.setPlanId(PLAN_ID);
-
+		CreateServiceInstanceRequest request = new CreateServiceInstanceRequest(
+				SERVICE_DEF_ID, PLAN_ID, "anOrg", "aSpace", true, null);
 		ServiceInstance si = vrServiceInstanceService
 				.createServiceInstance(request);
 		assertNotNull(si);
@@ -124,7 +46,7 @@ public class VrServiceInstanceServiceTest {
 
 		// delete
 		DeleteServiceInstanceRequest req = new DeleteServiceInstanceRequest(
-				si.getServiceInstanceId(), SERVICE_DEF_ID, PLAN_ID);
+				si.getServiceInstanceId(), SERVICE_DEF_ID, PLAN_ID, true);
 		ServiceInstance si3 = vrServiceInstanceService
 				.deleteServiceInstance(req);
 		assertNotNull(si3);
