@@ -20,7 +20,7 @@ public class TestConfig {
 
 	@Bean
 	Creds creds() {
-		return new Creds("vdude01@vra.lab", "P1v0t4l!", "LAB");
+		return new Creds("vdude01@vra.lab", "P1v0t4l!", "lab");
 	}
 
 	@Bean

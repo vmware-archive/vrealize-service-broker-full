@@ -44,12 +44,6 @@
 		</dependency>
 
 		<dependency>
-			<groupId>com.vmware.cloudclient</groupId>
-			<artifactId>core</artifactId>
-			<version>3.3.1</version>
-		</dependency>
-
-		<dependency>
 			<groupId>com.netflix.feign</groupId>
 			<artifactId>feign-gson</artifactId>
 			<version>8.5.0</version>
@@ -80,12 +74,5 @@
 			</plugin>
 		</plugins>
 	</build>
-
-	<repositories>
-		<repository>
-			<id>spring-io</id>
-			<url>http://repo.spring.io/release</url>
-		</repository>
-	</repositories>
 
 </project>
