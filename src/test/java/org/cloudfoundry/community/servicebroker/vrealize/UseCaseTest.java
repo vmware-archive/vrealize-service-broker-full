@@ -1,12 +1,9 @@
 package org.cloudfoundry.community.servicebroker.vrealize;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import org.cloudfoundry.community.servicebroker.exception.ServiceBrokerException;
 import org.cloudfoundry.community.servicebroker.vrealize.service.TokenService;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,22 +12,31 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = { Application.class })
-public class TokenServiceTest {
+public class UseCaseTest {
+
+	@Autowired
+	private VraClient client;
 
 	@Autowired
 	TokenService tokenService;
 
 	@Test
-	public void testGetToken() throws ServiceBrokerException {
-		String s = tokenService.getToken();
-		System.out.println(s);
-		assertNotNull(s);
-	}
+	public void testUseCase() throws ServiceBrokerException {
+		// get a token
 
-	@Ignore
-	@Test
-	public void testCheckToken() throws ServiceBrokerException {
-		assertTrue(tokenService.checkToken(tokenService.getToken()));
-		assertFalse(tokenService.checkToken("foo"));
+		// get the catalog
+
+		// ask for a request template for an item in catalog
+
+		// submit the request
+
+		// poll for response
+
+		// ask to bind to the service
+
+		// unbind from the service
+
+		// delete the service
+		fail();
 	}
 }

@@ -1,7 +1,7 @@
 package org.cloudfoundry.community.servicebroker.vrealize;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import org.cloudfoundry.community.servicebroker.exception.ServiceBrokerException;
 import org.cloudfoundry.community.servicebroker.model.Catalog;
@@ -29,7 +29,7 @@ public class VraClientTest {
 		assertNotNull(token);
 		Catalog c = client.getAllCatalogItems(token);
 		assertNotNull(c);
-		assertEquals(17, c.getServiceDefinitions().size());
+		assertTrue(c.getServiceDefinitions().size() > 0);
 	}
 
 	@Test
@@ -39,5 +39,6 @@ public class VraClientTest {
 		assertNotNull(token);
 		Catalog c = client.getAllCatalogItems(token);
 		assertNotNull(c);
+		assertTrue(c.getServiceDefinitions().size() > 0);
 	}
 }

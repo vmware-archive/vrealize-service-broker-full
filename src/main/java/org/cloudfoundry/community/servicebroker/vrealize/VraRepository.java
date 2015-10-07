@@ -26,7 +26,7 @@ public interface VraRepository {
 	public JsonElement getAllCatalogItems(@Param("token") String token);
 
 	@Headers({ "Content-Type: application/json", "Authorization: {token}" })
-	@RequestLine("GET /catalog-service/api/consumer/entitledCatalogItems")
+	@RequestLine("GET /catalog-service/api/consumer/entitledCatalogItemViews")
 	public JsonElement getEntitledCatalogItems(@Param("token") String token);
 
 	// @Headers({ "Content-Type: application/json", "Authorization: {token}" })
