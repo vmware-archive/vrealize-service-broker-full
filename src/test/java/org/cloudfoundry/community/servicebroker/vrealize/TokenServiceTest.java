@@ -1,12 +1,9 @@
 package org.cloudfoundry.community.servicebroker.vrealize;
 
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 import org.cloudfoundry.community.servicebroker.exception.ServiceBrokerException;
 import org.cloudfoundry.community.servicebroker.vrealize.service.TokenService;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,12 +22,5 @@ public class TokenServiceTest {
 		String s = tokenService.getToken();
 		System.out.println(s);
 		assertNotNull(s);
-	}
-
-	@Ignore
-	@Test
-	public void testCheckToken() throws ServiceBrokerException {
-		assertTrue(tokenService.checkToken(tokenService.getToken()));
-		assertFalse(tokenService.checkToken("foo"));
 	}
 }

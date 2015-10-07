@@ -22,16 +22,17 @@ public interface VraRepository {
 	public Map<String, String> checkToken(@Param("token") String token);
 
 	@Headers({ "Content-Type: application/json", "Authorization: {token}" })
-	@RequestLine("GET /catalog-service/api/catalogItems")
-	public JsonElement getAllCatalogItems(@Param("token") String token);
-
-	@Headers({ "Content-Type: application/json", "Authorization: {token}" })
 	@RequestLine("GET /catalog-service/api/consumer/entitledCatalogItemViews")
 	public JsonElement getEntitledCatalogItems(@Param("token") String token);
 
-	// @Headers({ "Content-Type: application/json", "Authorization: {token}" })
-	// @RequestLine("GET /service/api/consumer/entitledCatalogItems/{catalogId}/requests/template")
-	// public Map<String, Object> getCatalogItem(@Param("token") String token,
-	// @Param("catalogId") String catalogId);
+	@Headers({ "Content-Type: application/json", "Authorization: {token}" })
+	@RequestLine("GET /{path}")
+	public JsonElement getRequest(@Param("token") String token,
+			@Param("path") String path);
+
+	@Headers({ "Content-Type: application/json", "Authorization: {token}" })
+	@RequestLine("POST /{path}")
+	public JsonElement postRequest(@Param("token") String token,
+			@Param("path") String path, JsonElement request);
 
 }

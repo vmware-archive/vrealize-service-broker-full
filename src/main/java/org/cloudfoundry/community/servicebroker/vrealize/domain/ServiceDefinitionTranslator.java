@@ -38,7 +38,7 @@ public class ServiceDefinitionTranslator implements
 	private ServiceDefinition getSD(JsonElement json) {
 		JsonObject jo = json.getAsJsonObject();
 
-		String id = jo.get("id").getAsString();
+		String id = jo.get("catalogItemId").getAsString();
 		String name = jo.get("name").getAsString();
 		String description = jo.get("description").getAsString();
 

@@ -7,14 +7,23 @@ import org.cloudfoundry.community.servicebroker.model.ServiceDefinition;
 import org.cloudfoundry.community.servicebroker.vrealize.domain.CatalogTranslator;
 import org.cloudfoundry.community.servicebroker.vrealize.domain.PlanTranslator;
 import org.cloudfoundry.community.servicebroker.vrealize.domain.ServiceDefinitionTranslator;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import feign.Feign;
+import feign.gson.GsonDecoder;
+import feign.gson.GsonEncoder;
+import feign.slf4j.Slf4jLogger;
+
 @Configuration
 public class DefaultConfig {
+
+	@Autowired
+	String serviceUri;
 
 	@Bean
 	public BrokerApiVersion brokerApiVersion() {
@@ -39,6 +48,13 @@ public class DefaultConfig {
 		serviceDefinitionTranslator.setGson(gson);
 
 		return gson;
+	}
+
+	@Bean
+	public VraRepository vraRepository() {
+		return Feign.builder().encoder(new GsonEncoder())
+				.decoder(new GsonDecoder()).logger(new Slf4jLogger())
+				.target(VraRepository.class, serviceUri);
 	}
 
 }
