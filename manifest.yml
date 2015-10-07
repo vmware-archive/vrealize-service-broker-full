@@ -9,4 +9,4 @@ applications:
     SERVICE_URI: https://vra.vra.lab
     VRA_USER_ID: vdude01@vra.lab
     VRA_USER_PASSWORD: P1v0t4l!
-    VRA_TENANT: LAB
+    VRA_TENANT: lab

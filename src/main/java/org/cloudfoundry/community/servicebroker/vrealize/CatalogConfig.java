@@ -29,7 +29,7 @@ public class CatalogConfig {
 
 		try {
 			return gson.fromJson(
-					vraRepository.getAllCatalogItems("Bearer " + token),
+					vraRepository.getEntitledCatalogItems("Bearer " + token),
 					Catalog.class);
 		} catch (FeignException e) {
 			throw new ServiceBrokerException("error retrieving catalog.", e);

@@ -21,8 +21,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @SpringApplicationConfiguration(classes = { Application.class })
 public class VrServiceInstanceServiceTest {
 
-	private static final String SERVICE_DEF_ID = "2ce37e80-e526-416a-bf68-a52176ced367";
-	private static final String PLAN_ID = "Infrastructure.CatalogItem.Machine.Cloud.AmazonEC2";
+	private static final String SERVICE_DEF_ID = "e06ff060-dc7a-4f46-a7a7-c32c031fa31e";
+	private static final String PLAN_ID = "e06ff060-dc7a-4f46-a7a7-c32c031fa31e";
 
 	@Autowired
 	VrServiceInstanceService vrServiceInstanceService;

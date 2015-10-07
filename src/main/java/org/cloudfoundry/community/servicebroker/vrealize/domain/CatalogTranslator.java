@@ -4,6 +4,7 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.cloudfoundry.community.servicebroker.model.Catalog;
 import org.cloudfoundry.community.servicebroker.model.ServiceDefinition;
 
@@ -16,10 +17,14 @@ import com.google.gson.JsonParseException;
 
 public class CatalogTranslator implements JsonDeserializer<Catalog> {
 
+	private static final Logger LOG = Logger.getLogger(CatalogTranslator.class);
+
 	private Gson gson;
 
 	public Catalog deserialize(JsonElement json, Type typeOfT,
 			JsonDeserializationContext context) throws JsonParseException {
+
+		LOG.info("processing catalog json: " + json);
 
 		List<ServiceDefinition> sds = new ArrayList<ServiceDefinition>();
 		JsonArray content = json.getAsJsonObject().get("content")
