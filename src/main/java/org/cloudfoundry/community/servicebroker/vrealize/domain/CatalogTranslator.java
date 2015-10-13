@@ -24,7 +24,7 @@ public class CatalogTranslator implements JsonDeserializer<Catalog> {
 	public Catalog deserialize(JsonElement json, Type typeOfT,
 			JsonDeserializationContext context) throws JsonParseException {
 
-		LOG.info("processing catalog json: " + json);
+		LOG.debug("processing catalog json: " + json);
 
 		List<ServiceDefinition> sds = new ArrayList<ServiceDefinition>();
 		JsonArray content = json.getAsJsonObject().get("content")

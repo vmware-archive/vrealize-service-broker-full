@@ -75,8 +75,11 @@ public class VrServiceInstanceService implements ServiceInstanceService {
 		// get a template for the request
 		JsonElement template = vraClient.getRequestTemplate(token, sd);
 
+		// edit the template
+		JsonElement edited = vraClient.prepareRequest(template);
+
 		// request the request with the request
-		JsonElement response = vraClient.postRequest(token, template, sd);
+		// JsonElement response = vraClient.postRequest(token, edited, sd);
 
 		// TODO get some actual id from the vr response
 		request.withServiceInstanceId(UUID.randomUUID().toString());

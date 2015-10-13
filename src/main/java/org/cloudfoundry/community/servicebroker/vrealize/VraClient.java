@@ -1,15 +1,27 @@
 package org.cloudfoundry.community.servicebroker.vrealize;
 
+import java.io.IOException;
+import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
+import org.cloudfoundry.community.servicebroker.exception.ServiceBrokerException;
 import org.cloudfoundry.community.servicebroker.model.Catalog;
 import org.cloudfoundry.community.servicebroker.model.ServiceDefinition;
 import org.cloudfoundry.community.servicebroker.vrealize.domain.Creds;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 
 @Service
 public class VraClient {
@@ -60,7 +72,7 @@ public class VraClient {
 
 	private String getPostRequestPath(ServiceDefinition sd) {
 		Map<String, Object> meta = sd.getPlans().get(0).getMetadata();
-		String fullUri = meta.get("POST: Request Template").toString();
+		String fullUri = meta.get("POST: Submit Request").toString();
 		return fullUri.substring(serviceUri.length() + 1);
 	}
 
@@ -76,63 +88,40 @@ public class VraClient {
 
 	}
 
-	// private ServiceDefinition getServiceDefinition(String
-	// serviceDefinitionId)
-	// throws ServiceBrokerException {
-	//
-	// for (ServiceDefinition sd : catalog.getServiceDefinitions()) {
-	// if (serviceDefinitionId.equals(sd.getId())) {
-	// return sd;
-	// }
-	// }
-	// throw new ServiceBrokerException("service definition: "
-	// + serviceDefinitionId + " not found in catalog.");
-	// }
+	public JsonObject prepareRequest(JsonElement template)
+			throws ServiceBrokerException {
+		JsonObject jo = template.getAsJsonObject();
 
-	// private Plan getPlan(ServiceDefinition serviceDefinition, String planId)
-	// throws ServiceBrokerException {
-	//
-	// for (Plan p : serviceDefinition.getPlans()) {
-	// if (planId.equals(p.getId())) {
-	// return p;
-	// }
-	// }
-	// throw new ServiceBrokerException("plan: " + planId
-	// + " not found in service definition.");
-	// }
+		return removeFields(jo, getContents("fieldsToFilter.txt"));
+	}
 
-	// public String createRequestPayload(CreateServiceInstanceRequest request)
-	// throws ServiceBrokerException {
-	//
-	// ServiceDefinition sd = getServiceDefinition(request
-	// .getServiceDefinitionId());
-	//
-	// Plan plan = getPlan(sd, request.getPlanId());
-	//
-	// // TODO get from entitlement response
-	// // String subtenantRef = sd.getMetadata().get("groupId").toString();
-	// String subtenantRef = "1234567879";
-	//
-	// return String.format(getContents("createRequest.json"), sd.getId(),
-	// creds.getTenant(), subtenantRef, creds.getUsername(),
-	// plan.getId());
-	// }
-	//
-	// public String deleteRequestPayload(DeleteServiceInstanceRequest request)
-	// throws ServiceBrokerException {
-	//
-	// return String.format(getContents("deleteRequest.json"),
-	// request.getServiceInstanceId(), "anActionId",
-	// creds.getTenant(), "aGroupId");
-	// }
-	//
-	// private String getContents(String fileName) throws ServiceBrokerException
-	// {
-	// try {
-	// URI u = new ClassPathResource(fileName).getURI();
-	// return new String(Files.readAllBytes(Paths.get(u)));
-	// } catch (IOException e) {
-	// throw new ServiceBrokerException("error reading template.", e);
-	// }
-	// }
+	private JsonObject removeFields(JsonObject json, List<String> fields) {
+		if (json == null || fields == null) {
+			return null;
+		}
+		Set<Entry<String, JsonElement>> cs = new HashSet<Entry<String, JsonElement>>();
+		cs.addAll(json.entrySet());
+		Iterator<Entry<String, JsonElement>> i = cs.iterator();
+		while (i.hasNext()) {
+			Entry<String, JsonElement> entry = i.next();
+			if (fields.contains(entry.getKey())) {
+				json.remove(entry.getKey());
+			} else {
+				if (entry.getValue().isJsonObject()) {
+					removeFields(entry.getValue().getAsJsonObject(), fields);
+				}
+			}
+		}
+		return json;
+	}
+
+	private List<String> getContents(String fileName)
+			throws ServiceBrokerException {
+		try {
+			URI u = new ClassPathResource(fileName).getURI();
+			return Files.readAllLines((Paths.get(u)));
+		} catch (IOException e) {
+			throw new ServiceBrokerException("error reading template.", e);
+		}
+	}
 }
