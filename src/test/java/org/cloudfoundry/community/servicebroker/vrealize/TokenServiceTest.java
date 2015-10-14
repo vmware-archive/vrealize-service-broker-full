@@ -20,7 +20,7 @@ public class TokenServiceTest {
 	@Test
 	public void testGetToken() throws ServiceBrokerException {
 		String s = tokenService.getToken();
-		//System.out.println(s);
+		System.out.println(s);
 		assertNotNull(s);
 	}
 }
