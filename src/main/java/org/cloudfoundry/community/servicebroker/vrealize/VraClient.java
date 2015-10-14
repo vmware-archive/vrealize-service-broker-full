@@ -13,7 +13,10 @@ import java.util.Set;
 
 import org.cloudfoundry.community.servicebroker.exception.ServiceBrokerException;
 import org.cloudfoundry.community.servicebroker.model.Catalog;
+import org.cloudfoundry.community.servicebroker.model.OperationState;
 import org.cloudfoundry.community.servicebroker.model.ServiceDefinition;
+import org.cloudfoundry.community.servicebroker.model.ServiceInstance;
+import org.cloudfoundry.community.servicebroker.model.ServiceInstanceLastOperation;
 import org.cloudfoundry.community.servicebroker.vrealize.domain.Creds;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
@@ -90,9 +93,12 @@ public class VraClient {
 
 	public JsonObject prepareRequest(JsonElement template)
 			throws ServiceBrokerException {
-		JsonObject jo = template.getAsJsonObject();
+		JsonObject jo = removeFields(template.getAsJsonObject(),
+				getContents("fieldsToFilter.txt"));
 
-		return removeFields(jo, getContents("fieldsToFilter.txt"));
+		jo.addProperty("description", "PCF service broker request.");
+
+		return jo;
 	}
 
 	private JsonObject removeFields(JsonObject json, List<String> fields) {
@@ -123,5 +129,61 @@ public class VraClient {
 		} catch (IOException e) {
 			throw new ServiceBrokerException("error reading template.", e);
 		}
+	}
+
+	public ServiceInstanceLastOperation getRequestStatus(String token,
+			ServiceInstance si) {
+		if (token == null || si == null || si.getServiceInstanceId() == null) {
+			return new ServiceInstanceLastOperation(
+					"Unable to get request status: invalid request.",
+					OperationState.FAILED);
+		}
+
+		JsonElement je = vraRepository.getRequestStatus("Bearer " + token,
+				si.getServiceInstanceId());
+		if (je == null) {
+			return new ServiceInstanceLastOperation(
+					"Unable to get request status: nothing returned from vR service.",
+					OperationState.FAILED);
+		}
+
+		return getLastOperation(je);
+	}
+
+	private ServiceInstanceLastOperation getLastOperation(
+			JsonElement jsonElement) {
+		JsonElement je = jsonElement.getAsJsonObject().get("state");
+		if (je == null) {
+			return new ServiceInstanceLastOperation(
+					"Unable to determine state of request.",
+					OperationState.FAILED);
+		}
+
+		String vRstatus = je.getAsString();
+		if ("SUCCESSFUL".equals(vRstatus)) {
+			return new ServiceInstanceLastOperation("Request succeeded.",
+					OperationState.SUCCEEDED);
+		}
+
+		if ("FAILED".equals(vRstatus) || "REJECTED".equals(vRstatus)) {
+			return new ServiceInstanceLastOperation("Request failed: "
+					+ vRstatus + ".", OperationState.FAILED);
+		}
+
+		return new ServiceInstanceLastOperation("Request status: " + vRstatus
+				+ ".", OperationState.IN_PROGRESS);
+	}
+
+	public String getRequestId(JsonElement requestResponse) {
+		if (requestResponse == null) {
+			return null;
+		}
+
+		JsonElement je = requestResponse.getAsJsonObject().get("id");
+		if (je == null) {
+			return null;
+		}
+
+		return je.getAsString();
 	}
 }

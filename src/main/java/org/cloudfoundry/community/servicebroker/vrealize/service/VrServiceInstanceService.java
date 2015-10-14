@@ -2,7 +2,6 @@ package org.cloudfoundry.community.servicebroker.vrealize.service;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 import org.apache.log4j.Logger;
 import org.cloudfoundry.community.servicebroker.exception.ServiceBrokerException;
@@ -12,8 +11,10 @@ import org.cloudfoundry.community.servicebroker.exception.ServiceInstanceUpdateN
 import org.cloudfoundry.community.servicebroker.model.Catalog;
 import org.cloudfoundry.community.servicebroker.model.CreateServiceInstanceRequest;
 import org.cloudfoundry.community.servicebroker.model.DeleteServiceInstanceRequest;
+import org.cloudfoundry.community.servicebroker.model.OperationState;
 import org.cloudfoundry.community.servicebroker.model.ServiceDefinition;
 import org.cloudfoundry.community.servicebroker.model.ServiceInstance;
+import org.cloudfoundry.community.servicebroker.model.ServiceInstanceLastOperation;
 import org.cloudfoundry.community.servicebroker.model.UpdateServiceInstanceRequest;
 import org.cloudfoundry.community.servicebroker.service.ServiceInstanceService;
 import org.cloudfoundry.community.servicebroker.vrealize.VraClient;
@@ -45,7 +46,36 @@ public class VrServiceInstanceService implements ServiceInstanceService {
 
 	@Override
 	public ServiceInstance getServiceInstance(String id) {
-		return getInstance(id);
+		if (id == null || getInstance(id) == null) {
+			return null;
+		}
+
+		ServiceInstance si = getInstance(id);
+
+		// this method is polled via cloud controller to see if the async create
+		// request is complete
+		if (!si.getServiceInstanceLastOperation().getState()
+				.equals(OperationState.IN_PROGRESS)) {
+			return si;
+		}
+
+		// still in progress? check to see how we're doing.
+		String token;
+		try {
+			token = tokenService.getToken();
+		} catch (ServiceBrokerException e) {
+			LOG.error("unable to get auth token.", e);
+			return null;
+		}
+
+		ServiceInstanceLastOperation status = vraClient.getRequestStatus(token,
+				si);
+
+		LOG.info("request: " + id + " status is: " + status.getState());
+
+		si.withLastOperation(status);
+
+		return si;
 	}
 
 	@Override
@@ -57,6 +87,8 @@ public class VrServiceInstanceService implements ServiceInstanceService {
 			throw new ServiceBrokerException(
 					"invalid CreateServiceInstanceRequest object.");
 		}
+
+		// TODO make sure async flag is set per spec
 
 		if (request.getServiceInstanceId() != null
 				&& getInstance(request.getServiceInstanceId()) != null) {
@@ -79,15 +111,22 @@ public class VrServiceInstanceService implements ServiceInstanceService {
 		JsonElement edited = vraClient.prepareRequest(template);
 
 		// request the request with the request
-		// JsonElement response = vraClient.postRequest(token, edited, sd);
+		JsonElement response = vraClient.postRequest(token, edited, sd);
 
-		// TODO get some actual id from the vr response
-		request.withServiceInstanceId(UUID.randomUUID().toString());
+		// System.out.println(response.toString());
 
-		// TODO submit and poll for response to request
-		// LOG.info("request submitted with payload: \n" + requestPayload);
+		// TODO pull out connection information from response and add to service
+		// instance for later use
 
+		// use the request id to identify the service instance, since this is
+		// how vR seems to want to track everything
+		request.withServiceInstanceId(vraClient.getRequestId(response));
 		ServiceInstance instance = new ServiceInstance(request);
+
+		// set the last operation, since this is an async request
+		instance.withLastOperation(new ServiceInstanceLastOperation(
+				"vR Request submitted.", OperationState.IN_PROGRESS));
+		instance.withAsync(true);
 
 		INSTANCES.put(request.getServiceInstanceId(), instance);
 		LOG.info("registered service instance: "
