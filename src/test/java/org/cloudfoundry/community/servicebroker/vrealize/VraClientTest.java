@@ -16,6 +16,7 @@ import org.cloudfoundry.community.servicebroker.model.CreateServiceInstanceReque
 import org.cloudfoundry.community.servicebroker.model.ServiceDefinition;
 import org.cloudfoundry.community.servicebroker.model.ServiceInstance;
 import org.cloudfoundry.community.servicebroker.model.ServiceInstanceLastOperation;
+import org.cloudfoundry.community.servicebroker.vrealize.service.CatalogService;
 import org.cloudfoundry.community.servicebroker.vrealize.service.TokenService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -39,27 +40,28 @@ public class VraClientTest {
 	TokenService tokenService;
 
 	@Autowired
-	Catalog catalog;
+	CatalogService catalogService;
 
 	private static final String SD_ID = "e06ff060-dc7a-4f46-a7a7-c32c031fa31e";
 	private static final String SI_ID = "5c09a0f6-a19f-4ce9-904a-8f3bf8242ddc";
 
 	@Test
 	public void testGetEntitledCatalog() throws ServiceBrokerException {
+		Catalog catalog = catalogService.getCatalog();
 		assertNotNull(catalog);
 		assertTrue(catalog.getServiceDefinitions().size() > 0);
 	}
 
 	@Test
 	public void testGetEntitledCatalogItem() throws ServiceBrokerException {
-		assertNull(client.getEntitledCatalogItem(null));
-		assertNull(client.getEntitledCatalogItem(""));
-		assertNotNull(client.getEntitledCatalogItem(SD_ID));
+		assertNull(catalogService.getServiceDefinition(null));
+		assertNull(catalogService.getServiceDefinition(""));
+		assertNotNull(catalogService.getServiceDefinition(SD_ID));
 	}
 
 	@Test
 	public void testGetRequestTemplate() throws ServiceBrokerException {
-		ServiceDefinition sd = client.getEntitledCatalogItem(SD_ID);
+		ServiceDefinition sd = catalogService.getServiceDefinition(SD_ID);
 		assertNotNull(sd);
 
 		String token = tokenService.getToken();

@@ -12,7 +12,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.cloudfoundry.community.servicebroker.exception.ServiceBrokerException;
-import org.cloudfoundry.community.servicebroker.model.Catalog;
 import org.cloudfoundry.community.servicebroker.model.OperationState;
 import org.cloudfoundry.community.servicebroker.model.ServiceDefinition;
 import org.cloudfoundry.community.servicebroker.model.ServiceInstance;
@@ -39,23 +38,7 @@ public class VraClient {
 	Creds creds;
 
 	@Autowired
-	Catalog catalog;
-
-	@Autowired
 	String serviceUri;
-
-	public ServiceDefinition getEntitledCatalogItem(String id) {
-		if (id == null) {
-			return null;
-		}
-
-		for (ServiceDefinition sd : catalog.getServiceDefinitions()) {
-			if (sd.getId().equals(id)) {
-				return sd;
-			}
-		}
-		return null;
-	}
 
 	// note: assumes that there is only 1 plan for a vR service definition
 	public JsonElement getRequestTemplate(String token, ServiceDefinition sd) {
