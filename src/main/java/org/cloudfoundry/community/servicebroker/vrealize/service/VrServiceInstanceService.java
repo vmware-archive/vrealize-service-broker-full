@@ -8,7 +8,6 @@ import org.cloudfoundry.community.servicebroker.exception.ServiceBrokerException
 import org.cloudfoundry.community.servicebroker.exception.ServiceInstanceDoesNotExistException;
 import org.cloudfoundry.community.servicebroker.exception.ServiceInstanceExistsException;
 import org.cloudfoundry.community.servicebroker.exception.ServiceInstanceUpdateNotSupportedException;
-import org.cloudfoundry.community.servicebroker.model.Catalog;
 import org.cloudfoundry.community.servicebroker.model.CreateServiceInstanceRequest;
 import org.cloudfoundry.community.servicebroker.model.DeleteServiceInstanceRequest;
 import org.cloudfoundry.community.servicebroker.model.OperationState;
@@ -37,7 +36,7 @@ public class VrServiceInstanceService implements ServiceInstanceService {
 	TokenService tokenService;
 
 	@Autowired
-	Catalog catalog;
+	CatalogService catalogService;
 
 	@Autowired
 	Creds creds;
@@ -96,8 +95,9 @@ public class VrServiceInstanceService implements ServiceInstanceService {
 					.getServiceInstanceId()));
 		}
 
-		ServiceDefinition sd = vraClient.getEntitledCatalogItem(request
+		ServiceDefinition sd = catalogService.getServiceDefinition(request
 				.getServiceDefinitionId());
+
 		if (sd == null) {
 			throw new ServiceBrokerException(request.getServiceDefinitionId());
 		}
