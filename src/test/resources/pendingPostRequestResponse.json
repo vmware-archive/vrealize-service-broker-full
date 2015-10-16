@@ -4,7 +4,7 @@
     "iconId": "cafe_default_icon_genericCatalogItem",
     "version": 0,
     "requestNumber": null,
-    "state": "IN_PROGRESS",
+    "state": "PENDING_POST_APPROVAL",
     "description": "PCF service broker request.",
     "reasons": null,
     "requestedFor": "vdude01@vra.lab",
