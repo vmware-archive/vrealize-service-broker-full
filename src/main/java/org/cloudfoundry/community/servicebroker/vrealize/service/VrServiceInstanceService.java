@@ -18,6 +18,7 @@ import org.cloudfoundry.community.servicebroker.model.UpdateServiceInstanceReque
 import org.cloudfoundry.community.servicebroker.service.ServiceInstanceService;
 import org.cloudfoundry.community.servicebroker.vrealize.VraClient;
 import org.cloudfoundry.community.servicebroker.vrealize.domain.Creds;
+import org.cloudfoundry.community.servicebroker.vrealize.domain.VrServiceInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -41,15 +42,18 @@ public class VrServiceInstanceService implements ServiceInstanceService {
 	@Autowired
 	Creds creds;
 
-	private static final Map<String, ServiceInstance> INSTANCES = new HashMap<String, ServiceInstance>();
+	private static final Map<String, VrServiceInstance> INSTANCES = new HashMap<String, VrServiceInstance>();
 
 	@Override
 	public ServiceInstance getServiceInstance(String id) {
 		if (id == null || getInstance(id) == null) {
+			LOG.warn("service instance with id: " + id + " not found!");
 			return null;
 		}
 
-		ServiceInstance si = getInstance(id);
+		VrServiceInstance si = getInstance(id);
+		String state = si.getServiceInstanceLastOperation().getState();
+		LOG.info("service instance with id: " + id + " is in state: " + state);
 
 		// this method is polled via cloud controller to see if the async create
 		// request is complete
@@ -67,6 +71,7 @@ public class VrServiceInstanceService implements ServiceInstanceService {
 			return null;
 		}
 
+		LOG.info("checking on status of request id: " + si.getvRRequestId());
 		ServiceInstanceLastOperation status = vraClient.getRequestStatus(token,
 				si);
 
@@ -87,8 +92,6 @@ public class VrServiceInstanceService implements ServiceInstanceService {
 					"invalid CreateServiceInstanceRequest object.");
 		}
 
-		// TODO make sure async flag is set per spec
-
 		if (request.getServiceInstanceId() != null
 				&& getInstance(request.getServiceInstanceId()) != null) {
 			throw new ServiceInstanceExistsException(INSTANCES.get(request
@@ -99,7 +102,9 @@ public class VrServiceInstanceService implements ServiceInstanceService {
 				.getServiceDefinitionId());
 
 		if (sd == null) {
-			throw new ServiceBrokerException(request.getServiceDefinitionId());
+			throw new ServiceBrokerException(
+					"Unable to find service definition with id: "
+							+ request.getServiceDefinitionId());
 		}
 
 		String token = tokenService.getToken();
@@ -107,21 +112,22 @@ public class VrServiceInstanceService implements ServiceInstanceService {
 		// get a template for the request
 		JsonElement template = vraClient.getRequestTemplate(token, sd);
 
-		// edit the template
-		JsonElement edited = vraClient.prepareRequest(template);
+		// customize the template
+		JsonElement edited = vraClient.prepareRequestTemplate(template,
+				request.getServiceInstanceId());
 
 		// request the request with the request
 		JsonElement response = vraClient.postRequest(token, edited, sd);
 
-		// System.out.println(response.toString());
+		LOG.debug("service request response: " + response.toString());
 
-		// TODO pull out connection information from response and add to service
-		// instance for later use
+		VrServiceInstance instance = new VrServiceInstance(request);
 
-		// use the request id to identify the service instance, since this is
-		// how vR seems to want to track everything
-		request.withServiceInstanceId(vraClient.getRequestId(response));
-		ServiceInstance instance = new ServiceInstance(request);
+		// add vr request id so we can correlate later
+		instance.setvRRequestId(vraClient.getRequestId(response));
+
+		// get information from response and add to service instance for later
+		instance.getParameters().putAll(vraClient.getParameters(response));
 
 		// set the last operation, since this is an async request
 		instance.withLastOperation(new ServiceInstanceLastOperation(
@@ -130,7 +136,8 @@ public class VrServiceInstanceService implements ServiceInstanceService {
 
 		INSTANCES.put(request.getServiceInstanceId(), instance);
 		LOG.info("registered service instance: "
-				+ instance.getServiceInstanceId());
+				+ instance.getServiceInstanceId() + " requestId: "
+				+ instance.getvRRequestId());
 
 		return instance;
 	}
@@ -168,7 +175,7 @@ public class VrServiceInstanceService implements ServiceInstanceService {
 				"vRealize services are not updatable.");
 	}
 
-	private ServiceInstance getInstance(String id) {
+	private VrServiceInstance getInstance(String id) {
 		if (id == null) {
 			return null;
 		}

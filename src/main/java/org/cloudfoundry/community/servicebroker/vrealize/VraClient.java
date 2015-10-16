@@ -1,9 +1,11 @@
 package org.cloudfoundry.community.servicebroker.vrealize;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -11,12 +13,14 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import net.minidev.json.JSONArray;
+
 import org.cloudfoundry.community.servicebroker.exception.ServiceBrokerException;
 import org.cloudfoundry.community.servicebroker.model.OperationState;
 import org.cloudfoundry.community.servicebroker.model.ServiceDefinition;
-import org.cloudfoundry.community.servicebroker.model.ServiceInstance;
 import org.cloudfoundry.community.servicebroker.model.ServiceInstanceLastOperation;
 import org.cloudfoundry.community.servicebroker.vrealize.domain.Creds;
+import org.cloudfoundry.community.servicebroker.vrealize.domain.VrServiceInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
@@ -24,6 +28,9 @@ import org.springframework.stereotype.Service;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.reflect.TypeToken;
+import com.jayway.jsonpath.JsonPath;
+import com.jayway.jsonpath.ReadContext;
 
 @Service
 public class VraClient {
@@ -74,12 +81,13 @@ public class VraClient {
 
 	}
 
-	public JsonObject prepareRequest(JsonElement template)
-			throws ServiceBrokerException {
+	public JsonObject prepareRequestTemplate(JsonElement template,
+			String serviceInstanceId) throws ServiceBrokerException {
 		JsonObject jo = removeFields(template.getAsJsonObject(),
 				getContents("fieldsToFilter.txt"));
 
 		jo.addProperty("description", "PCF service broker request.");
+		jo.addProperty("reasons", serviceInstanceId);
 
 		return jo;
 	}
@@ -115,15 +123,15 @@ public class VraClient {
 	}
 
 	public ServiceInstanceLastOperation getRequestStatus(String token,
-			ServiceInstance si) {
-		if (token == null || si == null || si.getServiceInstanceId() == null) {
+			VrServiceInstance si) {
+		if (token == null || si == null || si.getvRRequestId() == null) {
 			return new ServiceInstanceLastOperation(
 					"Unable to get request status: invalid request.",
 					OperationState.FAILED);
 		}
 
 		JsonElement je = vraRepository.getRequestStatus("Bearer " + token,
-				si.getServiceInstanceId());
+				si.getvRRequestId());
 		if (je == null) {
 			return new ServiceInstanceLastOperation(
 					"Unable to get request status: nothing returned from vR service.",
@@ -133,8 +141,7 @@ public class VraClient {
 		return getLastOperation(je);
 	}
 
-	private ServiceInstanceLastOperation getLastOperation(
-			JsonElement jsonElement) {
+	ServiceInstanceLastOperation getLastOperation(JsonElement jsonElement) {
 		JsonElement je = jsonElement.getAsJsonObject().get("state");
 		if (je == null) {
 			return new ServiceInstanceLastOperation(
@@ -148,13 +155,16 @@ public class VraClient {
 					OperationState.SUCCEEDED);
 		}
 
-		if ("FAILED".equals(vRstatus) || "REJECTED".equals(vRstatus)) {
-			return new ServiceInstanceLastOperation("Request failed: "
-					+ vRstatus + ".", OperationState.FAILED);
+		if ("UNSUBMITTED".equals(vRstatus) || "SUBMITTED".equals(vRstatus)
+				|| "PENDING_PRE_APPROVAL".equals(vRstatus)
+				|| "IN_PROGRESS".equals(vRstatus)
+				|| "PENDING_POST_APPROVAL".equals(vRstatus)) {
+			return new ServiceInstanceLastOperation("Request in progress: "
+					+ vRstatus + ".", OperationState.IN_PROGRESS);
 		}
 
-		return new ServiceInstanceLastOperation("Request status: " + vRstatus
-				+ ".", OperationState.IN_PROGRESS);
+		return new ServiceInstanceLastOperation("Request status: " + vRstatus,
+				OperationState.FAILED);
 	}
 
 	public String getRequestId(JsonElement requestResponse) {
@@ -168,5 +178,48 @@ public class VraClient {
 		}
 
 		return je.getAsString();
+	}
+
+	@SuppressWarnings("unchecked")
+	public Map<String, Object> getParameters(JsonElement requestResponse) {
+		Map<String, Object> parameters = new HashMap<String, Object>();
+		if (requestResponse == null) {
+			return parameters;
+		}
+
+		// There must be a better way....
+		ReadContext ctx = JsonPath.parse(requestResponse.toString());
+		JSONArray ja = ctx
+				.read("$.requestData.entries[*].value.values.entries.value.items[?(@.classId == 'Infrastructure.CustomProperty')].values[*]");
+
+		if (ja == null) {
+			return parameters;
+		}
+
+		Type typeOfMapOfStringObject = new TypeToken<Map<String, Object>>() {
+		}.getType();
+
+		// avert your gaze....
+		Iterator<Object> it = ja.iterator();
+		while (it.hasNext()) {
+			Map<String, Object> m = gson.fromJson(it.next().toString(),
+					typeOfMapOfStringObject);
+			List<Map<String, Object>> a = (List<Map<String, Object>>) m
+					.get("entries");
+
+			Object value = null;
+			String key = null;
+			for (Map<String, Object> o : a) {
+				if (o.get("key").equals("value")) {
+					value = ((Map<String, Object>) o.get("value")).get("value");
+				}
+				if (o.get("key").equals("id")) {
+					key = ((Map<String, Object>) o.get("value")).get("value")
+							.toString();
+				}
+			}
+			parameters.put(key, value);
+		}
+		return parameters;
 	}
 }

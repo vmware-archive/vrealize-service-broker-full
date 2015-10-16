@@ -9,13 +9,14 @@ import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Map;
 
 import org.cloudfoundry.community.servicebroker.exception.ServiceBrokerException;
 import org.cloudfoundry.community.servicebroker.model.Catalog;
 import org.cloudfoundry.community.servicebroker.model.CreateServiceInstanceRequest;
 import org.cloudfoundry.community.servicebroker.model.ServiceDefinition;
-import org.cloudfoundry.community.servicebroker.model.ServiceInstance;
 import org.cloudfoundry.community.servicebroker.model.ServiceInstanceLastOperation;
+import org.cloudfoundry.community.servicebroker.vrealize.domain.VrServiceInstance;
 import org.cloudfoundry.community.servicebroker.vrealize.service.CatalogService;
 import org.cloudfoundry.community.servicebroker.vrealize.service.TokenService;
 import org.junit.Test;
@@ -25,6 +26,7 @@ import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -42,8 +44,11 @@ public class VraClientTest {
 	@Autowired
 	CatalogService catalogService;
 
+	@Autowired
+	Gson gson;
+
 	private static final String SD_ID = "e06ff060-dc7a-4f46-a7a7-c32c031fa31e";
-	private static final String SI_ID = "5c09a0f6-a19f-4ce9-904a-8f3bf8242ddc";
+	private static final String R_ID = "5c09a0f6-a19f-4ce9-904a-8f3bf8242ddc";
 
 	@Test
 	public void testGetEntitledCatalog() throws ServiceBrokerException {
@@ -76,7 +81,7 @@ public class VraClientTest {
 		JsonParser parser = new JsonParser();
 		JsonObject o = (JsonObject) parser
 				.parse(getContents("requestTemplate.json"));
-		String s = client.prepareRequest(o).toString();
+		String s = client.prepareRequestTemplate(o, "abc123").toString();
 		assertEquals(getContents("filteredRequestTemplate.json"), s);
 	}
 
@@ -97,7 +102,7 @@ public class VraClientTest {
 		assertNotNull(o);
 		String s = client.getRequestId(o);
 		assertNotNull(s);
-		assertEquals("5c09a0f6-a19f-4ce9-904a-8f3bf8242ddc", s);
+		assertEquals(R_ID, s);
 	}
 
 	@Test
@@ -105,15 +110,79 @@ public class VraClientTest {
 		CreateServiceInstanceRequest req = new CreateServiceInstanceRequest();
 		String token = tokenService.getToken();
 
-		ServiceInstance si = new ServiceInstance(req);
+		VrServiceInstance si = new VrServiceInstance(req);
+		si.setvRRequestId(R_ID);
 		ServiceInstanceLastOperation silo = client.getRequestStatus(token, si);
+		assertNotNull(silo);
+		assertEquals("succeeded", silo.getState());
+	}
+
+	@Test
+	public void testGetParameters() throws Exception {
+		String json = getContents("requestResponse.json");
+		JsonParser parser = new JsonParser();
+		JsonElement je = parser.parse(json);
+
+		Map<String, Object> m = client.getParameters(je);
+		assertNotNull(m);
+		assertEquals(5, m.size());
+		assertEquals("3306", m.get("mysql_port"));
+		assertEquals("P1v0t4l!", m.get("mysql_passwd"));
+		assertEquals("P1v0t4l!", m.get("mysql_passwd"));
+		assertEquals("mysqluser", m.get("mysql_user"));
+		assertEquals("db01", m.get("mysql_dbname"));
+
+	}
+
+	@Test
+	public void testGetLastOperation() throws ServiceBrokerException {
+		JsonParser parser = new JsonParser();
+		JsonElement je = parser
+				.parse(getContents("submittedRequestResponse.json"));
+
+		ServiceInstanceLastOperation silo = client.getLastOperation(je);
+		assertNotNull(silo);
+		assertEquals("in progress", silo.getState());
+
+		je = parser.parse(getContents("inProgressRequestResponse.json"));
+		silo = client.getLastOperation(je);
+		assertNotNull(silo);
+		assertEquals("in progress", silo.getState());
+
+		je = parser.parse(getContents("pendingPreRequestResponse.json"));
+		silo = client.getLastOperation(je);
+		assertNotNull(silo);
+		assertEquals("in progress", silo.getState());
+
+		je = parser.parse(getContents("pendingPostRequestResponse.json"));
+		silo = client.getLastOperation(je);
+		assertNotNull(silo);
+		assertEquals("in progress", silo.getState());
+
+		je = parser.parse(getContents("successfulPostRequestResponse.json"));
+		silo = client.getLastOperation(je);
+		assertNotNull(silo);
+		assertEquals("succeeded", silo.getState());
+
+		je = parser.parse(getContents("failedPostRequestResponse.json"));
+		silo = client.getLastOperation(je);
 		assertNotNull(silo);
 		assertEquals("failed", silo.getState());
 
-		req.withServiceInstanceId(SI_ID);
-		si = new ServiceInstance(req);
-		silo = client.getRequestStatus(token, si);
+		je = parser.parse(getContents("rejectedRequestResponse.json"));
+		silo = client.getLastOperation(je);
 		assertNotNull(silo);
-		assertEquals("succeeded", silo.getState());
+		assertEquals("failed", silo.getState());
+
+		je = parser.parse(getContents("bogusStateRequestResponse.json"));
+		silo = client.getLastOperation(je);
+		assertNotNull(silo);
+		assertEquals("failed", silo.getState());
+
+		je = parser.parse(getContents("missingStateRequestResponse.json"));
+		silo = client.getLastOperation(je);
+		assertNotNull(silo);
+		assertEquals("failed", silo.getState());
+
 	}
 }
