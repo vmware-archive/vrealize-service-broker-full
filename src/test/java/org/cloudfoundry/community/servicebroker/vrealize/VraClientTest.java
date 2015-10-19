@@ -72,7 +72,7 @@ public class VraClientTest {
 		String token = tokenService.getToken();
 		assertNotNull(token);
 
-		JsonElement template = client.getRequestTemplate(token, sd);
+		JsonElement template = client.getCreateRequestTemplate(token, sd);
 		assertNotNull(template);
 	}
 
@@ -81,7 +81,7 @@ public class VraClientTest {
 		JsonParser parser = new JsonParser();
 		JsonObject o = (JsonObject) parser
 				.parse(getContents("requestTemplate.json"));
-		String s = client.prepareRequestTemplate(o, "abc123").toString();
+		String s = client.prepareCreateRequestTemplate(o, "abc123").toString();
 		assertEquals(getContents("filteredRequestTemplate.json"), s);
 	}
 
@@ -110,8 +110,7 @@ public class VraClientTest {
 		CreateServiceInstanceRequest req = new CreateServiceInstanceRequest();
 		String token = tokenService.getToken();
 
-		VrServiceInstance si = new VrServiceInstance(req);
-		si.setvRRequestId(R_ID);
+		VrServiceInstance si = VrServiceInstance.create(req, R_ID);
 		ServiceInstanceLastOperation silo = client.getRequestStatus(token, si);
 		assertNotNull(silo);
 		assertEquals("succeeded", silo.getState());
@@ -184,5 +183,36 @@ public class VraClientTest {
 		assertNotNull(silo);
 		assertEquals("failed", silo.getState());
 
+	}
+
+	@Test
+	public void testGetDeleteRequestTemplate() throws ServiceBrokerException {
+		CreateServiceInstanceRequest req = new CreateServiceInstanceRequest();
+		VrServiceInstance si = VrServiceInstance.create(req,
+				"9ca10dee-730e-486a-9138-d8aade4913e2");
+		si = VrServiceInstance.delete(si,
+				"9ca10dee-730e-486a-9138-d8aade4913e2");
+		
+		String token = tokenService.getToken();
+		client.loadMetadata(token, si);
+		
+		JsonElement je = client.getDeleteRequestTemplate(token, si);
+		assertNotNull(je);
+	}
+
+	@Test
+	public void testGetLinks() throws Exception {
+		JsonParser parser = new JsonParser();
+		JsonElement je = parser.parse(getContents("requestResources.json"));
+		Map<Enum<VrServiceInstance.VrKey>, String> m = client
+				.getDeleteLinks(je);
+		assertNotNull(m);
+		assertEquals(2, m.size());
+		assertEquals(
+				"https://vra.vra.lab/catalog-service/api/consumer/resources/d591e58d-b2cf-4061-aec1-7f41168b7a6d/actions/fe9af618-f21d-47a2-bebc-62d5914f6e6c/requests/template",
+				m.get(VrServiceInstance.VrKey.DELETE_TEMPLATE_LINK));
+		assertEquals(
+				"https://vra.vra.lab/catalog-service/api/consumer/resources/d591e58d-b2cf-4061-aec1-7f41168b7a6d/actions/fe9af618-f21d-47a2-bebc-62d5914f6e6c/requests",
+				m.get(VrServiceInstance.VrKey.DELETE_LINK));
 	}
 }

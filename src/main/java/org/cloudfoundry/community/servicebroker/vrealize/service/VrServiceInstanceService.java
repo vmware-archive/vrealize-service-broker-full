@@ -10,7 +10,6 @@ import org.cloudfoundry.community.servicebroker.exception.ServiceInstanceExistsE
 import org.cloudfoundry.community.servicebroker.exception.ServiceInstanceUpdateNotSupportedException;
 import org.cloudfoundry.community.servicebroker.model.CreateServiceInstanceRequest;
 import org.cloudfoundry.community.servicebroker.model.DeleteServiceInstanceRequest;
-import org.cloudfoundry.community.servicebroker.model.OperationState;
 import org.cloudfoundry.community.servicebroker.model.ServiceDefinition;
 import org.cloudfoundry.community.servicebroker.model.ServiceInstance;
 import org.cloudfoundry.community.servicebroker.model.ServiceInstanceLastOperation;
@@ -46,23 +45,39 @@ public class VrServiceInstanceService implements ServiceInstanceService {
 
 	@Override
 	public ServiceInstance getServiceInstance(String id) {
+
 		if (id == null || getInstance(id) == null) {
 			LOG.warn("service instance with id: " + id + " not found!");
 			return null;
 		}
 
 		VrServiceInstance si = getInstance(id);
-		String state = si.getServiceInstanceLastOperation().getState();
-		LOG.info("service instance with id: " + id + " is in state: " + state);
 
-		// this method is polled via cloud controller to see if the async create
-		// request is complete
-		if (!si.getServiceInstanceLastOperation().getState()
-				.equals(OperationState.IN_PROGRESS)) {
+		// check the last operation
+		ServiceInstanceLastOperation silo = si
+				.getServiceInstanceLastOperation();
+		if (silo == null || silo.getState() == null) {
+			LOG.error("ServiceInstance: " + id + " has no last operation.");
+			deleteInstance(si);
+			return null;
+		}
+
+		if (!si.isInProgress()) {
 			return si;
 		}
 
-		// still in progress? check to see how we're doing.
+		// still in progress, let's check up on things...
+		String currentRequestId = silo.getDescription();
+		if (currentRequestId == null) {
+			LOG.error("ServiceInstance: " + id + " last operation has no id.");
+			deleteInstance(si);
+			return null;
+		}
+
+		String state = si.getServiceInstanceLastOperation().getState();
+		LOG.info("service instance id: " + id + " request id: "
+				+ currentRequestId + " is in state: " + state);
+
 		String token;
 		try {
 			token = tokenService.getToken();
@@ -71,13 +86,23 @@ public class VrServiceInstanceService implements ServiceInstanceService {
 			return null;
 		}
 
-		LOG.info("checking on status of request id: " + si.getvRRequestId());
+		LOG.info("checking on status of request id: " + currentRequestId);
 		ServiceInstanceLastOperation status = vraClient.getRequestStatus(token,
 				si);
 
 		LOG.info("request: " + id + " status is: " + status.getState());
 
 		si.withLastOperation(status);
+
+		// if this was a create request and was successful, load metadata
+		if (si.isCurrentOperationSuccessful() && si.isCurrentOperationCreate()) {
+			vraClient.loadMetadata(token, si);
+		}
+
+		// if this is a delete request and was successful, remove the instance
+		if (si.isCurrentOperationSuccessful() && si.isCurrentOperationDelete()) {
+			deleteInstance(si);
+		}
 
 		return si;
 	}
@@ -110,34 +135,28 @@ public class VrServiceInstanceService implements ServiceInstanceService {
 		String token = tokenService.getToken();
 
 		// get a template for the request
-		JsonElement template = vraClient.getRequestTemplate(token, sd);
+		JsonElement template = vraClient.getCreateRequestTemplate(token, sd);
 
 		// customize the template
-		JsonElement edited = vraClient.prepareRequestTemplate(template,
+		JsonElement edited = vraClient.prepareCreateRequestTemplate(template,
 				request.getServiceInstanceId());
 
 		// request the request with the request
-		JsonElement response = vraClient.postRequest(token, edited, sd);
+		JsonElement response = vraClient.postCreateRequest(token, edited, sd);
 
 		LOG.debug("service request response: " + response.toString());
 
-		VrServiceInstance instance = new VrServiceInstance(request);
+		String requestId = vraClient.getRequestId(response);
+		VrServiceInstance instance = VrServiceInstance.create(request,
+				requestId);
 
-		// add vr request id so we can correlate later
-		instance.setvRRequestId(vraClient.getRequestId(response));
-
-		// get information from response and add to service instance for later
+		// add information from response to service instance parameters
 		instance.getParameters().putAll(vraClient.getParameters(response));
 
-		// set the last operation, since this is an async request
-		instance.withLastOperation(new ServiceInstanceLastOperation(
-				"vR Request submitted.", OperationState.IN_PROGRESS));
-		instance.withAsync(true);
+		saveInstance(instance);
 
-		INSTANCES.put(request.getServiceInstanceId(), instance);
 		LOG.info("registered service instance: "
-				+ instance.getServiceInstanceId() + " requestId: "
-				+ instance.getvRRequestId());
+				+ instance.getServiceInstanceId() + " requestId: " + requestId);
 
 		return instance;
 	}
@@ -151,18 +170,35 @@ public class VrServiceInstanceService implements ServiceInstanceService {
 					"invalid DeleteServiceInstanceRequest object.");
 		}
 
-		ServiceInstance i = getInstance(request.getServiceInstanceId());
-		if (i == null) {
-			return null;
+		VrServiceInstance si = getInstance(request.getServiceInstanceId());
+		if (si == null) {
+			throw new ServiceBrokerException("Service instance: "
+					+ request.getServiceInstanceId() + " not found.");
 		}
 
-		// String requestPayload = vraClient.deleteRequestPayload(request);
-		// LOG.info("request submitted with payload: \n" + requestPayload);
+		String token = tokenService.getToken();
 
-		INSTANCES.remove(request.getServiceInstanceId());
-		LOG.info("unregistered service instance: " + i.getServiceInstanceId());
+		// get the delete request template from the resources
+		JsonElement template = vraClient.getDeleteRequestTemplate(token, si);
 
-		return i;
+		// customize the template
+		JsonElement edited = vraClient.prepareDeleteRequestTemplate(template,
+				si.getServiceInstanceId());
+
+		// request the delete with the template
+		JsonElement response = vraClient.postDeleteRequest(token, edited, si);
+
+		LOG.debug("service request response: " + response.toString());
+
+		String requestId = vraClient.getRequestId(response);
+
+		// update si with new delete metadata
+		si = VrServiceInstance.delete(si, requestId);
+
+		LOG.info("unregistering service instance: " + si.getServiceInstanceId()
+				+ " requestId: " + requestId);
+
+		return si;
 	}
 
 	@Override
@@ -180,5 +216,16 @@ public class VrServiceInstanceService implements ServiceInstanceService {
 			return null;
 		}
 		return INSTANCES.get(id);
+	}
+
+	private VrServiceInstance deleteInstance(VrServiceInstance instance) {
+		if (instance == null || instance.getServiceInstanceId() == null) {
+			return null;
+		}
+		return INSTANCES.remove(instance.getServiceInstanceId());
+	}
+
+	private void saveInstance(VrServiceInstance instance) {
+		INSTANCES.put(instance.getServiceInstanceId(), instance);
 	}
 }

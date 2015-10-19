@@ -40,4 +40,8 @@ public interface VraRepository {
 	public JsonElement getRequestStatus(@Param("token") String token,
 			@Param("requestId") String requestId);
 
+	@Headers({ "Content-Type: application/json", "Authorization: {token}" })
+	@RequestLine("GET /catalog-service/api/consumer/requests/{requestId}/resourceViews")
+	public JsonElement getRequestResources(@Param("token") String token,
+			@Param("requestId") String requestId);
 }
