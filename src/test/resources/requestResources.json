@@ -1,0 +1,65 @@
+{
+    "links": [],
+    "content": [
+        {
+            "@type": "CatalogResourceView",
+            "links": [
+                {
+                    "@type": "link",
+                    "rel": "GET: Catalog Item",
+                    "href": "https://vra.vra.lab/catalog-service/api/consumer/entitledCatalogItemViews/e06ff060-dc7a-4f46-a7a7-c32c031fa31e"
+                },
+                {
+                    "@type": "link",
+                    "rel": "GET: Request",
+                    "href": "https://vra.vra.lab/catalog-service/api/consumer/requests/9ca10dee-730e-486a-9138-d8aade4913e2"
+                },
+                {
+                    "@type": "link",
+                    "rel": "GET Template: {com.vmware.csp.component.cafe.composition@resource.action.deployment.destroy.name}",
+                    "href": "https://vra.vra.lab/catalog-service/api/consumer/resources/d591e58d-b2cf-4061-aec1-7f41168b7a6d/actions/fe9af618-f21d-47a2-bebc-62d5914f6e6c/requests/template"
+                },
+                {
+                    "@type": "link",
+                    "rel": "POST: {com.vmware.csp.component.cafe.composition@resource.action.deployment.destroy.name}",
+                    "href": "https://vra.vra.lab/catalog-service/api/consumer/resources/d591e58d-b2cf-4061-aec1-7f41168b7a6d/actions/fe9af618-f21d-47a2-bebc-62d5914f6e6c/requests"
+                },
+                {
+                    "@type": "link",
+                    "rel": "GET: Child Resources",
+                    "href": "https://vra.vra.lab/catalog-service/api/consumer/resourceViews?managedOnly=false&withExtendedData=true&withOperations=true&%24filter=parentResource%20eq%20%27d591e58d-b2cf-4061-aec1-7f41168b7a6d%27"
+                }
+            ],
+            "resourceId": "d591e58d-b2cf-4061-aec1-7f41168b7a6d",
+            "iconId": "cafe_default_icon_genericCatalogItem",
+            "name": "vRA-MariaDB-Single-Instance-96168968",
+            "description": null,
+            "status": null,
+            "catalogItemId": "e06ff060-dc7a-4f46-a7a7-c32c031fa31e",
+            "catalogItemLabel": "vRA-MariaDB-Single-Instance",
+            "requestId": "9ca10dee-730e-486a-9138-d8aade4913e2",
+            "resourceType": "{com.vmware.csp.component.cafe.composition@resource.type.deployment.name}",
+            "owners": [
+                "vmware dude1"
+            ],
+            "businessGroupId": "40d34c19-edfb-4c25-b291-0475b2a1d2d6",
+            "tenantId": "lab",
+            "dateCreated": "2015-10-16T19:36:19.764Z",
+            "lastUpdated": "2015-10-16T19:39:40.008Z",
+            "lease": null,
+            "costs": null,
+            "costToDate": null,
+            "totalCost": null,
+            "parentResourceId": null,
+            "hasChildren": true,
+            "data": {}
+        }
+    ],
+    "metadata": {
+        "size": 20,
+        "totalElements": 1,
+        "totalPages": 1,
+        "number": 1,
+        "offset": 0
+    }
+}
