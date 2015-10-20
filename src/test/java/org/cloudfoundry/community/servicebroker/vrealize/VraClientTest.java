@@ -2,8 +2,6 @@ package org.cloudfoundry.community.servicebroker.vrealize;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.net.URI;
@@ -12,7 +10,6 @@ import java.nio.file.Paths;
 import java.util.Map;
 
 import org.cloudfoundry.community.servicebroker.exception.ServiceBrokerException;
-import org.cloudfoundry.community.servicebroker.model.Catalog;
 import org.cloudfoundry.community.servicebroker.model.CreateServiceInstanceRequest;
 import org.cloudfoundry.community.servicebroker.model.ServiceDefinition;
 import org.cloudfoundry.community.servicebroker.model.ServiceInstanceLastOperation;
@@ -50,19 +47,6 @@ public class VraClientTest {
 	private static final String SD_ID = "e06ff060-dc7a-4f46-a7a7-c32c031fa31e";
 	private static final String R_ID = "5c09a0f6-a19f-4ce9-904a-8f3bf8242ddc";
 
-	@Test
-	public void testGetEntitledCatalog() throws ServiceBrokerException {
-		Catalog catalog = catalogService.getCatalog();
-		assertNotNull(catalog);
-		assertTrue(catalog.getServiceDefinitions().size() > 0);
-	}
-
-	@Test
-	public void testGetEntitledCatalogItem() throws ServiceBrokerException {
-		assertNull(catalogService.getServiceDefinition(null));
-		assertNull(catalogService.getServiceDefinition(""));
-		assertNotNull(catalogService.getServiceDefinition(SD_ID));
-	}
 
 	@Test
 	public void testGetRequestTemplate() throws ServiceBrokerException {
@@ -204,15 +188,15 @@ public class VraClientTest {
 	public void testGetLinks() throws Exception {
 		JsonParser parser = new JsonParser();
 		JsonElement je = parser.parse(getContents("requestResources.json"));
-		Map<Enum<VrServiceInstance.VrKey>, String> m = client
+		Map<Enum<VrServiceInstance.MetatdataKeys>, String> m = client
 				.getDeleteLinks(je);
 		assertNotNull(m);
 		assertEquals(2, m.size());
 		assertEquals(
 				"https://vra.vra.lab/catalog-service/api/consumer/resources/d591e58d-b2cf-4061-aec1-7f41168b7a6d/actions/fe9af618-f21d-47a2-bebc-62d5914f6e6c/requests/template",
-				m.get(VrServiceInstance.VrKey.DELETE_TEMPLATE_LINK));
+				m.get(VrServiceInstance.MetatdataKeys.DELETE_TEMPLATE_LINK));
 		assertEquals(
 				"https://vra.vra.lab/catalog-service/api/consumer/resources/d591e58d-b2cf-4061-aec1-7f41168b7a6d/actions/fe9af618-f21d-47a2-bebc-62d5914f6e6c/requests",
-				m.get(VrServiceInstance.VrKey.DELETE_LINK));
+				m.get(VrServiceInstance.MetatdataKeys.DELETE_LINK));
 	}
 }

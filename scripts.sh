@@ -26,3 +26,5 @@ token=MTQ0NTI4MzM3MTE5MDowMDc5MmM1M2NhODg4YWI4ODM1Njp0ZW5hbnQ6bGFidXNlcm5hbWU6dm
 
 
 curl --insecure -X GET -H "Content-Type: application/json" -D headers.out -H "Authorization: Bearer $token" https://vra.vra.lab/catalog-service/api/consumer/resources/d591e58d-b2cf-4061-aec1-7f41168b7a6d/actions/fe9af618-f21d-47a2-bebc-62d5914f6e6c/requests/template
+
+                                                                                                            https://vra.vra.lab/catalog-service/api/consumer/resources/d591e58d-b2cf-4061-aec1-7f41168b7a6d/actions/fe9af618-f21d-47a2-bebc-62d5914f6e6c/requests
