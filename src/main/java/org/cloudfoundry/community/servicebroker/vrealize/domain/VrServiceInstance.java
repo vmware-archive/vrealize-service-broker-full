@@ -15,8 +15,12 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 public class VrServiceInstance extends ServiceInstance {
 
-	public enum VrKey {
+	public enum MetatdataKeys {
 		CREATE_REQUEST_ID, DELETE_REQUEST_ID, CREATE_TEMPLATE_LINK, DELETE_TEMPLATE_LINK, DELETE_LINK, RESOURCES_LINK
+	}
+
+	public enum ParameterKeys {
+		USER_ID, PASSWORD, DB_ID, HOST_IP
 	}
 
 	@JsonSerialize
@@ -33,7 +37,8 @@ public class VrServiceInstance extends ServiceInstance {
 		ServiceInstanceLastOperation silo = new ServiceInstanceLastOperation(
 				createRequestId, OperationState.IN_PROGRESS);
 		instance.withLastOperation(silo);
-		instance.getMetadata().put(VrServiceInstance.VrKey.CREATE_REQUEST_ID,
+		instance.getMetadata().put(
+				VrServiceInstance.MetatdataKeys.CREATE_REQUEST_ID,
 				createRequestId);
 		instance.withAsync(true);
 
@@ -51,7 +56,8 @@ public class VrServiceInstance extends ServiceInstance {
 
 	public static VrServiceInstance delete(VrServiceInstance instance,
 			String deleteRequestId) {
-		instance.getMetadata().put(VrServiceInstance.VrKey.DELETE_REQUEST_ID,
+		instance.getMetadata().put(
+				VrServiceInstance.MetatdataKeys.DELETE_REQUEST_ID,
 				deleteRequestId);
 		ServiceInstanceLastOperation silo = new ServiceInstanceLastOperation(
 				deleteRequestId, OperationState.IN_PROGRESS);
@@ -91,11 +97,11 @@ public class VrServiceInstance extends ServiceInstance {
 	}
 
 	public boolean isCurrentOperationDelete() {
-		return getMetadata().containsKey(VrKey.DELETE_REQUEST_ID);
+		return getMetadata().containsKey(MetatdataKeys.DELETE_REQUEST_ID);
 	}
 
 	public boolean isCurrentOperationCreate() {
-		return getMetadata().containsKey(VrKey.CREATE_REQUEST_ID)
+		return getMetadata().containsKey(MetatdataKeys.CREATE_REQUEST_ID)
 				&& !isCurrentOperationDelete();
 	}
 
@@ -115,6 +121,6 @@ public class VrServiceInstance extends ServiceInstance {
 	}
 
 	public String getCreateRequestId() {
-		return getMetadata().get(VrKey.CREATE_REQUEST_ID);
+		return getMetadata().get(MetatdataKeys.CREATE_REQUEST_ID);
 	}
 }

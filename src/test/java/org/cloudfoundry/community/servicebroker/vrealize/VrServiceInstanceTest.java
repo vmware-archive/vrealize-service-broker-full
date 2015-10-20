@@ -59,10 +59,14 @@ public class VrServiceInstanceTest {
 		assertTrue(si.isInProgress());
 		assertEquals("23456", si.getServiceInstanceLastOperation()
 				.getDescription());
-		assertEquals("23456",
-				si.getMetadata().get(VrServiceInstance.VrKey.DELETE_REQUEST_ID));
-		assertEquals("12345",
-				si.getMetadata().get(VrServiceInstance.VrKey.CREATE_REQUEST_ID));
+		assertEquals(
+				"23456",
+				si.getMetadata().get(
+						VrServiceInstance.MetatdataKeys.DELETE_REQUEST_ID));
+		assertEquals(
+				"12345",
+				si.getMetadata().get(
+						VrServiceInstance.MetatdataKeys.CREATE_REQUEST_ID));
 
 		// delete failed
 		si = VrServiceInstance.update(si, OperationState.FAILED);
@@ -73,10 +77,14 @@ public class VrServiceInstanceTest {
 		assertFalse(si.isInProgress());
 		assertEquals("23456", si.getServiceInstanceLastOperation()
 				.getDescription());
-		assertEquals("23456",
-				si.getMetadata().get(VrServiceInstance.VrKey.DELETE_REQUEST_ID));
-		assertEquals("12345",
-				si.getMetadata().get(VrServiceInstance.VrKey.CREATE_REQUEST_ID));
+		assertEquals(
+				"23456",
+				si.getMetadata().get(
+						VrServiceInstance.MetatdataKeys.DELETE_REQUEST_ID));
+		assertEquals(
+				"12345",
+				si.getMetadata().get(
+						VrServiceInstance.MetatdataKeys.CREATE_REQUEST_ID));
 
 		// delete succeeded
 		si = VrServiceInstance.update(si, OperationState.SUCCEEDED);
@@ -87,10 +95,14 @@ public class VrServiceInstanceTest {
 		assertFalse(si.isInProgress());
 		assertEquals("23456", si.getServiceInstanceLastOperation()
 				.getDescription());
-		assertEquals("23456",
-				si.getMetadata().get(VrServiceInstance.VrKey.DELETE_REQUEST_ID));
-		assertEquals("12345",
-				si.getMetadata().get(VrServiceInstance.VrKey.CREATE_REQUEST_ID));
+		assertEquals(
+				"23456",
+				si.getMetadata().get(
+						VrServiceInstance.MetatdataKeys.DELETE_REQUEST_ID));
+		assertEquals(
+				"12345",
+				si.getMetadata().get(
+						VrServiceInstance.MetatdataKeys.CREATE_REQUEST_ID));
 	}
 
 }

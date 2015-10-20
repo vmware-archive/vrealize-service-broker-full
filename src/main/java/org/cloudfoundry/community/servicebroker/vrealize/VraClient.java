@@ -90,7 +90,7 @@ public class VraClient {
 		}
 
 		return vraRepository.postRequest("Bearer " + token, si.getMetadata()
-				.get(VrServiceInstance.VrKey.DELETE_LINK), body);
+				.get(VrServiceInstance.MetatdataKeys.DELETE_LINK), body);
 
 	}
 
@@ -99,8 +99,8 @@ public class VraClient {
 		JsonObject jo = removeFields(template.getAsJsonObject(),
 				getContents("fieldsToFilter.txt"));
 
-		jo.addProperty("description", "serviceInstanceId");
-		jo.addProperty("reasons", "CF serviceInstanceId broker request.");
+		jo.addProperty("description", serviceInstanceId);
+		jo.addProperty("reasons", "CF service broker request.");
 
 		return jo;
 	}
@@ -109,7 +109,7 @@ public class VraClient {
 			String serviceInstanceId) throws ServiceBrokerException {
 
 		JsonObject jo = template.getAsJsonObject();
-		jo.addProperty("description", "serviceInstanceId");
+		jo.addProperty("description", serviceInstanceId);
 		return jo;
 	}
 
@@ -223,8 +223,26 @@ public class VraClient {
 		return je.getAsString();
 	}
 
-	@SuppressWarnings("unchecked")
 	public Map<String, Object> getParameters(JsonElement requestResponse) {
+		Map<String, Object> m = new HashMap<String, Object>();
+		Map<String, Object> keyValues = getCustomValues(requestResponse);
+
+		// TODO: this works for mysql, make it generalized!
+		m.put(VrServiceInstance.ParameterKeys.USER_ID.toString(),
+				keyValues.get("foo"));
+		m.put(VrServiceInstance.ParameterKeys.PASSWORD.toString(),
+				keyValues.get("foo"));
+		m.put(VrServiceInstance.ParameterKeys.DB_ID.toString(),
+				keyValues.get("foo"));
+		m.put(VrServiceInstance.ParameterKeys.HOST_IP.toString(),
+				keyValues.get("foo"));
+
+		return m;
+
+	}
+
+	@SuppressWarnings("unchecked")
+	private Map<String, Object> getCustomValues(JsonElement requestResponse) {
 		Map<String, Object> parameters = new HashMap<String, Object>();
 		if (requestResponse == null) {
 			return parameters;
@@ -273,7 +291,7 @@ public class VraClient {
 		}
 
 		String path = si.getMetadata()
-				.get(VrServiceInstance.VrKey.DELETE_TEMPLATE_LINK)
+				.get(VrServiceInstance.MetatdataKeys.DELETE_TEMPLATE_LINK)
 				.substring(serviceUri.length() + 1);
 		return vraRepository.getRequest("Bearer " + token, path);
 	}
@@ -283,25 +301,26 @@ public class VraClient {
 				si.getCreateRequestId());
 	}
 
-	public Map<Enum<VrServiceInstance.VrKey>, String> getDeleteLinks(
+	public Map<Enum<VrServiceInstance.MetatdataKeys>, String> getDeleteLinks(
 			JsonElement resources) {
-		Map<Enum<VrServiceInstance.VrKey>, String> map = new HashMap<Enum<VrServiceInstance.VrKey>, String>();
+		Map<Enum<VrServiceInstance.MetatdataKeys>, String> map = new HashMap<Enum<VrServiceInstance.MetatdataKeys>, String>();
 		ReadContext ctx = JsonPath.parse(resources.toString());
 
 		JSONArray o = ctx
 				.read("$.content.[0].links[?(@.rel == 'GET Template: {com.vmware.csp.component.cafe.composition@resource.action.deployment.destroy.name}')].href");
-		map.put(VrServiceInstance.VrKey.DELETE_TEMPLATE_LINK, o.get(0)
+		map.put(VrServiceInstance.MetatdataKeys.DELETE_TEMPLATE_LINK, o.get(0)
 				.toString());
 
 		o = ctx.read("$.content.[0].links[?(@.rel == 'POST: {com.vmware.csp.component.cafe.composition@resource.action.deployment.destroy.name}')].href");
-		map.put(VrServiceInstance.VrKey.DELETE_LINK, o.get(0).toString());
+		map.put(VrServiceInstance.MetatdataKeys.DELETE_LINK, o.get(0)
+				.toString());
 
 		return map;
 	}
 
 	public void loadMetadata(String token, VrServiceInstance instance) {
 		JsonElement je = getRequestResources(token, instance);
-		Map<Enum<VrServiceInstance.VrKey>, String> links = getDeleteLinks(je);
+		Map<Enum<VrServiceInstance.MetatdataKeys>, String> links = getDeleteLinks(je);
 		instance.getMetadata().putAll(links);
 	}
 }
