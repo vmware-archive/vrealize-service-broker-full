@@ -106,15 +106,14 @@ public class VraClientTest {
 		JsonParser parser = new JsonParser();
 		JsonElement je = parser.parse(json);
 
-		Map<String, Object> m = client.getParameters(je);
+		Map<Enum<VrServiceInstance.ParameterKeys>, Object> m = client.getParameters(je);
 		assertNotNull(m);
 		assertEquals(5, m.size());
-		assertEquals("3306", m.get("mysql_port"));
-		assertEquals("P1v0t4l!", m.get("mysql_passwd"));
-		assertEquals("P1v0t4l!", m.get("mysql_passwd"));
-		assertEquals("mysqluser", m.get("mysql_user"));
-		assertEquals("db01", m.get("mysql_dbname"));
-
+		assertEquals("3306", m.get(VrServiceInstance.ParameterKeys.PORT));
+		assertEquals("P1v0t4l!", m.get(VrServiceInstance.ParameterKeys.PASSWORD));
+		assertEquals("mysqluser", m.get(VrServiceInstance.ParameterKeys.USER_ID));
+		assertEquals("db01", m.get(VrServiceInstance.ParameterKeys.DB_ID));
+//		assertEquals("foo", m.get("host"));
 	}
 
 	@Test

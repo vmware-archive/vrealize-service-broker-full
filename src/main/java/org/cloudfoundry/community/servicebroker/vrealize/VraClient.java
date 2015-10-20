@@ -1,7 +1,6 @@
 package org.cloudfoundry.community.servicebroker.vrealize;
 
 import java.io.IOException;
-import java.lang.reflect.Type;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -28,7 +27,6 @@ import org.springframework.stereotype.Service;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.reflect.TypeToken;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.ReadContext;
 
@@ -223,25 +221,25 @@ public class VraClient {
 		return je.getAsString();
 	}
 
-	public Map<String, Object> getParameters(JsonElement requestResponse) {
-		Map<String, Object> m = new HashMap<String, Object>();
+	public Map<Enum<VrServiceInstance.ParameterKeys>, Object> getParameters(
+			JsonElement requestResponse) {
+		Map<Enum<VrServiceInstance.ParameterKeys>, Object> m = new HashMap<Enum<VrServiceInstance.ParameterKeys>, Object>();
 		Map<String, Object> keyValues = getCustomValues(requestResponse);
 
 		// TODO: this works for mysql, make it generalized!
-		m.put(VrServiceInstance.ParameterKeys.USER_ID.toString(),
-				keyValues.get("foo"));
-		m.put(VrServiceInstance.ParameterKeys.PASSWORD.toString(),
-				keyValues.get("foo"));
-		m.put(VrServiceInstance.ParameterKeys.DB_ID.toString(),
-				keyValues.get("foo"));
-		m.put(VrServiceInstance.ParameterKeys.HOST_IP.toString(),
-				keyValues.get("foo"));
+		m.put(VrServiceInstance.ParameterKeys.USER_ID,
+				keyValues.get("mysql_user"));
+		m.put(VrServiceInstance.ParameterKeys.PASSWORD,
+				keyValues.get("mysql_passwd"));
+		m.put(VrServiceInstance.ParameterKeys.DB_ID,
+				keyValues.get("mysql_dbname"));
+		m.put(VrServiceInstance.ParameterKeys.HOST_IP, keyValues.get("foo"));
+		m.put(VrServiceInstance.ParameterKeys.PORT, keyValues.get("mysql_port"));
 
 		return m;
 
 	}
 
-	@SuppressWarnings("unchecked")
 	private Map<String, Object> getCustomValues(JsonElement requestResponse) {
 		Map<String, Object> parameters = new HashMap<String, Object>();
 		if (requestResponse == null) {
@@ -257,28 +255,18 @@ public class VraClient {
 			return parameters;
 		}
 
-		Type typeOfMapOfStringObject = new TypeToken<Map<String, Object>>() {
-		}.getType();
+		for (int i = 0; i < ja.size(); i++) {
+			String o = ctx
+					.read("$.requestData.entries[*].value.values.entries.value.items[?(@.classId == 'Infrastructure.CustomProperty')].values["
+							+ i + "].entries[*]").toString();
+			System.out.println(o);
 
-		// avert your gaze....
-		Iterator<Object> it = ja.iterator();
-		while (it.hasNext()) {
-			Map<String, Object> m = gson.fromJson(it.next().toString(),
-					typeOfMapOfStringObject);
-			List<Map<String, Object>> a = (List<Map<String, Object>>) m
-					.get("entries");
-
-			Object value = null;
-			String key = null;
-			for (Map<String, Object> o : a) {
-				if (o.get("key").equals("value")) {
-					value = ((Map<String, Object>) o.get("value")).get("value");
-				}
-				if (o.get("key").equals("id")) {
-					key = ((Map<String, Object>) o.get("value")).get("value")
-							.toString();
-				}
-			}
+			ReadContext ctx2 = JsonPath.parse(o);
+			Object value = ((JSONArray) ctx2
+					.read("$.[?(@.key == 'value')].value.value")).get(0);
+			String key = ((JSONArray) ctx2
+					.read("$.[?(@.key == 'id')].value.value")).get(0)
+					.toString();
 			parameters.put(key, value);
 		}
 		return parameters;
