@@ -20,16 +20,16 @@ public class VrServiceInstance extends ServiceInstance {
 	}
 
 	public enum ParameterKeys {
-		USER_ID, PASSWORD, DB_ID, HOST_IP
+		USER_ID, PASSWORD, DB_ID, HOST_IP, PORT
 	}
 
 	@JsonSerialize
 	@JsonProperty("parameters")
-	private final Map<String, Object> parameters = new HashMap<String, Object>();
+	private final Map<Enum<ParameterKeys>, Object> parameters = new HashMap<Enum<ParameterKeys>, Object>();
 
 	@JsonSerialize
 	@JsonProperty("metadata")
-	private final Map<Enum<?>, String> metadata = new HashMap<Enum<?>, String>();
+	private final Map<Enum<MetatdataKeys>, String> metadata = new HashMap<Enum<MetatdataKeys>, String>();
 
 	public static VrServiceInstance create(
 			CreateServiceInstanceRequest request, String createRequestId) {
@@ -78,11 +78,11 @@ public class VrServiceInstance extends ServiceInstance {
 		super(request);
 	}
 
-	public Map<String, Object> getParameters() {
+	public Map<Enum<VrServiceInstance.ParameterKeys>, Object> getParameters() {
 		return parameters;
 	}
 
-	public Map<Enum<?>, String> getMetadata() {
+	public Map<Enum<MetatdataKeys>, String> getMetadata() {
 		return metadata;
 	}
 
