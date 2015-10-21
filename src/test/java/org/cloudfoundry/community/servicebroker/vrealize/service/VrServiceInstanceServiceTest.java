@@ -1,4 +1,4 @@
-package org.cloudfoundry.community.servicebroker.vrealize;
+package org.cloudfoundry.community.servicebroker.vrealize.service;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -19,7 +19,9 @@ import org.cloudfoundry.community.servicebroker.model.OperationState;
 import org.cloudfoundry.community.servicebroker.model.ServiceDefinition;
 import org.cloudfoundry.community.servicebroker.model.ServiceInstanceLastOperation;
 import org.cloudfoundry.community.servicebroker.service.ServiceInstanceService;
-import org.cloudfoundry.community.servicebroker.vrealize.domain.VrServiceInstance;
+import org.cloudfoundry.community.servicebroker.vrealize.Application;
+import org.cloudfoundry.community.servicebroker.vrealize.VraClient;
+import org.cloudfoundry.community.servicebroker.vrealize.persistance.VrServiceInstance;
 import org.cloudfoundry.community.servicebroker.vrealize.service.CatalogService;
 import org.cloudfoundry.community.servicebroker.vrealize.service.TokenService;
 import org.junit.Before;
@@ -41,10 +43,10 @@ import com.google.gson.JsonParser;
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = { Application.class })
 @Ignore
-public class ServiceInstanceServiceTest {
+public class VrServiceInstanceServiceTest {
 
 	private static final Logger LOG = Logger
-			.getLogger(ServiceInstanceServiceTest.class);
+			.getLogger(VrServiceInstanceServiceTest.class);
 
 	@Autowired
 	@InjectMocks

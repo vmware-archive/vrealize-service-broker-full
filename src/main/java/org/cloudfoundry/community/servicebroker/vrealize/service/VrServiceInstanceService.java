@@ -17,7 +17,7 @@ import org.cloudfoundry.community.servicebroker.model.UpdateServiceInstanceReque
 import org.cloudfoundry.community.servicebroker.service.ServiceInstanceService;
 import org.cloudfoundry.community.servicebroker.vrealize.VraClient;
 import org.cloudfoundry.community.servicebroker.vrealize.domain.Creds;
-import org.cloudfoundry.community.servicebroker.vrealize.domain.VrServiceInstance;
+import org.cloudfoundry.community.servicebroker.vrealize.persistance.VrServiceInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -37,6 +37,9 @@ public class VrServiceInstanceService implements ServiceInstanceService {
 
 	@Autowired
 	CatalogService catalogService;
+
+	// @Autowired
+	// VrServiceInstanceRepository repository;
 
 	@Autowired
 	Creds creds;

@@ -3,7 +3,6 @@ package org.cloudfoundry.community.servicebroker.vrealize;
 import java.util.Map;
 
 import org.cloudfoundry.community.servicebroker.vrealize.domain.Creds;
-import org.springframework.stereotype.Repository;
 
 import com.google.gson.JsonElement;
 
@@ -11,7 +10,6 @@ import feign.Headers;
 import feign.Param;
 import feign.RequestLine;
 
-@Repository
 public interface VraRepository {
 
 	@Headers("Content-Type: application/json")

@@ -1,4 +1,4 @@
-package org.cloudfoundry.community.servicebroker.vrealize.domain;
+package org.cloudfoundry.community.servicebroker.vrealize.persistance;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -22,6 +22,9 @@ public class VrServiceInstance extends ServiceInstance {
 	public enum ParameterKeys {
 		USER_ID, PASSWORD, DB_ID, HOST_IP, PORT
 	}
+
+	// @Id
+	// private String id;
 
 	@JsonSerialize
 	@JsonProperty("parameters")
@@ -66,15 +69,19 @@ public class VrServiceInstance extends ServiceInstance {
 		return instance;
 	}
 
-	private VrServiceInstance(CreateServiceInstanceRequest request) {
+	public VrServiceInstance() {
+		this(new CreateServiceInstanceRequest());
+	}
+
+	public VrServiceInstance(CreateServiceInstanceRequest request) {
 		super(request);
 	}
 
-	private VrServiceInstance(DeleteServiceInstanceRequest request) {
+	public VrServiceInstance(DeleteServiceInstanceRequest request) {
 		super(request);
 	}
 
-	private VrServiceInstance(UpdateServiceInstanceRequest request) {
+	public VrServiceInstance(UpdateServiceInstanceRequest request) {
 		super(request);
 	}
 
@@ -123,4 +130,12 @@ public class VrServiceInstance extends ServiceInstance {
 	public String getCreateRequestId() {
 		return getMetadata().get(MetatdataKeys.CREATE_REQUEST_ID);
 	}
+
+	// public String getId() {
+	// return id;
+	// }
+	//
+	// public void setId(String id) {
+	// this.id = id;
+	// }
 }

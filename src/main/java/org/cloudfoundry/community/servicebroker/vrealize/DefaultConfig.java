@@ -17,7 +17,6 @@ import com.google.gson.GsonBuilder;
 import feign.Feign;
 import feign.gson.GsonDecoder;
 import feign.gson.GsonEncoder;
-import feign.slf4j.Slf4jLogger;
 
 @Configuration
 public class DefaultConfig {
@@ -53,7 +52,7 @@ public class DefaultConfig {
 	@Bean
 	public VraRepository vraRepository() {
 		return Feign.builder().encoder(new GsonEncoder())
-				.decoder(new GsonDecoder()).logger(new Slf4jLogger())
+				.decoder(new GsonDecoder())
 				.target(VraRepository.class, serviceUri);
 	}
 
