@@ -256,17 +256,14 @@ public class VraClient {
 		}
 
 		for (int i = 0; i < ja.size(); i++) {
-			String o = ctx
+			String key = ctx
 					.read("$.requestData.entries[*].value.values.entries.value.items[?(@.classId == 'Infrastructure.CustomProperty')].values["
-							+ i + "].entries[*]").toString();
-			System.out.println(o);
+							+ i + "].entries[?(@.key == 'id')].[0].value.value");
 
-			ReadContext ctx2 = JsonPath.parse(o);
-			Object value = ((JSONArray) ctx2
-					.read("$.[?(@.key == 'value')].value.value")).get(0);
-			String key = ((JSONArray) ctx2
-					.read("$.[?(@.key == 'id')].value.value")).get(0)
-					.toString();
+			Object value = ctx
+					.read("$.requestData.entries[*].value.values.entries.value.items[?(@.classId == 'Infrastructure.CustomProperty')].values["
+							+ i
+							+ "].entries[?(@.key == 'value')].[0].value.value");
 			parameters.put(key, value);
 		}
 		return parameters;
@@ -306,9 +303,12 @@ public class VraClient {
 		return map;
 	}
 
-	public void loadMetadata(String token, VrServiceInstance instance) {
+	public VrServiceInstance loadMetadata(String token,
+			VrServiceInstance instance) {
 		JsonElement je = getRequestResources(token, instance);
 		Map<Enum<VrServiceInstance.MetatdataKeys>, String> links = getDeleteLinks(je);
 		instance.getMetadata().putAll(links);
+
+		return instance;
 	}
 }
