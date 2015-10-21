@@ -16,6 +16,7 @@ import org.cloudfoundry.community.servicebroker.model.ServiceInstanceLastOperati
 import org.cloudfoundry.community.servicebroker.vrealize.domain.VrServiceInstance;
 import org.cloudfoundry.community.servicebroker.vrealize.service.CatalogService;
 import org.cloudfoundry.community.servicebroker.vrealize.service.TokenService;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,9 +45,14 @@ public class VraClientTest {
 	@Autowired
 	Gson gson;
 
+	@Autowired
+	VraRepository repo;
+
 	private static final String SD_ID = "e06ff060-dc7a-4f46-a7a7-c32c031fa31e";
 	private static final String R_ID = "5c09a0f6-a19f-4ce9-904a-8f3bf8242ddc";
 
+	// private static final String P_ID =
+	// "e06ff060-dc7a-4f46-a7a7-c32c031fa31e";
 
 	@Test
 	public void testGetRequestTemplate() throws ServiceBrokerException {
@@ -106,14 +112,17 @@ public class VraClientTest {
 		JsonParser parser = new JsonParser();
 		JsonElement je = parser.parse(json);
 
-		Map<Enum<VrServiceInstance.ParameterKeys>, Object> m = client.getParameters(je);
+		Map<Enum<VrServiceInstance.ParameterKeys>, Object> m = client
+				.getParameters(je);
 		assertNotNull(m);
 		assertEquals(5, m.size());
 		assertEquals("3306", m.get(VrServiceInstance.ParameterKeys.PORT));
-		assertEquals("P1v0t4l!", m.get(VrServiceInstance.ParameterKeys.PASSWORD));
-		assertEquals("mysqluser", m.get(VrServiceInstance.ParameterKeys.USER_ID));
+		assertEquals("P1v0t4l!",
+				m.get(VrServiceInstance.ParameterKeys.PASSWORD));
+		assertEquals("mysqluser",
+				m.get(VrServiceInstance.ParameterKeys.USER_ID));
 		assertEquals("db01", m.get(VrServiceInstance.ParameterKeys.DB_ID));
-//		assertEquals("foo", m.get("host"));
+		// assertEquals("foo", m.get("host"));
 	}
 
 	@Test
@@ -169,16 +178,17 @@ public class VraClientTest {
 	}
 
 	@Test
+	@Ignore
 	public void testGetDeleteRequestTemplate() throws ServiceBrokerException {
 		CreateServiceInstanceRequest req = new CreateServiceInstanceRequest();
 		VrServiceInstance si = VrServiceInstance.create(req,
 				"9ca10dee-730e-486a-9138-d8aade4913e2");
 		si = VrServiceInstance.delete(si,
 				"9ca10dee-730e-486a-9138-d8aade4913e2");
-		
+
 		String token = tokenService.getToken();
 		client.loadMetadata(token, si);
-		
+
 		JsonElement je = client.getDeleteRequestTemplate(token, si);
 		assertNotNull(je);
 	}
@@ -197,5 +207,23 @@ public class VraClientTest {
 		assertEquals(
 				"https://vra.vra.lab/catalog-service/api/consumer/resources/d591e58d-b2cf-4061-aec1-7f41168b7a6d/actions/fe9af618-f21d-47a2-bebc-62d5914f6e6c/requests",
 				m.get(VrServiceInstance.MetatdataKeys.DELETE_LINK));
+	}
+
+	@Test
+	@Ignore
+	public void testDelete() throws Exception {
+		String token = tokenService.getToken();
+		JsonElement deleteTemplate = repo
+				.getRequest(
+						"Bearer " + token,
+						"catalog-service/api/consumer/resources/df13aba9-278b-4fb9-beec-1e14f29a2337/actions/fe9af618-f21d-47a2-bebc-62d5914f6e6c/requests/template");
+		JsonElement edited = client.prepareDeleteRequestTemplate(
+				deleteTemplate, "12345");
+		JsonElement results = repo
+				.postRequest(
+						"Bearer " + token,
+						"catalog-service/api/consumer/resources/df13aba9-278b-4fb9-beec-1e14f29a2337/actions/fe9af618-f21d-47a2-bebc-62d5914f6e6c/requests",
+						edited);
+		System.out.println(results);
 	}
 }
