@@ -11,7 +11,7 @@ import org.cloudfoundry.community.servicebroker.model.ServiceInstanceBinding;
 import org.cloudfoundry.community.servicebroker.service.ServiceInstanceBindingService;
 import org.cloudfoundry.community.servicebroker.service.ServiceInstanceService;
 import org.cloudfoundry.community.servicebroker.vrealize.VraClient;
-import org.cloudfoundry.community.servicebroker.vrealize.domain.VrServiceInstance;
+import org.cloudfoundry.community.servicebroker.vrealize.persistance.VrServiceInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

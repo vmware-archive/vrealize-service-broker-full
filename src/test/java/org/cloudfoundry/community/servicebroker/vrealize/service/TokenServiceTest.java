@@ -1,8 +1,9 @@
-package org.cloudfoundry.community.servicebroker.vrealize;
+package org.cloudfoundry.community.servicebroker.vrealize.service;
 
 import static org.junit.Assert.assertNotNull;
 
 import org.cloudfoundry.community.servicebroker.exception.ServiceBrokerException;
+import org.cloudfoundry.community.servicebroker.vrealize.Application;
 import org.cloudfoundry.community.servicebroker.vrealize.service.TokenService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
