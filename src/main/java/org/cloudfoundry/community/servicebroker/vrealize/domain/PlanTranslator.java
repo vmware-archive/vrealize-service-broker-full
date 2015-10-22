@@ -25,16 +25,7 @@ public class PlanTranslator implements JsonDeserializer<Plan> {
 
 	private Plan getPlan(JsonElement json) {
 		JsonObject jo = json.getAsJsonObject();
-
-//		JsonObject providerBinding = jo.get("providerBinding")
-//				.getAsJsonObject();
-
-		// TODO, get correct id from entitlement payload
-		// JsonObject provideRef =
-		// providerBinding.get("providerRef").getAsJsonObject();
-		// String id = provideRef.get("id").getAsString();
 		String id = jo.get("catalogItemId").getAsString();
-
 		String name = jo.get("name").getAsString();
 		String description = jo.get("description").getAsString();
 		return new Plan(id, name, description, getMetadata(jo, name), true);

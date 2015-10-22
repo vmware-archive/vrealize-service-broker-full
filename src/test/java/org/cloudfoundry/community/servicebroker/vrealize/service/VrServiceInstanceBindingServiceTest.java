@@ -23,11 +23,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @Ignore
 public class VrServiceInstanceBindingServiceTest {
 
-	// private static final String SERVICE_DEF_ID =
-	// "2ce37e80-e526-416a-bf68-a52176ced367";
-	// private static final String PLAN_ID =
-	// "Infrastructure.CatalogItem.Machine.Cloud.AmazonEC2";
-
 	@Autowired
 	VrServiceInstanceBindingService vrServiceInstanceBindingService;
 

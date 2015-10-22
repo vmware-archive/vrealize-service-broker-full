@@ -6,13 +6,8 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.when;
 
-import java.io.IOException;
-import java.net.URI;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-
 import org.apache.log4j.Logger;
-import org.cloudfoundry.community.servicebroker.exception.ServiceBrokerException;
+import org.cloudfoundry.community.servicebroker.model.Catalog;
 import org.cloudfoundry.community.servicebroker.model.CreateServiceInstanceRequest;
 import org.cloudfoundry.community.servicebroker.model.DeleteServiceInstanceRequest;
 import org.cloudfoundry.community.servicebroker.model.OperationState;
@@ -20,10 +15,9 @@ import org.cloudfoundry.community.servicebroker.model.ServiceDefinition;
 import org.cloudfoundry.community.servicebroker.model.ServiceInstanceLastOperation;
 import org.cloudfoundry.community.servicebroker.service.ServiceInstanceService;
 import org.cloudfoundry.community.servicebroker.vrealize.Application;
+import org.cloudfoundry.community.servicebroker.vrealize.TestConfig;
 import org.cloudfoundry.community.servicebroker.vrealize.VraClient;
 import org.cloudfoundry.community.servicebroker.vrealize.persistance.VrServiceInstance;
-import org.cloudfoundry.community.servicebroker.vrealize.service.CatalogService;
-import org.cloudfoundry.community.servicebroker.vrealize.service.TokenService;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -34,9 +28,9 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 
@@ -52,13 +46,16 @@ public class VrServiceInstanceServiceTest {
 	@InjectMocks
 	ServiceInstanceService service;
 
+	@Autowired
+	Gson gson;
+
 	@Mock
 	VraClient vraClient;
 
 	@Mock
 	TokenService tokenService;
 
-	@Autowired
+	@Mock
 	CatalogService catalogService;
 
 	@Before
@@ -111,15 +108,25 @@ public class VrServiceInstanceServiceTest {
 				vraClient.postDeleteRequest(Matchers.anyString(),
 						any(JsonElement.class), any(VrServiceInstance.class)))
 				.thenReturn(getJsonElement("deleteRequest.json"));
-	}
 
-	private static final String SD_ID = "e06ff060-dc7a-4f46-a7a7-c32c031fa31e";
-	private static final String P_ID = "e06ff060-dc7a-4f46-a7a7-c32c031fa31e";
+		// ServiceDefinition sd = new ServiceDefinition(TestConfig.SD_ID,
+		// "A Service Definition", "It's a great service", true, null);
+
+		Catalog catalog = gson.fromJson(
+				TestConfig.getContents("catItems.json"), Catalog.class);
+
+		when(catalogService.getCatalog()).thenReturn(catalog);
+
+		when(catalogService.getServiceDefinition(Matchers.anyString()))
+				.thenCallRealMethod();
+
+	}
 
 	@Test
 	public void testLifecycle() throws Exception {
 		CreateServiceInstanceRequest creq = new CreateServiceInstanceRequest(
-				SD_ID, P_ID, "orgId", "spaceId", true, null);
+				TestConfig.SD_ID, TestConfig.P_ID, "orgId", "spaceId", true,
+				null);
 		creq.withServiceInstanceId("12345");
 
 		VrServiceInstance instance = (VrServiceInstance) service
@@ -128,6 +135,7 @@ public class VrServiceInstanceServiceTest {
 		assertTrue(instance.isAsync());
 		assertTrue(instance.isCurrentOperationCreate());
 		assertTrue(instance.isInProgress());
+		assertEquals("12345", instance.getServiceInstanceId());
 
 		String state = instance.getServiceInstanceLastOperation().getState();
 		assertEquals("in progress", state);
@@ -136,46 +144,49 @@ public class VrServiceInstanceServiceTest {
 			LOG.info("request status: " + state);
 
 			// pretend this is taking a few seconds...
-			Thread.sleep(10000);
+			Thread.sleep(3000);
 			instance = (VrServiceInstance) service.getServiceInstance(instance
 					.getServiceInstanceId());
+			assertNotNull(instance);
+			assertEquals("12345", instance.getServiceInstanceId());
 			state = instance.getServiceInstanceLastOperation().getState();
+			assertNotNull(state);
 		}
+
 		LOG.info("request status: " + state);
 		assertEquals("succeeded", state);
 
 		DeleteServiceInstanceRequest dreq = new DeleteServiceInstanceRequest(
-				instance.getServiceInstanceId(), SD_ID, P_ID, true);
+				instance.getServiceInstanceId(), TestConfig.SD_ID,
+				TestConfig.P_ID, true);
 
 		instance = (VrServiceInstance) service.deleteServiceInstance(dreq);
+		assertNotNull(instance);
+		assertEquals("12345", instance.getServiceInstanceId());
 		state = instance.getServiceInstanceLastOperation().getState();
+		assertNotNull(state);
 		assertEquals("in progress", state);
 
 		while (state.equals("in progress")) {
 			LOG.info("request status: " + state);
-			Thread.sleep(10000);
+			Thread.sleep(3000);
 			instance = (VrServiceInstance) service.getServiceInstance(instance
 					.getServiceInstanceId());
+			assertNotNull(instance);
+			assertEquals("12345", instance.getServiceInstanceId());
 			state = instance.getServiceInstanceLastOperation().getState();
-
+			assertNotNull(state);
 		}
+
 		LOG.info("request status: " + state);
 		assertEquals("succeeded", state);
 	}
 
 	private JsonElement getJsonElement(String fileName) throws Exception {
 		JsonParser parser = new JsonParser();
-		JsonElement o = (JsonElement) parser.parse(getContents(fileName));
+		JsonElement o = (JsonElement) parser.parse(TestConfig
+				.getContents(fileName));
 
 		return o;
-	}
-
-	private String getContents(String fileName) throws ServiceBrokerException {
-		try {
-			URI u = new ClassPathResource(fileName).getURI();
-			return new String(Files.readAllBytes(Paths.get(u)));
-		} catch (IOException e) {
-			throw new ServiceBrokerException("error reading template.", e);
-		}
 	}
 }

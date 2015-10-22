@@ -3,10 +3,6 @@ package org.cloudfoundry.community.servicebroker.vrealize;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-import java.io.IOException;
-import java.net.URI;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.Map;
 
 import org.cloudfoundry.community.servicebroker.exception.ServiceBrokerException;
@@ -21,7 +17,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.google.gson.Gson;
@@ -31,6 +26,7 @@ import com.google.gson.JsonParser;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = { Application.class })
+@Ignore
 public class VraClientTest {
 
 	@Autowired
@@ -48,15 +44,10 @@ public class VraClientTest {
 	@Autowired
 	VraRepository repo;
 
-	private static final String SD_ID = "e06ff060-dc7a-4f46-a7a7-c32c031fa31e";
-	private static final String R_ID = "5c09a0f6-a19f-4ce9-904a-8f3bf8242ddc";
-
-	// private static final String P_ID =
-	// "e06ff060-dc7a-4f46-a7a7-c32c031fa31e";
-
 	@Test
 	public void testGetRequestTemplate() throws ServiceBrokerException {
-		ServiceDefinition sd = catalogService.getServiceDefinition(SD_ID);
+		ServiceDefinition sd = catalogService
+				.getServiceDefinition(TestConfig.SD_ID);
 		assertNotNull(sd);
 
 		String token = tokenService.getToken();
@@ -67,32 +58,23 @@ public class VraClientTest {
 	}
 
 	@Test
-	public void testPrepareRequest() throws ServiceBrokerException {
+	public void testPrepareRequest() throws Exception {
 		JsonParser parser = new JsonParser();
-		JsonObject o = (JsonObject) parser
-				.parse(getContents("requestTemplate.json"));
+		JsonObject o = (JsonObject) parser.parse(TestConfig
+				.getContents("requestTemplate.json"));
 		String s = client.prepareCreateRequestTemplate(o, "abc123").toString();
-		assertEquals(getContents("filteredRequestTemplate.json"), s);
-	}
-
-	private String getContents(String fileName) throws ServiceBrokerException {
-		try {
-			URI u = new ClassPathResource(fileName).getURI();
-			return new String(Files.readAllBytes(Paths.get(u)));
-		} catch (IOException e) {
-			throw new ServiceBrokerException("error reading template.", e);
-		}
+		assertEquals(TestConfig.getContents("filteredRequestTemplate.json"), s);
 	}
 
 	@Test
 	public void testGetRequestId() throws Exception {
 		JsonParser parser = new JsonParser();
-		JsonElement o = (JsonElement) parser
-				.parse(getContents("requestResponse.json"));
+		JsonElement o = (JsonElement) parser.parse(TestConfig
+				.getContents("requestResponse.json"));
 		assertNotNull(o);
 		String s = client.getRequestId(o);
 		assertNotNull(s);
-		assertEquals(R_ID, s);
+		assertEquals(TestConfig.R_ID, s);
 	}
 
 	@Test
@@ -100,7 +82,7 @@ public class VraClientTest {
 		CreateServiceInstanceRequest req = new CreateServiceInstanceRequest();
 		String token = tokenService.getToken();
 
-		VrServiceInstance si = VrServiceInstance.create(req, R_ID);
+		VrServiceInstance si = VrServiceInstance.create(req, TestConfig.R_ID);
 		ServiceInstanceLastOperation silo = client.getRequestStatus(token, si);
 		assertNotNull(silo);
 		assertEquals("succeeded", silo.getState());
@@ -108,69 +90,75 @@ public class VraClientTest {
 
 	@Test
 	public void testGetParameters() throws Exception {
-		String json = getContents("requestResponse.json");
+		String json = TestConfig.getContents("requestResponse.json");
 		JsonParser parser = new JsonParser();
 		JsonElement je = parser.parse(json);
 
-		Map<Enum<VrServiceInstance.ParameterKeys>, Object> m = client
-				.getParameters(je);
+		Map<String, Object> m = client.getParameters(je);
 		assertNotNull(m);
-		assertEquals(5, m.size());
-		assertEquals("3306", m.get(VrServiceInstance.ParameterKeys.PORT));
-		assertEquals("P1v0t4l!",
-				m.get(VrServiceInstance.ParameterKeys.PASSWORD));
-		assertEquals("mysqluser",
-				m.get(VrServiceInstance.ParameterKeys.USER_ID));
-		assertEquals("db01", m.get(VrServiceInstance.ParameterKeys.DB_ID));
-		// assertEquals("foo", m.get("host"));
+		assertEquals(6, m.size());
+		assertEquals("3306", m.get(VrServiceInstance.PORT));
+		assertEquals("P1v0t4l!", m.get(VrServiceInstance.PASSWORD));
+		assertEquals("mysqluser", m.get(VrServiceInstance.USER_ID));
+		assertEquals("db01", m.get(VrServiceInstance.DB_ID));
+		// assertEquals("foo", m.get("HOST"));
+		assertEquals("mysql", m.get(VrServiceInstance.SERVICE_TYPE));
 	}
 
 	@Test
-	public void testGetLastOperation() throws ServiceBrokerException {
+	public void testGetLastOperation() throws Exception {
 		JsonParser parser = new JsonParser();
-		JsonElement je = parser
-				.parse(getContents("submittedRequestResponse.json"));
+		JsonElement je = parser.parse(TestConfig
+				.getContents("submittedRequestResponse.json"));
 
 		ServiceInstanceLastOperation silo = client.getLastOperation(je);
 		assertNotNull(silo);
 		assertEquals("in progress", silo.getState());
 
-		je = parser.parse(getContents("inProgressRequestResponse.json"));
+		je = parser.parse(TestConfig
+				.getContents("inProgressRequestResponse.json"));
 		silo = client.getLastOperation(je);
 		assertNotNull(silo);
 		assertEquals("in progress", silo.getState());
 
-		je = parser.parse(getContents("pendingPreRequestResponse.json"));
+		je = parser.parse(TestConfig
+				.getContents("pendingPreRequestResponse.json"));
 		silo = client.getLastOperation(je);
 		assertNotNull(silo);
 		assertEquals("in progress", silo.getState());
 
-		je = parser.parse(getContents("pendingPostRequestResponse.json"));
+		je = parser.parse(TestConfig
+				.getContents("pendingPostRequestResponse.json"));
 		silo = client.getLastOperation(je);
 		assertNotNull(silo);
 		assertEquals("in progress", silo.getState());
 
-		je = parser.parse(getContents("successfulPostRequestResponse.json"));
+		je = parser.parse(TestConfig
+				.getContents("successfulPostRequestResponse.json"));
 		silo = client.getLastOperation(je);
 		assertNotNull(silo);
 		assertEquals("succeeded", silo.getState());
 
-		je = parser.parse(getContents("failedPostRequestResponse.json"));
+		je = parser.parse(TestConfig
+				.getContents("failedPostRequestResponse.json"));
 		silo = client.getLastOperation(je);
 		assertNotNull(silo);
 		assertEquals("failed", silo.getState());
 
-		je = parser.parse(getContents("rejectedRequestResponse.json"));
+		je = parser.parse(TestConfig
+				.getContents("rejectedRequestResponse.json"));
 		silo = client.getLastOperation(je);
 		assertNotNull(silo);
 		assertEquals("failed", silo.getState());
 
-		je = parser.parse(getContents("bogusStateRequestResponse.json"));
+		je = parser.parse(TestConfig
+				.getContents("bogusStateRequestResponse.json"));
 		silo = client.getLastOperation(je);
 		assertNotNull(silo);
 		assertEquals("failed", silo.getState());
 
-		je = parser.parse(getContents("missingStateRequestResponse.json"));
+		je = parser.parse(TestConfig
+				.getContents("missingStateRequestResponse.json"));
 		silo = client.getLastOperation(je);
 		assertNotNull(silo);
 		assertEquals("failed", silo.getState());
@@ -196,17 +184,17 @@ public class VraClientTest {
 	@Test
 	public void testGetLinks() throws Exception {
 		JsonParser parser = new JsonParser();
-		JsonElement je = parser.parse(getContents("requestResources.json"));
-		Map<Enum<VrServiceInstance.MetatdataKeys>, String> m = client
-				.getDeleteLinks(je);
+		JsonElement je = parser.parse(TestConfig
+				.getContents("requestResources.json"));
+		Map<String, String> m = client.getDeleteLinks(je);
 		assertNotNull(m);
 		assertEquals(2, m.size());
 		assertEquals(
 				"https://vra.vra.lab/catalog-service/api/consumer/resources/d591e58d-b2cf-4061-aec1-7f41168b7a6d/actions/fe9af618-f21d-47a2-bebc-62d5914f6e6c/requests/template",
-				m.get(VrServiceInstance.MetatdataKeys.DELETE_TEMPLATE_LINK));
+				m.get(VrServiceInstance.DELETE_TEMPLATE_LINK));
 		assertEquals(
 				"https://vra.vra.lab/catalog-service/api/consumer/resources/d591e58d-b2cf-4061-aec1-7f41168b7a6d/actions/fe9af618-f21d-47a2-bebc-62d5914f6e6c/requests",
-				m.get(VrServiceInstance.MetatdataKeys.DELETE_LINK));
+				m.get(VrServiceInstance.DELETE_LINK));
 	}
 
 	@Test

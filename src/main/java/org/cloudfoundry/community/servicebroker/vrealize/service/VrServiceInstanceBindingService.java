@@ -97,9 +97,38 @@ public class VrServiceInstanceBindingService implements
 		return BINDINGS.remove(binding.getId());
 	}
 
-	private String getConnectionString(VrServiceInstance si) {
-		String userId = si.getParameters().get("foo").toString();
+	// TODO generalize this!
+	private String getConnectionString(VrServiceInstance si)
+			throws ServiceBrokerException {
 
-		return null;
+		// returns a string in the format:
+		// DB-TYPE://USERNAME:PASSWORD@HOSTNAME:PORT/NAME
+		Object dbType = si.getParameters().get(VrServiceInstance.SERVICE_TYPE);
+		Object userId = si.getParameters().get(VrServiceInstance.USER_ID);
+		Object pw = si.getParameters().get(VrServiceInstance.PASSWORD);
+		Object host = si.getParameters().get(VrServiceInstance.HOST);
+		Object port = si.getParameters().get(VrServiceInstance.PORT);
+		Object dbId = si.getParameters().get(VrServiceInstance.DB_ID);
+
+		if (dbType == null || userId == null || pw == null || host == null
+				|| port == null || dbId == null) {
+			throw new ServiceBrokerException(
+					"unable to construct connection uri from ServiceInstance.");
+		}
+
+		StringBuffer sb = new StringBuffer();
+		sb.append(dbType);
+		sb.append("://");
+		sb.append(userId);
+		sb.append(":");
+		sb.append(pw);
+		sb.append("@");
+		sb.append(host);
+		sb.append(":");
+		sb.append(port);
+		sb.append("/");
+		sb.append(dbId);
+
+		return sb.toString();
 	}
 }

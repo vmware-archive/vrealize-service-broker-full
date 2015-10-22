@@ -9,30 +9,40 @@ import org.cloudfoundry.community.servicebroker.model.OperationState;
 import org.cloudfoundry.community.servicebroker.model.ServiceInstance;
 import org.cloudfoundry.community.servicebroker.model.ServiceInstanceLastOperation;
 import org.cloudfoundry.community.servicebroker.model.UpdateServiceInstanceRequest;
+import org.springframework.data.annotation.Id;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 public class VrServiceInstance extends ServiceInstance {
 
-	public enum MetatdataKeys {
-		CREATE_REQUEST_ID, DELETE_REQUEST_ID, CREATE_TEMPLATE_LINK, DELETE_TEMPLATE_LINK, DELETE_LINK, RESOURCES_LINK
-	}
+	// some "known" keys to store stuff under
+	// metatdata keys
+	public static final String CREATE_REQUEST_ID = "CREATE_REQUEST_ID";
+	public static final String DELETE_REQUEST_ID = "DELETE_REQUEST_ID";
+	public static final String CREATE_TEMPLATE_LINK = "CREATE_TEMPLATE_LINK";
+	public static final String DELETE_TEMPLATE_LINK = "DELETE_TEMPLATE_LINK";
+	public static final String DELETE_LINK = "DELETE_LINK";
+	public static final String RESOURCES_LINK = "RESOURCES_LINK";
 
-	public enum ParameterKeys {
-		USER_ID, PASSWORD, DB_ID, HOST_IP, PORT
-	}
+	// parameter keys
+	public static final String USER_ID = "USER_ID";
+	public static final String PASSWORD = "PASSWORD";
+	public static final String DB_ID = "DB_ID";
+	public static final String HOST = "HOST";
+	public static final String PORT = "PORT";
+	public static final String SERVICE_TYPE = "SERVICE_TYPE";
 
-	// @Id
-	// private String id;
+	@Id
+	private String id;
 
 	@JsonSerialize
 	@JsonProperty("parameters")
-	private final Map<Enum<ParameterKeys>, Object> parameters = new HashMap<Enum<ParameterKeys>, Object>();
+	private final Map<String, Object> parameters = new HashMap<String, Object>();
 
 	@JsonSerialize
 	@JsonProperty("metadata")
-	private final Map<Enum<MetatdataKeys>, String> metadata = new HashMap<Enum<MetatdataKeys>, String>();
+	private final Map<String, Object> metadata = new HashMap<String, Object>();
 
 	public static VrServiceInstance create(
 			CreateServiceInstanceRequest request, String createRequestId) {
@@ -40,10 +50,9 @@ public class VrServiceInstance extends ServiceInstance {
 		ServiceInstanceLastOperation silo = new ServiceInstanceLastOperation(
 				createRequestId, OperationState.IN_PROGRESS);
 		instance.withLastOperation(silo);
-		instance.getMetadata().put(
-				VrServiceInstance.MetatdataKeys.CREATE_REQUEST_ID,
-				createRequestId);
+		instance.getMetadata().put(CREATE_REQUEST_ID, createRequestId);
 		instance.withAsync(true);
+		instance.setId(instance.getServiceInstanceId());
 
 		return instance;
 	}
@@ -59,9 +68,7 @@ public class VrServiceInstance extends ServiceInstance {
 
 	public static VrServiceInstance delete(VrServiceInstance instance,
 			String deleteRequestId) {
-		instance.getMetadata().put(
-				VrServiceInstance.MetatdataKeys.DELETE_REQUEST_ID,
-				deleteRequestId);
+		instance.getMetadata().put(DELETE_REQUEST_ID, deleteRequestId);
 		ServiceInstanceLastOperation silo = new ServiceInstanceLastOperation(
 				deleteRequestId, OperationState.IN_PROGRESS);
 		instance.withLastOperation(silo);
@@ -85,11 +92,11 @@ public class VrServiceInstance extends ServiceInstance {
 		super(request);
 	}
 
-	public Map<Enum<VrServiceInstance.ParameterKeys>, Object> getParameters() {
+	public Map<String, Object> getParameters() {
 		return parameters;
 	}
 
-	public Map<Enum<MetatdataKeys>, String> getMetadata() {
+	public Map<String, Object> getMetadata() {
 		return metadata;
 	}
 
@@ -104,11 +111,11 @@ public class VrServiceInstance extends ServiceInstance {
 	}
 
 	public boolean isCurrentOperationDelete() {
-		return getMetadata().containsKey(MetatdataKeys.DELETE_REQUEST_ID);
+		return getMetadata().containsKey(DELETE_REQUEST_ID);
 	}
 
 	public boolean isCurrentOperationCreate() {
-		return getMetadata().containsKey(MetatdataKeys.CREATE_REQUEST_ID)
+		return getMetadata().containsKey(CREATE_REQUEST_ID)
 				&& !isCurrentOperationDelete();
 	}
 
@@ -128,14 +135,14 @@ public class VrServiceInstance extends ServiceInstance {
 	}
 
 	public String getCreateRequestId() {
-		return getMetadata().get(MetatdataKeys.CREATE_REQUEST_ID);
+		return getMetadata().get(CREATE_REQUEST_ID).toString();
 	}
 
-	// public String getId() {
-	// return id;
-	// }
-	//
-	// public void setId(String id) {
-	// this.id = id;
-	// }
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
 }

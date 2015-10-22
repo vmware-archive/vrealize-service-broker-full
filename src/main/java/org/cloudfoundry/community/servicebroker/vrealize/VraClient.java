@@ -33,6 +33,13 @@ import com.jayway.jsonpath.ReadContext;
 @Service
 public class VraClient {
 
+	public static final String SUCCESSFUL = "SUCCESSFUL";
+	public static final String UNSUBMITTED = "UNSUBMITTED";
+	public static final String SUBMITTED = "SUBMITTED";
+	public static final String PENDING_PRE_APPROVAL = "PENDING_PRE_APPROVAL";
+	public static final String IN_PROGRESS = "IN_PROGRESS";
+	public static final String PENDING_POST_APPROVAL = "PENDING_POST_APPROVAL";
+
 	@Autowired
 	private VraRepository vraRepository;
 
@@ -88,7 +95,7 @@ public class VraClient {
 		}
 
 		return vraRepository.postRequest("Bearer " + token, si.getMetadata()
-				.get(VrServiceInstance.MetatdataKeys.DELETE_LINK), body);
+				.get(VrServiceInstance.DELETE_LINK).toString(), body);
 
 	}
 
@@ -193,14 +200,14 @@ public class VraClient {
 			return OperationState.FAILED;
 		}
 
-		if ("SUCCESSFUL".equals(vrStatus)) {
+		if (SUCCESSFUL.equals(vrStatus)) {
 			return OperationState.SUCCEEDED;
 		}
 
-		if ("UNSUBMITTED".equals(vrStatus) || "SUBMITTED".equals(vrStatus)
-				|| "PENDING_PRE_APPROVAL".equals(vrStatus)
-				|| "IN_PROGRESS".equals(vrStatus)
-				|| "PENDING_POST_APPROVAL".equals(vrStatus)) {
+		if (UNSUBMITTED.equals(vrStatus) || SUBMITTED.equals(vrStatus)
+				|| PENDING_PRE_APPROVAL.equals(vrStatus)
+				|| IN_PROGRESS.equals(vrStatus)
+				|| PENDING_POST_APPROVAL.equals(vrStatus)) {
 			return OperationState.IN_PROGRESS;
 		}
 
@@ -221,20 +228,17 @@ public class VraClient {
 		return je.getAsString();
 	}
 
-	public Map<Enum<VrServiceInstance.ParameterKeys>, Object> getParameters(
-			JsonElement requestResponse) {
-		Map<Enum<VrServiceInstance.ParameterKeys>, Object> m = new HashMap<Enum<VrServiceInstance.ParameterKeys>, Object>();
+	public Map<String, Object> getParameters(JsonElement requestResponse) {
+		Map<String, Object> m = new HashMap<String, Object>();
 		Map<String, Object> keyValues = getCustomValues(requestResponse);
 
 		// TODO: this works for mysql, make it generalized!
-		m.put(VrServiceInstance.ParameterKeys.USER_ID,
-				keyValues.get("mysql_user"));
-		m.put(VrServiceInstance.ParameterKeys.PASSWORD,
-				keyValues.get("mysql_passwd"));
-		m.put(VrServiceInstance.ParameterKeys.DB_ID,
-				keyValues.get("mysql_dbname"));
-		m.put(VrServiceInstance.ParameterKeys.HOST_IP, keyValues.get("foo"));
-		m.put(VrServiceInstance.ParameterKeys.PORT, keyValues.get("mysql_port"));
+		m.put(VrServiceInstance.USER_ID, keyValues.get("mysql_user"));
+		m.put(VrServiceInstance.PASSWORD, keyValues.get("mysql_passwd"));
+		m.put(VrServiceInstance.DB_ID, keyValues.get("mysql_dbname"));
+		m.put(VrServiceInstance.HOST, keyValues.get("foo"));
+		m.put(VrServiceInstance.PORT, keyValues.get("mysql_port"));
+		m.put(VrServiceInstance.SERVICE_TYPE, "mysql");
 
 		return m;
 
@@ -276,7 +280,7 @@ public class VraClient {
 		}
 
 		String path = si.getMetadata()
-				.get(VrServiceInstance.MetatdataKeys.DELETE_TEMPLATE_LINK)
+				.get(VrServiceInstance.DELETE_TEMPLATE_LINK).toString()
 				.substring(serviceUri.length() + 1);
 		return vraRepository.getRequest("Bearer " + token, path);
 	}
@@ -286,19 +290,16 @@ public class VraClient {
 				si.getCreateRequestId());
 	}
 
-	public Map<Enum<VrServiceInstance.MetatdataKeys>, String> getDeleteLinks(
-			JsonElement resources) {
-		Map<Enum<VrServiceInstance.MetatdataKeys>, String> map = new HashMap<Enum<VrServiceInstance.MetatdataKeys>, String>();
+	public Map<String, String> getDeleteLinks(JsonElement resources) {
+		Map<String, String> map = new HashMap<String, String>();
 		ReadContext ctx = JsonPath.parse(resources.toString());
 
 		JSONArray o = ctx
 				.read("$.content.[0].links[?(@.rel == 'GET Template: {com.vmware.csp.component.cafe.composition@resource.action.deployment.destroy.name}')].href");
-		map.put(VrServiceInstance.MetatdataKeys.DELETE_TEMPLATE_LINK, o.get(0)
-				.toString());
+		map.put(VrServiceInstance.DELETE_TEMPLATE_LINK, o.get(0).toString());
 
 		o = ctx.read("$.content.[0].links[?(@.rel == 'POST: {com.vmware.csp.component.cafe.composition@resource.action.deployment.destroy.name}')].href");
-		map.put(VrServiceInstance.MetatdataKeys.DELETE_LINK, o.get(0)
-				.toString());
+		map.put(VrServiceInstance.DELETE_LINK, o.get(0).toString());
 
 		return map;
 	}
@@ -306,7 +307,7 @@ public class VraClient {
 	public VrServiceInstance loadMetadata(String token,
 			VrServiceInstance instance) {
 		JsonElement je = getRequestResources(token, instance);
-		Map<Enum<VrServiceInstance.MetatdataKeys>, String> links = getDeleteLinks(je);
+		Map<String, String> links = getDeleteLinks(je);
 		instance.getMetadata().putAll(links);
 
 		return instance;
