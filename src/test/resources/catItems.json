@@ -3,7 +3,7 @@
     "content": [
         {
             "@type": "CatalogItem",
-            "id": "fd9910c8-e056-4e5d-b0ed-af0afa70c1ce",
+            "catalogItemId": "e06ff060-dc7a-4f46-a7a7-c32c031fa31e",
             "version": 0,
             "name": "OpenStack Machine",
             "description": "Provisions an OpenStack based machine.",
@@ -36,7 +36,7 @@
         },
         {
             "@type": "CatalogItem",
-            "id": "05c35ad0-65af-40b2-b27d-324804def4a4",
+            "catalogItemId": "05c35ad0-65af-40b2-b27d-324804def4a4",
             "version": 0,
             "name": "vSphere Machine",
             "description": "Provisions a VMware vSphere based machine.",
@@ -69,7 +69,7 @@
         },
         {
             "@type": "CatalogItem",
-            "id": "5ac6ec15-2c27-4338-bc18-e3bd161b9944",
+            "catalogItemId": "5ac6ec15-2c27-4338-bc18-e3bd161b9944",
             "version": 0,
             "name": "SCVMM Machine",
             "description": "Provisions a Microsoft SCVMM based machine.",
@@ -102,7 +102,7 @@
         },
         {
             "@type": "CatalogItem",
-            "id": "4564b9b4-6e76-4da5-acae-8fed8498332a",
+            "catalogItemId": "4564b9b4-6e76-4da5-acae-8fed8498332a",
             "version": 0,
             "name": "KVM (RHEV) Machine",
             "description": "Provisions a KVM Machine based on Red Hat Enterprise Virtualization.",
@@ -135,7 +135,7 @@
         },
         {
             "@type": "CatalogItem",
-            "id": "2ce37e80-e526-416a-bf68-a52176ced367",
+            "catalogItemId": "2ce37e80-e526-416a-bf68-a52176ced367",
             "version": 0,
             "name": "Amazon Machine",
             "description": "Provisions an Amazon EC2 based machine.",
@@ -168,7 +168,7 @@
         },
         {
             "@type": "CatalogItem",
-            "id": "4eba379d-b63b-4127-b3b2-ae6dc66ed761",
+            "catalogItemId": "4eba379d-b63b-4127-b3b2-ae6dc66ed761",
             "version": 0,
             "name": "HP iLO Machine",
             "description": "Provisions an HP iLO physical machine.",
@@ -201,7 +201,7 @@
         },
         {
             "@type": "CatalogItem",
-            "id": "840c2165-c47e-4d88-9d5f-8a0b05e39efd",
+            "catalogItemId": "840c2165-c47e-4d88-9d5f-8a0b05e39efd",
             "version": 0,
             "name": "Cisco UCS Machine",
             "description": "Provisions a Cisco UCS physical machine.",
@@ -234,7 +234,7 @@
         },
         {
             "@type": "CatalogItem",
-            "id": "ae94a050-8733-4589-84bc-080483760379",
+            "catalogItemId": "ae94a050-8733-4589-84bc-080483760379",
             "version": 0,
             "name": "Dell iDRAC Machine",
             "description": "Provisions a Dell iDRAC physical machine.",
@@ -267,7 +267,7 @@
         },
         {
             "@type": "CatalogItem",
-            "id": "12394250-cce3-4137-a8f2-c5d652122644",
+            "catalogItemId": "12394250-cce3-4137-a8f2-c5d652122644",
             "version": 0,
             "name": "HyperV Machine",
             "description": "Provisions a Microsoft HyperV based machine.",
@@ -300,7 +300,7 @@
         },
         {
             "@type": "CatalogItem",
-            "id": "d51dd5b0-3e76-4593-84eb-c16957f41628",
+            "catalogItemId": "d51dd5b0-3e76-4593-84eb-c16957f41628",
             "version": 0,
             "name": "Citrix Xen Machine",
             "description": "Provisions a Citrix Xen based machine.",
@@ -333,7 +333,7 @@
         },
         {
             "@type": "CatalogItem",
-            "id": "fbfcf35f-6c2b-4cd7-bb32-58dc6dd84db3",
+            "catalogItemId": "fbfcf35f-6c2b-4cd7-bb32-58dc6dd84db3",
             "version": 0,
             "name": "Generic Virtual Machine",
             "description": "Provisions a generic virtual machine.",
@@ -366,7 +366,7 @@
         },
         {
             "@type": "CatalogItem",
-            "id": "0ee12daf-3bc9-4492-b8d4-d67ad276efcd",
+            "catalogItemId": "0ee12daf-3bc9-4492-b8d4-d67ad276efcd",
             "version": 0,
             "name": "vCloud Director Machine",
             "description": "Provisions a VMware vCloud Director based machine.",
@@ -399,7 +399,7 @@
         },
         {
             "@type": "CatalogItem",
-            "id": "702ddd07-c5ba-4cc4-ba29-25390cbbcb7a",
+            "catalogItemId": "702ddd07-c5ba-4cc4-ba29-25390cbbcb7a",
             "version": 0,
             "name": "vCloud Air Machine",
             "description": "Provisions a VMware vCloud Air based machine.",
@@ -432,7 +432,7 @@
         },
         {
             "@type": "CatalogItem",
-            "id": "c5e1229e-142f-482f-8d19-324e97dc3e7c",
+            "catalogItemId": "c5e1229e-142f-482f-8d19-324e97dc3e7c",
             "version": 0,
             "name": "Existing Security Group",
             "description": "Existing Security Group ({com.vmware.csp.component.iaas.proxy.provider@network.securitygroup.type.registration.name.Infrastructure.Network.SecurityGroup.NSX})",
@@ -465,7 +465,7 @@
         },
         {
             "@type": "CatalogItem",
-            "id": "8ac60b99-df66-4c96-9355-89704fb8db63",
+            "catalogItemId": "8ac60b99-df66-4c96-9355-89704fb8db63",
             "version": 0,
             "name": "On Demand Security Group",
             "description": "On Demand Security Group ({com.vmware.csp.component.iaas.proxy.provider@network.securitygroup.type.registration.name.Infrastructure.Network.SecurityGroup.NSX})",
@@ -498,7 +498,7 @@
         },
         {
             "@type": "CatalogItem",
-            "id": "b05ac5a7-5ab4-4c98-b175-61228bb607a8",
+            "catalogItemId": "b05ac5a7-5ab4-4c98-b175-61228bb607a8",
             "version": 0,
             "name": "Security Tag",
             "description": "Security Tag ({com.vmware.csp.component.iaas.proxy.provider@network.securitytag.type.registration.name.Infrastructure.Network.SecurityTag.NSX})",
@@ -531,7 +531,7 @@
         },
         {
             "@type": "CatalogItem",
-            "id": "5ae3589f-0354-4d24-8dda-441376e1ebb5",
+            "catalogItemId": "5ae3589f-0354-4d24-8dda-441376e1ebb5",
             "version": 0,
             "name": "Existing Network",
             "description": "Existing Network {com.vmware.csp.component.iaas.proxy.provider@network.network.type.registration.name.Infrastructure.Network.Network.Existing}",
