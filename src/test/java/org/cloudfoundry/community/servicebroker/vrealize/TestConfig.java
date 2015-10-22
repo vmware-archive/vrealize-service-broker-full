@@ -5,7 +5,9 @@ import java.net.UnknownHostException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
+import org.cloudfoundry.community.servicebroker.model.CreateServiceInstanceRequest;
 import org.cloudfoundry.community.servicebroker.vrealize.domain.Creds;
+import org.cloudfoundry.community.servicebroker.vrealize.persistance.VrServiceInstance;
 import org.cloudfoundry.community.servicebroker.vrealize.persistance.VrServiceInstanceRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -49,6 +51,17 @@ public class TestConfig {
 	public static String getContents(String fileName) throws Exception {
 		URI u = new ClassPathResource(fileName).getURI();
 		return new String(Files.readAllBytes(Paths.get(u)));
+	}
+
+	public static CreateServiceInstanceRequest getServiceInstanceRequest() {
+		CreateServiceInstanceRequest req = new CreateServiceInstanceRequest(
+				"sdId", "pId", "orgId", "spaceId", true, null);
+		req.withServiceInstanceId("anID");
+		return req;
+	}
+
+	public static VrServiceInstance getServiceInstance() {
+		return VrServiceInstance.create(getServiceInstanceRequest(), "12345");
 	}
 
 }

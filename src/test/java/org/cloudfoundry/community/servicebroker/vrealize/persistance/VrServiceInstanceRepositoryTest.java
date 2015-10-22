@@ -53,15 +53,12 @@ public class VrServiceInstanceRepositoryTest {
 
 		repository.save(si);
 		assertEquals(1, repository.count());
-		// assertEquals(1, mongo.getCollection(COLLECTION).count());
 	}
 
 	@Test
 	public void instanceDeletedSuccessfully() throws Exception {
 		VrServiceInstance si = getInstance();
 		assertEquals(0, repository.count());
-
-		// assertEquals(0, mongo.getCollection(COLLECTION).count());
 
 		si = repository.save(si);
 		assertEquals(1, repository.count());

@@ -18,6 +18,7 @@ import org.cloudfoundry.community.servicebroker.exception.ServiceBrokerException
 import org.cloudfoundry.community.servicebroker.model.OperationState;
 import org.cloudfoundry.community.servicebroker.model.ServiceDefinition;
 import org.cloudfoundry.community.servicebroker.model.ServiceInstanceLastOperation;
+import org.cloudfoundry.community.servicebroker.vrealize.adapter.Adaptors;
 import org.cloudfoundry.community.servicebroker.vrealize.domain.Creds;
 import org.cloudfoundry.community.servicebroker.vrealize.persistance.VrServiceInstance;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,7 +53,6 @@ public class VraClient {
 	@Autowired
 	String serviceUri;
 
-	// TODO: assumes that there is only 1 plan for a vR service definition
 	public JsonElement getCreateRequestTemplate(String token,
 			ServiceDefinition sd) {
 		if (token == null || sd == null) {
@@ -228,20 +228,9 @@ public class VraClient {
 		return je.getAsString();
 	}
 
-	public Map<String, Object> getParameters(JsonElement requestResponse) {
-		Map<String, Object> m = new HashMap<String, Object>();
-		Map<String, Object> keyValues = getCustomValues(requestResponse);
-
-		// TODO: this works for mysql, make it generalized!
-		m.put(VrServiceInstance.USER_ID, keyValues.get("mysql_user"));
-		m.put(VrServiceInstance.PASSWORD, keyValues.get("mysql_passwd"));
-		m.put(VrServiceInstance.DB_ID, keyValues.get("mysql_dbname"));
-		m.put(VrServiceInstance.HOST, keyValues.get("foo"));
-		m.put(VrServiceInstance.PORT, keyValues.get("mysql_port"));
-		m.put(VrServiceInstance.SERVICE_TYPE, "mysql");
-
-		return m;
-
+	public Map<String, Object> getParameters(JsonElement requestResponse)
+			throws ServiceBrokerException {
+		return Adaptors.getParameters(getCustomValues(requestResponse));
 	}
 
 	private Map<String, Object> getCustomValues(JsonElement requestResponse) {

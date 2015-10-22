@@ -11,6 +11,7 @@ import org.cloudfoundry.community.servicebroker.model.ServiceInstanceBinding;
 import org.cloudfoundry.community.servicebroker.service.ServiceInstanceBindingService;
 import org.cloudfoundry.community.servicebroker.service.ServiceInstanceService;
 import org.cloudfoundry.community.servicebroker.vrealize.VraClient;
+import org.cloudfoundry.community.servicebroker.vrealize.adapter.Adaptors;
 import org.cloudfoundry.community.servicebroker.vrealize.persistance.VrServiceInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -53,12 +54,9 @@ public class VrServiceInstanceBindingService implements
 					"ServiceInstance operation is still in progress.");
 		}
 
-		// TODO assumes a mysql jdbc connection. Make this generic!
-		Map<String, Object> credentials = new HashMap<String, Object>();
-		credentials.put("uri", getConnectionString(si));
-
 		ServiceInstanceBinding binding = new ServiceInstanceBinding(bindingId,
-				serviceInstanceId, credentials, null, request.getAppGuid());
+				serviceInstanceId, Adaptors.getCredentials(si), null,
+				request.getAppGuid());
 
 		saveBinding(binding);
 		return binding;
@@ -97,38 +95,4 @@ public class VrServiceInstanceBindingService implements
 		return BINDINGS.remove(binding.getId());
 	}
 
-	// TODO generalize this!
-	private String getConnectionString(VrServiceInstance si)
-			throws ServiceBrokerException {
-
-		// returns a string in the format:
-		// DB-TYPE://USERNAME:PASSWORD@HOSTNAME:PORT/NAME
-		Object dbType = si.getParameters().get(VrServiceInstance.SERVICE_TYPE);
-		Object userId = si.getParameters().get(VrServiceInstance.USER_ID);
-		Object pw = si.getParameters().get(VrServiceInstance.PASSWORD);
-		Object host = si.getParameters().get(VrServiceInstance.HOST);
-		Object port = si.getParameters().get(VrServiceInstance.PORT);
-		Object dbId = si.getParameters().get(VrServiceInstance.DB_ID);
-
-		if (dbType == null || userId == null || pw == null || host == null
-				|| port == null || dbId == null) {
-			throw new ServiceBrokerException(
-					"unable to construct connection uri from ServiceInstance.");
-		}
-
-		StringBuffer sb = new StringBuffer();
-		sb.append(dbType);
-		sb.append("://");
-		sb.append(userId);
-		sb.append(":");
-		sb.append(pw);
-		sb.append("@");
-		sb.append(host);
-		sb.append(":");
-		sb.append(port);
-		sb.append("/");
-		sb.append(dbId);
-
-		return sb.toString();
-	}
 }

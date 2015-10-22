@@ -10,10 +10,12 @@ import org.cloudfoundry.community.servicebroker.model.ServiceInstance;
 import org.cloudfoundry.community.servicebroker.model.ServiceInstanceLastOperation;
 import org.cloudfoundry.community.servicebroker.model.UpdateServiceInstanceRequest;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
+@Document
 public class VrServiceInstance extends ServiceInstance {
 
 	// some "known" keys to store stuff under
@@ -32,6 +34,11 @@ public class VrServiceInstance extends ServiceInstance {
 	public static final String HOST = "HOST";
 	public static final String PORT = "PORT";
 	public static final String SERVICE_TYPE = "SERVICE_TYPE";
+
+	// other keys
+	public static final String URI = "uri";
+	public static final String OPERATION_STATE_SUCCEEDED = "succeeded";
+	public static final String OPERATION_STATE_IN_PROGRESS = "in progress";
 
 	@Id
 	private String id;
@@ -107,7 +114,7 @@ public class VrServiceInstance extends ServiceInstance {
 		}
 
 		return getServiceInstanceLastOperation().getState().equals(
-				"in progress");
+				OPERATION_STATE_IN_PROGRESS);
 	}
 
 	public boolean isCurrentOperationDelete() {
@@ -124,7 +131,8 @@ public class VrServiceInstance extends ServiceInstance {
 				|| getServiceInstanceLastOperation().getState() == null) {
 			return false;
 		}
-		return getServiceInstanceLastOperation().getState().equals("succeeded");
+		return getServiceInstanceLastOperation().getState().equals(
+				OPERATION_STATE_SUCCEEDED);
 	}
 
 	public String getCurrentOperationRequestId() {
