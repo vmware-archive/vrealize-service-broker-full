@@ -1,8 +1,5 @@
 package org.cloudfoundry.community.servicebroker.vrealize.service;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.log4j.Logger;
 import org.cloudfoundry.community.servicebroker.exception.ServiceBrokerException;
 import org.cloudfoundry.community.servicebroker.exception.ServiceInstanceDoesNotExistException;
@@ -18,6 +15,7 @@ import org.cloudfoundry.community.servicebroker.service.ServiceInstanceService;
 import org.cloudfoundry.community.servicebroker.vrealize.VraClient;
 import org.cloudfoundry.community.servicebroker.vrealize.domain.Creds;
 import org.cloudfoundry.community.servicebroker.vrealize.persistance.VrServiceInstance;
+import org.cloudfoundry.community.servicebroker.vrealize.persistance.VrServiceInstanceRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -38,13 +36,11 @@ public class VrServiceInstanceService implements ServiceInstanceService {
 	@Autowired
 	CatalogService catalogService;
 
-	// @Autowired
-	// VrServiceInstanceRepository repository;
+	@Autowired
+	VrServiceInstanceRepository repository;
 
 	@Autowired
 	Creds creds;
-
-	private static final Map<String, VrServiceInstance> INSTANCES = new HashMap<String, VrServiceInstance>();
 
 	@Override
 	public ServiceInstance getServiceInstance(String id) {
@@ -122,7 +118,7 @@ public class VrServiceInstanceService implements ServiceInstanceService {
 
 		if (request.getServiceInstanceId() != null
 				&& getInstance(request.getServiceInstanceId()) != null) {
-			throw new ServiceInstanceExistsException(INSTANCES.get(request
+			throw new ServiceInstanceExistsException(repository.findOne(request
 					.getServiceInstanceId()));
 		}
 
@@ -156,7 +152,7 @@ public class VrServiceInstanceService implements ServiceInstanceService {
 		// add information from response to service instance parameters
 		instance.getParameters().putAll(vraClient.getParameters(response));
 
-		saveInstance(instance);
+		instance = saveInstance(instance);
 
 		LOG.info("registered service instance: "
 				+ instance.getServiceInstanceId() + " requestId: " + requestId);
@@ -218,17 +214,17 @@ public class VrServiceInstanceService implements ServiceInstanceService {
 		if (id == null) {
 			return null;
 		}
-		return INSTANCES.get(id);
+		return repository.findOne(id);
 	}
 
-	private VrServiceInstance deleteInstance(VrServiceInstance instance) {
+	private void deleteInstance(VrServiceInstance instance) {
 		if (instance == null || instance.getServiceInstanceId() == null) {
-			return null;
+			return;
 		}
-		return INSTANCES.remove(instance.getServiceInstanceId());
+		repository.delete(instance.getServiceInstanceId());
 	}
 
-	private void saveInstance(VrServiceInstance instance) {
-		INSTANCES.put(instance.getServiceInstanceId(), instance);
+	private VrServiceInstance saveInstance(VrServiceInstance instance) {
+		return repository.save(instance);
 	}
 }

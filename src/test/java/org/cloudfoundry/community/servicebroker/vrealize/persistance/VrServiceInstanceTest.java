@@ -4,9 +4,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import org.cloudfoundry.community.servicebroker.model.CreateServiceInstanceRequest;
 import org.cloudfoundry.community.servicebroker.model.OperationState;
 import org.cloudfoundry.community.servicebroker.vrealize.Application;
+import org.cloudfoundry.community.servicebroker.vrealize.TestConfig;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,8 +24,7 @@ public class VrServiceInstanceTest {
 
 	@Test
 	public void testStates() {
-		VrServiceInstance si = VrServiceInstance.create(
-				getServiceInstanceRequest(), "12345");
+		VrServiceInstance si = TestConfig.getServiceInstance();
 
 		assertTrue(si.isCurrentOperationCreate());
 		assertFalse(si.isCurrentOperationDelete());
@@ -101,17 +100,9 @@ public class VrServiceInstanceTest {
 		System.out.println(gson.toJson(si));
 	}
 
-	private CreateServiceInstanceRequest getServiceInstanceRequest() {
-		CreateServiceInstanceRequest req = new CreateServiceInstanceRequest(
-				"sdId", "pId", "orgId", "spaceId", true, null);
-		req.withServiceInstanceId("anID");
-		return req;
-	}
-
 	@Test
 	public void testToJson() {
-		VrServiceInstance si = VrServiceInstance.create(
-				getServiceInstanceRequest(), "12345");
+		VrServiceInstance si = TestConfig.getServiceInstance();
 		si.getParameters().put("foo", "bar");
 		toJson(si);
 	}
