@@ -1,8 +1,5 @@
 package org.cloudfoundry.community.servicebroker.vrealize.service;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.cloudfoundry.community.servicebroker.exception.ServiceBrokerException;
 import org.cloudfoundry.community.servicebroker.exception.ServiceInstanceBindingExistsException;
 import org.cloudfoundry.community.servicebroker.model.CreateServiceInstanceBindingRequest;
@@ -11,7 +8,7 @@ import org.cloudfoundry.community.servicebroker.model.ServiceInstanceBinding;
 import org.cloudfoundry.community.servicebroker.service.ServiceInstanceBindingService;
 import org.cloudfoundry.community.servicebroker.service.ServiceInstanceService;
 import org.cloudfoundry.community.servicebroker.vrealize.VraClient;
-import org.cloudfoundry.community.servicebroker.vrealize.adapter.Adaptors;
+import org.cloudfoundry.community.servicebroker.vrealize.persistance.ServiceInstanceBindingRepository;
 import org.cloudfoundry.community.servicebroker.vrealize.persistance.VrServiceInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,7 +23,8 @@ public class VrServiceInstanceBindingService implements
 	@Autowired
 	ServiceInstanceService serviceInstanceService;
 
-	private static final Map<String, ServiceInstanceBinding> BINDINGS = new HashMap<String, ServiceInstanceBinding>();
+	@Autowired
+	ServiceInstanceBindingRepository repository;
 
 	@Override
 	public ServiceInstanceBinding createServiceInstanceBinding(
@@ -34,19 +32,24 @@ public class VrServiceInstanceBindingService implements
 			throws ServiceInstanceBindingExistsException,
 			ServiceBrokerException {
 
-		if (request == null) {
-			throw new ServiceBrokerException("invalid binding request.");
+		String bindingId = request.getBindingId();
+		if (bindingId == null) {
+			throw new ServiceBrokerException("no bindingId in request.");
 		}
 
-		String bindingId = request.getBindingId();
-		if (bindingId != null && BINDINGS.containsKey(bindingId)) {
-			throw new ServiceInstanceBindingExistsException(
-					BINDINGS.get(bindingId));
+		ServiceInstanceBinding sib = repository.findOne(bindingId);
+		if (sib != null) {
+			throw new ServiceInstanceBindingExistsException(sib);
 		}
 
 		String serviceInstanceId = request.getServiceInstanceId();
 		VrServiceInstance si = (VrServiceInstance) serviceInstanceService
 				.getServiceInstance(serviceInstanceId);
+
+		if (si == null) {
+			throw new ServiceBrokerException("service instance for binding: "
+					+ bindingId + " is missing.");
+		}
 
 		// not supposed to happen per the spec, but better check...
 		if (si.isInProgress()) {
@@ -55,11 +58,10 @@ public class VrServiceInstanceBindingService implements
 		}
 
 		ServiceInstanceBinding binding = new ServiceInstanceBinding(bindingId,
-				serviceInstanceId, Adaptors.getCredentials(si), null,
+				serviceInstanceId, si.getCredentials(), null,
 				request.getAppGuid());
 
-		saveBinding(binding);
-		return binding;
+		return repository.save(binding);
 	}
 
 	@Override
@@ -67,32 +69,15 @@ public class VrServiceInstanceBindingService implements
 			DeleteServiceInstanceBindingRequest request)
 			throws ServiceBrokerException {
 
-		if (request == null || request.getBindingId() == null) {
-			throw new ServiceBrokerException(
-					"invalid DeleteServiceInstanceRequest object.");
-		}
+		ServiceInstanceBinding binding = repository.findOne(request
+				.getBindingId());
 
-		ServiceInstanceBinding binding = getBinding(request.getBindingId());
 		if (binding == null) {
 			throw new ServiceBrokerException("binding with id: "
 					+ request.getBindingId() + " does not exist.");
 		}
 
-		deleteBinding(binding);
+		repository.delete(binding);
 		return binding;
 	}
-
-	private ServiceInstanceBinding getBinding(String id) {
-		return BINDINGS.get(id);
-	}
-
-	private ServiceInstanceBinding saveBinding(ServiceInstanceBinding binding) {
-		BINDINGS.put(binding.getId(), binding);
-		return binding;
-	}
-
-	private ServiceInstanceBinding deleteBinding(ServiceInstanceBinding binding) {
-		return BINDINGS.remove(binding.getId());
-	}
-
 }

@@ -3,12 +3,14 @@ package org.cloudfoundry.community.servicebroker.vrealize.persistance;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.cloudfoundry.community.servicebroker.exception.ServiceBrokerException;
 import org.cloudfoundry.community.servicebroker.model.CreateServiceInstanceRequest;
 import org.cloudfoundry.community.servicebroker.model.DeleteServiceInstanceRequest;
 import org.cloudfoundry.community.servicebroker.model.OperationState;
 import org.cloudfoundry.community.servicebroker.model.ServiceInstance;
 import org.cloudfoundry.community.servicebroker.model.ServiceInstanceLastOperation;
 import org.cloudfoundry.community.servicebroker.model.UpdateServiceInstanceRequest;
+import org.cloudfoundry.community.servicebroker.vrealize.adapter.Adaptors;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -152,5 +154,9 @@ public class VrServiceInstance extends ServiceInstance {
 
 	public void setId(String id) {
 		this.id = id;
+	}
+
+	public Map<String, Object> getCredentials() throws ServiceBrokerException {
+		return Adaptors.getCredentials(this);
 	}
 }

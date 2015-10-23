@@ -233,7 +233,7 @@ public class VraClient {
 		return Adaptors.getParameters(getCustomValues(requestResponse));
 	}
 
-	private Map<String, Object> getCustomValues(JsonElement requestResponse) {
+	public Map<String, Object> getCustomValues(JsonElement requestResponse) {
 		Map<String, Object> parameters = new HashMap<String, Object>();
 		if (requestResponse == null) {
 			return parameters;

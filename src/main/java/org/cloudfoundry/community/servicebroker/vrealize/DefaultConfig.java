@@ -10,6 +10,7 @@ import org.cloudfoundry.community.servicebroker.vrealize.domain.ServiceDefinitio
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -19,6 +20,7 @@ import feign.gson.GsonDecoder;
 import feign.gson.GsonEncoder;
 
 @Configuration
+@EnableMongoRepositories
 public class DefaultConfig {
 
 	@Autowired
