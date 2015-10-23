@@ -64,7 +64,7 @@ public class VrServiceInstanceRepositoryTest {
 		VrServiceInstance si3 = repository.findOne("anID");
 		assertNotNull(si3);
 		assertEquals("anID", si3.getServiceInstanceId());
-		assertEquals("sdId", si3.getServiceDefinitionId());
+		assertEquals(TestConfig.SD_ID, si3.getServiceDefinitionId());
 		assertNotNull(si3.getServiceInstanceLastOperation());
 		assertEquals("in progress", si3.getServiceInstanceLastOperation()
 				.getState());

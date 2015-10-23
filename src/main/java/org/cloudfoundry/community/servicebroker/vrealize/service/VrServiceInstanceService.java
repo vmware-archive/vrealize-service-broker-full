@@ -217,14 +217,15 @@ public class VrServiceInstanceService implements ServiceInstanceService {
 		return repository.findOne(id);
 	}
 
-	private void deleteInstance(VrServiceInstance instance) {
+	VrServiceInstance deleteInstance(VrServiceInstance instance) {
 		if (instance == null || instance.getServiceInstanceId() == null) {
-			return;
+			return null;
 		}
 		repository.delete(instance.getServiceInstanceId());
+		return instance;
 	}
 
-	private VrServiceInstance saveInstance(VrServiceInstance instance) {
+	VrServiceInstance saveInstance(VrServiceInstance instance) {
 		return repository.save(instance);
 	}
 }

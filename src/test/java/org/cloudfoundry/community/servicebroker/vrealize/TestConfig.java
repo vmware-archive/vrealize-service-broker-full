@@ -8,6 +8,8 @@ import java.nio.file.Paths;
 import org.cloudfoundry.community.servicebroker.exception.ServiceBrokerException;
 import org.cloudfoundry.community.servicebroker.model.CreateServiceInstanceBindingRequest;
 import org.cloudfoundry.community.servicebroker.model.CreateServiceInstanceRequest;
+import org.cloudfoundry.community.servicebroker.model.DeleteServiceInstanceBindingRequest;
+import org.cloudfoundry.community.servicebroker.model.DeleteServiceInstanceRequest;
 import org.cloudfoundry.community.servicebroker.model.ServiceInstanceBinding;
 import org.cloudfoundry.community.servicebroker.vrealize.domain.Creds;
 import org.cloudfoundry.community.servicebroker.vrealize.persistance.VrServiceInstance;
@@ -51,16 +53,24 @@ public class TestConfig {
 		return new String(Files.readAllBytes(Paths.get(u)));
 	}
 
-	public static CreateServiceInstanceRequest getServiceInstanceRequest() {
+	public static CreateServiceInstanceRequest getCreateServiceInstanceRequest() {
 		CreateServiceInstanceRequest req = new CreateServiceInstanceRequest(
-				"sdId", "pId", "orgId", "spaceId", true, null);
+				SD_ID, "pId", "orgId", "spaceId", true, null);
 		req.withServiceInstanceId("anID");
 		return req;
 	}
 
+	public static DeleteServiceInstanceRequest getDeleteServiceInstanceRequest() {
+		CreateServiceInstanceRequest creq = getCreateServiceInstanceRequest();
+		DeleteServiceInstanceRequest dreq = new DeleteServiceInstanceRequest(
+				creq.getServiceInstanceId(), creq.getServiceDefinitionId(),
+				creq.getPlanId(), true);
+		return dreq;
+	}
+
 	public static VrServiceInstance getServiceInstance() {
 		VrServiceInstance si = VrServiceInstance.create(
-				getServiceInstanceRequest(), "12345");
+				getCreateServiceInstanceRequest(), "12345");
 		si.getParameters().put(VrServiceInstance.SERVICE_TYPE, "mysql");
 		si.getParameters().put(VrServiceInstance.DB_ID, "aDB");
 		si.getParameters().put(VrServiceInstance.HOST, "aHost");
@@ -70,11 +80,11 @@ public class TestConfig {
 		return si;
 	}
 
-	public static CreateServiceInstanceBindingRequest getBindingRequest() {
+	public static CreateServiceInstanceBindingRequest getCreateBindingRequest() {
 		VrServiceInstance si = getServiceInstance();
 		CreateServiceInstanceBindingRequest req = new CreateServiceInstanceBindingRequest(
-				si.getServiceDefinitionId(), si.getPlanId(),
-				si.getOrganizationGuid(), si.getParameters());
+				si.getServiceDefinitionId(), si.getPlanId(), "anAppId",
+				si.getParameters());
 		req.withBindingId("98765");
 		req.withServiceInstanceId(si.getServiceInstanceId());
 		return req;
@@ -82,10 +92,19 @@ public class TestConfig {
 
 	public static ServiceInstanceBinding getServiceInstanceBinding()
 			throws ServiceBrokerException {
-		CreateServiceInstanceBindingRequest req = getBindingRequest();
+		CreateServiceInstanceBindingRequest req = getCreateBindingRequest();
 		return new ServiceInstanceBinding(req.getBindingId(),
 				req.getServiceInstanceId(), getServiceInstance()
 						.getCredentials(), null, req.getAppGuid());
+	}
+
+	public static DeleteServiceInstanceBindingRequest getDeleteBindingRequest() {
+		VrServiceInstance si = getServiceInstance();
+		CreateServiceInstanceBindingRequest creq = getCreateBindingRequest();
+		DeleteServiceInstanceBindingRequest dreq = new DeleteServiceInstanceBindingRequest(
+				creq.getBindingId(), si, si.getServiceDefinitionId(),
+				si.getPlanId());
+		return dreq;
 	}
 
 }

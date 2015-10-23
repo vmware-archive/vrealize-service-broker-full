@@ -166,7 +166,6 @@ public class VraClientTest {
 	}
 
 	@Test
-	@Ignore
 	public void testGetDeleteRequestTemplate() throws ServiceBrokerException {
 		CreateServiceInstanceRequest req = new CreateServiceInstanceRequest();
 		VrServiceInstance si = VrServiceInstance.create(req,
@@ -195,23 +194,5 @@ public class VraClientTest {
 		assertEquals(
 				"https://vra.vra.lab/catalog-service/api/consumer/resources/d591e58d-b2cf-4061-aec1-7f41168b7a6d/actions/fe9af618-f21d-47a2-bebc-62d5914f6e6c/requests",
 				m.get(VrServiceInstance.DELETE_LINK));
-	}
-
-	@Test
-	@Ignore
-	public void testDelete() throws Exception {
-		String token = tokenService.getToken();
-		JsonElement deleteTemplate = repo
-				.getRequest(
-						"Bearer " + token,
-						"catalog-service/api/consumer/resources/df13aba9-278b-4fb9-beec-1e14f29a2337/actions/fe9af618-f21d-47a2-bebc-62d5914f6e6c/requests/template");
-		JsonElement edited = client.prepareDeleteRequestTemplate(
-				deleteTemplate, "12345");
-		JsonElement results = repo
-				.postRequest(
-						"Bearer " + token,
-						"catalog-service/api/consumer/resources/df13aba9-278b-4fb9-beec-1e14f29a2337/actions/fe9af618-f21d-47a2-bebc-62d5914f6e6c/requests",
-						edited);
-		System.out.println(results);
 	}
 }

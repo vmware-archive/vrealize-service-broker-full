@@ -2,80 +2,110 @@ package org.cloudfoundry.community.servicebroker.vrealize.service;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.when;
 
 import java.util.Map;
 
 import org.cloudfoundry.community.servicebroker.exception.ServiceBrokerException;
 import org.cloudfoundry.community.servicebroker.exception.ServiceInstanceBindingExistsException;
-import org.cloudfoundry.community.servicebroker.model.CreateServiceInstanceBindingRequest;
+import org.cloudfoundry.community.servicebroker.model.OperationState;
 import org.cloudfoundry.community.servicebroker.model.ServiceInstanceBinding;
+import org.cloudfoundry.community.servicebroker.model.ServiceInstanceLastOperation;
 import org.cloudfoundry.community.servicebroker.vrealize.Application;
-import org.cloudfoundry.community.servicebroker.vrealize.service.VrServiceInstanceBindingService;
-import org.junit.Ignore;
+import org.cloudfoundry.community.servicebroker.vrealize.TestConfig;
+import org.cloudfoundry.community.servicebroker.vrealize.persistance.ServiceInstanceBindingRepository;
+import org.cloudfoundry.community.servicebroker.vrealize.persistance.VrServiceInstance;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Matchers;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = { Application.class })
-@Ignore
 public class VrServiceInstanceBindingServiceTest {
 
 	@Autowired
+	@InjectMocks
 	VrServiceInstanceBindingService vrServiceInstanceBindingService;
 
-	@Test
-	public void testCreateBinding() throws ServiceBrokerException,
-			ServiceInstanceBindingExistsException {
+	@Mock
+	VrServiceInstanceService vrServiceInstanceService;
 
-		CreateServiceInstanceBindingRequest req = new CreateServiceInstanceBindingRequest();
+	@Autowired
+	ServiceInstanceBindingRepository repo;
 
-		ServiceInstanceBinding b = vrServiceInstanceBindingService
-				.createServiceInstanceBinding(req);
-		assertNotNull(b);
-		assertEquals("app123", b.getAppGuid());
-		Map<String, Object> m = b.getCredentials();
-		assertNotNull(m);
-		assertEquals("http://localhost:8080/hello/en", m.get("uri"));
-		assertNotNull(b.getId());
-		assertEquals("hello", b.getServiceInstanceId());
+	@Before
+	public void setUp() throws Exception {
+		MockitoAnnotations.initMocks(this);
+
+		VrServiceInstance si = TestConfig.getServiceInstance();
+		ServiceInstanceLastOperation silo = new ServiceInstanceLastOperation(
+				"anOp", OperationState.SUCCEEDED);
+		si.withLastOperation(silo);
+
+		when(vrServiceInstanceService.getServiceInstance(Matchers.anyString()))
+				.thenReturn(si);
+
+		when(
+				vrServiceInstanceService
+						.saveInstance(any(VrServiceInstance.class)))
+				.thenReturn(si);
+
+		when(
+				vrServiceInstanceService
+						.deleteInstance(any(VrServiceInstance.class)))
+				.thenReturn(si);
+
+		repo.deleteAll();
 	}
 
-	// @Test
-	// public void testDeleteBinding() throws Exception {
-	//
-	// CreateServiceInstanceBindingRequest c =
-	// getCreateServiceInstanceBindingRequest();
-	// ServiceInstance si = client.getInstance(c.getServiceInstanceId());
-	//
-	// DeleteServiceInstanceBindingRequest req = new
-	// DeleteServiceInstanceBindingRequest(
-	// c.getBindingId(), si, c.getServiceDefinitionId(), c.getPlanId());
-	//
-	// assertNotNull(client.deleteBinding(req));
-	// }
+	@After
+	public void cleanUp() throws Exception {
+		repo.deleteAll();
+	}
 
-	// private CreateServiceInstanceBindingRequest
-	// getCreateServiceInstanceBindingRequest() {
-	// Creds credentials = new Creds();
-	// credentials.Password = "secret";
-	// credentials.Tenant = "mycompany";
-	// credentials.Username = "tester";
-	//
-	// Map<String, Object> parameters = new HashMap<String,Object>();
-	// parameters.put("credentials", credentials);
-	//
-	// CreateServiceInstanceBindingRequest req = new
-	// CreateServiceInstanceBindingRequest("7c8275d6-1bd6-452a-97c4-d6c053e4baa4",
-	// "7c8275d6-1bd6-452a-97c4-d6c053e4baa4", "myApp", parameters);
-	// req.setAppGuid("myApp");
-	// req.setPlanId("7c8275d6-1bd6-452a-97c4-d6c053e4baa4");
-	// req.setServiceDefinitionId("7c8275d6-1bd6-452a-97c4-d6c053e4baa4");
-	// // req.withBindingId("abc");
-	// req.setParameters(parameters);
-	// return req;
-	// }
+	@Test
+	public void testBinding() throws ServiceBrokerException,
+			ServiceInstanceBindingExistsException {
 
+		ServiceInstanceBinding b = TestConfig.getServiceInstanceBinding();
+		assertNotNull(b);
+		assertEquals("anAppId", b.getAppGuid());
+		Map<String, Object> m = b.getCredentials();
+		assertNotNull(m);
+		assertEquals("mysql://aUser:secret@aHost:1234/aDB",
+				m.get(VrServiceInstance.URI));
+		assertNotNull(b.getId());
+		assertEquals("anID", b.getServiceInstanceId());
+	}
+
+	@Test
+	public void testCreateAndDeleteBinding() throws ServiceBrokerException,
+			ServiceInstanceBindingExistsException {
+
+		ServiceInstanceBinding b = vrServiceInstanceBindingService
+				.createServiceInstanceBinding(TestConfig
+						.getCreateBindingRequest());
+		assertNotNull(b);
+		Map<String, Object> m = b.getCredentials();
+		assertNotNull(m);
+		assertEquals("mysql://aUser:secret@aHost:1234/aDB",
+				m.get(VrServiceInstance.URI));
+		String id = b.getId();
+		assertNotNull(id);
+
+		b = vrServiceInstanceBindingService
+				.deleteServiceInstanceBinding(TestConfig
+						.getDeleteBindingRequest());
+		assertNotNull(b);
+		assertEquals(id, b.getId());
+	}
 }
