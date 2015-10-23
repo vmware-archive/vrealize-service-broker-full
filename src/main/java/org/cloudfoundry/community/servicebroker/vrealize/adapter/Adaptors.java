@@ -19,15 +19,15 @@ public class Adaptors {
 	public static Map<String, Object> getParameters(
 			Map<String, Object> vrCustomKeyValues)
 			throws ServiceBrokerException {
-		String serviceType = vrCustomKeyValues.get(
-				VrServiceInstance.SERVICE_TYPE).toString();
+		Object serviceType = vrCustomKeyValues.get(
+				VrServiceInstance.SERVICE_TYPE);
 
 		if (serviceType == null) {
 			throw new ServiceBrokerException(
 					"SERVICE_TYPE not found in vR response.");
 		}
 
-		Adaptor adaptor = getAdaptor(serviceType);
+		Adaptor adaptor = getAdaptor(serviceType.toString());
 		if (adaptor == null) {
 			throw new ServiceBrokerException(
 					"adaptor not found for service type: " + serviceType);
