@@ -22,6 +22,7 @@ import org.cloudfoundry.community.servicebroker.vrealize.persistance.VrServiceIn
 import org.cloudfoundry.community.servicebroker.vrealize.persistance.VrServiceInstanceRepository;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -38,6 +39,7 @@ import com.google.gson.JsonParser;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = { Application.class })
+@Ignore
 public class VrServiceInstanceServiceTest {
 
 	private static final Logger LOG = Logger

@@ -1,554 +1,303 @@
 {
-    "@type": "CatalogItemRequest",
-    "id": "5c09a0f6-a19f-4ce9-904a-8f3bf8242ddc",
-    "iconId": "cafe_default_icon_genericCatalogItem",
-    "version": 0,
-    "requestNumber": null,
-    "state": "IN_PROGRESS",
-    "description": "PCF service broker request.",
-    "reasons": null,
-    "requestedFor": "vdude01@vra.lab",
-    "requestedBy": "vdude01@vra.lab",
-    "organization": {
-        "tenantRef": "lab",
-        "tenantLabel": null,
-        "subtenantRef": "40d34c19-edfb-4c25-b291-0475b2a1d2d6",
-        "subtenantLabel": null
-    },
-    "requestorEntitlementId": "c15135be-9be2-4524-9b3e-42f23e346351",
-    "preApprovalId": null,
-    "postApprovalId": null,
-    "dateCreated": "2015-10-13T21:29:15.605Z",
-    "lastUpdated": "2015-10-13T21:29:15.605Z",
-    "dateSubmitted": "2015-10-13T21:29:15.605Z",
-    "dateApproved": null,
-    "dateCompleted": null,
-    "quote": {},
-    "requestCompletion": null,
-    "requestData": {
-        "entries": [
-            {
-                "key": "providerId",
-                "value": {
-                    "type": "string",
-                    "value": "708abe5b-e3eb-470e-a4b6-8cd0f03ba452"
-                }
-            },
-            {
-                "key": "providerBindingId",
-                "value": {
-                    "type": "string",
-                    "value": "MySQL01"
-                }
-            },
-            {
-                "key": "Existing_Network_1",
-                "value": {
-                    "type": "complex",
-                    "componentTypeId": "com.vmware.csp.component.cafe.composition",
-                    "componentId": null,
-                    "classId": "Blueprint.Component.Declaration",
-                    "typeFilter": "MySQL01*Existing_Network_1",
-                    "values": {
-                        "entries": [
-                            {
-                                "key": "subnetmask",
-                                "value": {
-                                    "type": "string",
-                                    "value": "255.255.254.0"
-                                }
-                            },
-                            {
-                                "key": "_cluster",
-                                "value": {
-                                    "type": "integer",
-                                    "value": 1
-                                }
-                            },
-                            {
-                                "key": "gateway",
-                                "value": {
-                                    "type": "string",
-                                    "value": "192.168.200.1"
-                                }
-                            },
-                            {
-                                "key": "networkname",
-                                "value": {
-                                    "type": "string",
-                                    "value": "vra-Lab-deployment-net"
-                                }
-                            },
-                            {
-                                "key": "name",
-                                "value": {
-                                    "type": "string",
-                                    "value": "vra-Lab-deployment-net"
-                                }
-                            }
-                        ]
-                    }
-                }
-            },
-            {
-                "key": "maraidb-01",
-                "value": {
-                    "type": "complex",
-                    "componentTypeId": "com.vmware.csp.component.cafe.composition",
-                    "componentId": null,
-                    "classId": "Blueprint.Component.Declaration",
-                    "typeFilter": "MySQL01*maraidb-01",
-                    "values": {
-                        "entries": [
-                            {
-                                "key": "_cluster",
-                                "value": {
-                                    "type": "integer",
-                                    "value": 1
-                                }
-                            },
-                            {
-                                "key": "cpu",
-                                "value": {
-                                    "type": "integer",
-                                    "value": 1
-                                }
-                            },
-                            {
-                                "key": "custom_properties",
-                                "value": {
-                                    "type": "multiple",
-                                    "elementTypeId": "COMPLEX",
-                                    "items": [
-                                        {
-                                            "type": "complex",
-                                            "componentTypeId": "com.vmware.csp.iaas.blueprint.service",
-                                            "componentId": null,
-                                            "classId": "Infrastructure.CustomProperty",
-                                            "typeFilter": null,
-                                            "values": {
-                                                "entries": [
-                                                    {
-                                                        "key": "value",
-                                                        "value": {
-                                                            "type": "string",
-                                                            "value": "mysqluser"
-                                                        }
-                                                    },
-                                                    {
-                                                        "key": "isPromptUser",
-                                                        "value": {
-                                                            "type": "string",
-                                                            "value": "false"
-                                                        }
-                                                    },
-                                                    {
-                                                        "key": "id",
-                                                        "value": {
-                                                            "type": "string",
-                                                            "value": "mysql_user"
-                                                        }
-                                                    },
-                                                    {
-                                                        "key": "propertyGroup",
-                                                        "value": {
-                                                            "type": "string",
-                                                            "value": ""
-                                                        }
-                                                    },
-                                                    {
-                                                        "key": "isEncrypted",
-                                                        "value": {
-                                                            "type": "string",
-                                                            "value": "false"
-                                                        }
-                                                    }
-                                                ]
-                                            }
-                                        },
-                                        {
-                                            "type": "complex",
-                                            "componentTypeId": "com.vmware.csp.iaas.blueprint.service",
-                                            "componentId": null,
-                                            "classId": "Infrastructure.CustomProperty",
-                                            "typeFilter": null,
-                                            "values": {
-                                                "entries": [
-                                                    {
-                                                        "key": "value",
-                                                        "value": {
-                                                            "type": "string",
-                                                            "value": "P1v0t4l!"
-                                                        }
-                                                    },
-                                                    {
-                                                        "key": "isPromptUser",
-                                                        "value": {
-                                                            "type": "string",
-                                                            "value": "false"
-                                                        }
-                                                    },
-                                                    {
-                                                        "key": "id",
-                                                        "value": {
-                                                            "type": "string",
-                                                            "value": "mysql_passwd"
-                                                        }
-                                                    },
-                                                    {
-                                                        "key": "propertyGroup",
-                                                        "value": {
-                                                            "type": "string",
-                                                            "value": ""
-                                                        }
-                                                    },
-                                                    {
-                                                        "key": "isEncrypted",
-                                                        "value": {
-                                                            "type": "string",
-                                                            "value": "true"
-                                                        }
-                                                    }
-                                                ]
-                                            }
-                                        },
-                                        {
-                                            "type": "complex",
-                                            "componentTypeId": "com.vmware.csp.iaas.blueprint.service",
-                                            "componentId": null,
-                                            "classId": "Infrastructure.CustomProperty",
-                                            "typeFilter": null,
-                                            "values": {
-                                                "entries": [
-                                                    {
-                                                        "key": "value",
-                                                        "value": {
-                                                            "type": "string",
-                                                            "value": "db01"
-                                                        }
-                                                    },
-                                                    {
-                                                        "key": "isPromptUser",
-                                                        "value": {
-                                                            "type": "string",
-                                                            "value": "false"
-                                                        }
-                                                    },
-                                                    {
-                                                        "key": "id",
-                                                        "value": {
-                                                            "type": "string",
-                                                            "value": "mysql_dbname"
-                                                        }
-                                                    },
-                                                    {
-                                                        "key": "propertyGroup",
-                                                        "value": {
-                                                            "type": "string",
-                                                            "value": ""
-                                                        }
-                                                    },
-                                                    {
-                                                        "key": "isEncrypted",
-                                                        "value": {
-                                                            "type": "string",
-                                                            "value": "false"
-                                                        }
-                                                    }
-                                                ]
-                                            }
-                                        },
-                                        {
-                                            "type": "complex",
-                                            "componentTypeId": "com.vmware.csp.iaas.blueprint.service",
-                                            "componentId": null,
-                                            "classId": "Infrastructure.CustomProperty",
-                                            "typeFilter": null,
-                                            "values": {
-                                                "entries": [
-                                                    {
-                                                        "key": "value",
-                                                        "value": {
-                                                            "type": "string",
-                                                            "value": "3306"
-                                                        }
-                                                    },
-                                                    {
-                                                        "key": "isPromptUser",
-                                                        "value": {
-                                                            "type": "string",
-                                                            "value": "false"
-                                                        }
-                                                    },
-                                                    {
-                                                        "key": "id",
-                                                        "value": {
-                                                            "type": "string",
-                                                            "value": "mysql_port"
-                                                        }
-                                                    },
-                                                    {
-                                                        "key": "propertyGroup",
-                                                        "value": {
-                                                            "type": "string",
-                                                            "value": ""
-                                                        }
-                                                    },
-                                                    {
-                                                        "key": "isEncrypted",
-                                                        "value": {
-                                                            "type": "string",
-                                                            "value": "false"
-                                                        }
-                                                    }
-                                                ]
-                                            }
-                                        },
-                                        {
-                                            "type": "complex",
-                                            "componentTypeId": "com.vmware.csp.iaas.blueprint.service",
-                                            "componentId": null,
-                                            "classId": "Infrastructure.CustomProperty",
-                                            "typeFilter": null,
-                                            "values": {
-                                                "entries": [
-                                                    {
-                                                        "key": "value",
-                                                        "value": {
-                                                            "type": "string",
-                                                            "value": "true"
-                                                        }
-                                                    },
-                                                    {
-                                                        "key": "isPromptUser",
-                                                        "value": {
-                                                            "type": "string",
-                                                            "value": "false"
-                                                        }
-                                                    },
-                                                    {
-                                                        "key": "id",
-                                                        "value": {
-                                                            "type": "string",
-                                                            "value": "VirtualMachine.Customize.WaitComplete"
-                                                        }
-                                                    },
-                                                    {
-                                                        "key": "propertyGroup",
-                                                        "value": {
-                                                            "type": "string",
-                                                            "value": ""
-                                                        }
-                                                    },
-                                                    {
-                                                        "key": "isEncrypted",
-                                                        "value": {
-                                                            "type": "string",
-                                                            "value": "false"
-                                                        }
-                                                    }
-                                                ]
-                                            }
-                                        }
+   "@type":"CatalogItemRequest",
+   "id":"4331735d-4a47-4055-b82e-21eb7666f18f",
+   "iconId":"71d3235c-f5f9-4140-94a4-64d375cbd783",
+   "version":0,
+   "requestNumber":null,
+   "state":"SUBMITTED",
+   "description":"71d3235c-f5f9-4140-94a4-64d375cbd783",
+   "reasons":"CF service broker request.",
+   "requestedFor":"vdude1@vsphere.local",
+   "requestedBy":"vdude1@vsphere.local",
+   "organization":{
+      "tenantRef":"lab",
+      "tenantLabel":null,
+      "subtenantRef":"ef21a850-36d7-4be9-9609-e0a815509535",
+      "subtenantLabel":null
+   },
+   "requestorEntitlementId":"eb6cfa7a-027d-4016-bc2b-e4d4f210cf5b",
+   "preApprovalId":null,
+   "postApprovalId":null,
+   "dateCreated":"2015-11-05T16:29:41.398Z",
+   "lastUpdated":"2015-11-05T16:29:41.398Z",
+   "dateSubmitted":"2015-11-05T16:29:41.398Z",
+   "dateApproved":null,
+   "dateCompleted":null,
+   "quote":{
+
+   },
+   "requestCompletion":null,
+   "requestData":{
+      "entries":[
+         {
+            "key":"mariadb",
+            "value":{
+               "type":"complex",
+               "componentTypeId":"com.vmware.csp.component.cafe.composition",
+               "componentId":null,
+               "classId":"Blueprint.Component.Declaration",
+               "typeFilter":"MariaDB*mariadb",
+               "values":{
+                  "entries":[
+                     {
+                        "key":"_cluster",
+                        "value":{
+                           "type":"integer",
+                           "value":1
+                        }
+                     },
+                     {
+                        "key":"mysql_port",
+                        "value":{
+                           "type":"string",
+                           "value":"3306"
+                        }
+                     },
+                     {
+                        "key":"mysql_passwd",
+                        "value":{
+                           "type":"string",
+                           "value":"P1v0t4l!"
+                        }
+                     },
+                     {
+                        "key":"SERVICE_TYPE",
+                        "value":{
+                           "type":"string",
+                           "value":"mysql"
+                        }
+                     },
+                     {
+                        "key":"disks",
+                        "value":{
+                           "type":"multiple",
+                           "elementTypeId":"COMPLEX",
+                           "items":[
+                              {
+                                 "type":"complex",
+                                 "componentTypeId":"com.vmware.csp.iaas.blueprint.service",
+                                 "componentId":null,
+                                 "classId":"Infrastructure.Compute.Machine.MachineDisk",
+                                 "typeFilter":null,
+                                 "values":{
+                                    "entries":[
+                                       {
+                                          "key":"is_clone",
+                                          "value":{
+                                             "type":"boolean",
+                                             "value":true
+                                          }
+                                       },
+                                       {
+                                          "key":"initial_location",
+                                          "value":{
+                                             "type":"string",
+                                             "value":""
+                                          }
+                                       },
+                                       {
+                                          "key":"volumeId",
+                                          "value":{
+                                             "type":"string",
+                                             "value":"0"
+                                          }
+                                       },
+                                       {
+                                          "key":"id",
+                                          "value":{
+                                             "type":"integer",
+                                             "value":-1
+                                          }
+                                       },
+                                       {
+                                          "key":"label",
+                                          "value":{
+                                             "type":"string",
+                                             "value":"Hard disk 1"
+                                          }
+                                       },
+                                       {
+                                          "key":"userCreated",
+                                          "value":{
+                                             "type":"boolean",
+                                             "value":false
+                                          }
+                                       },
+                                       {
+                                          "key":"storage_reservation_policy",
+                                          "value":{
+                                             "type":"string",
+                                             "value":""
+                                          }
+                                       },
+                                       {
+                                          "key":"capacity",
+                                          "value":{
+                                             "type":"integer",
+                                             "value":50
+                                          }
+                                       }
                                     ]
-                                }
-                            },
-                            {
-                                "key": "archive_days",
-                                "value": {
-                                    "type": "integer",
-                                    "value": 0
-                                }
-                            },
-                            {
-                                "key": "number_of_instances",
-                                "value": {
-                                    "type": "integer",
-                                    "value": 1
-                                }
-                            },
-                            {
-                                "key": "nics",
-                                "value": {
-                                    "type": "multiple",
-                                    "elementTypeId": "COMPLEX",
-                                    "items": [
-                                        {
-                                            "type": "complex",
-                                            "componentTypeId": "com.vmware.csp.iaas.blueprint.service",
-                                            "componentId": null,
-                                            "classId": "Infrastructure.Compute.Machine.Nic",
-                                            "typeFilter": null,
-                                            "values": {
-                                                "entries": [
-                                                    {
-                                                        "key": "id",
-                                                        "value": {
-                                                            "type": "integer",
-                                                            "value": 0
-                                                        }
-                                                    },
-                                                    {
-                                                        "key": "load_balancing",
-                                                        "value": {
-                                                            "type": "string",
-                                                            "value": ""
-                                                        }
-                                                    },
-                                                    {
-                                                        "key": "assignment_type",
-                                                        "value": {
-                                                            "type": "string",
-                                                            "value": "DHCP"
-                                                        }
-                                                    },
-                                                    {
-                                                        "key": "address",
-                                                        "value": {
-                                                            "type": "string",
-                                                            "value": ""
-                                                        }
-                                                    },
-                                                    {
-                                                        "key": "network_profile",
-                                                        "value": {
-                                                            "type": "string",
-                                                            "value": "vra-Lab-deployment-net"
-                                                        }
-                                                    }
+                                 }
+                              }
+                           ]
+                        }
+                     },
+                     {
+                        "key":"mysql_user",
+                        "value":{
+                           "type":"string",
+                           "value":"mysqluser"
+                        }
+                     },
+                     {
+                        "key":"mysql_dbname",
+                        "value":{
+                           "type":"string",
+                           "value":"db01"
+                        }
+                     },
+                     {
+                        "key":"_allocation",
+                        "value":{
+                           "type":"complex",
+                           "componentTypeId":"com.vmware.csp.iaas.blueprint.service",
+                           "componentId":null,
+                           "classId":"Infrastructure.Compute.Machine.Allocation",
+                           "typeFilter":null,
+                           "values":{
+                              "entries":[
+                                 {
+                                    "key":"machines",
+                                    "value":{
+                                       "type":"multiple",
+                                       "elementTypeId":"COMPLEX",
+                                       "items":[
+                                          {
+                                             "type":"complex",
+                                             "componentTypeId":"com.vmware.csp.iaas.blueprint.service",
+                                             "componentId":null,
+                                             "classId":"Infrastructure.Compute.Machine.Allocation.Machine",
+                                             "typeFilter":null,
+                                             "values":{
+                                                "entries":[
+                                                   {
+                                                      "key":"nics",
+                                                      "value":{
+                                                         "type":"multiple",
+                                                         "elementTypeId":"COMPLEX",
+                                                         "items":[
+                                                            {
+                                                               "type":"complex",
+                                                               "componentTypeId":"com.vmware.csp.iaas.blueprint.service",
+                                                               "componentId":null,
+                                                               "classId":"Infrastructure.Compute.Machine.Nic",
+                                                               "typeFilter":null,
+                                                               "values":{
+                                                                  "entries":[
+                                                                     {
+                                                                        "key":"external_address",
+                                                                        "value":{
+                                                                           "type":"string",
+                                                                           "value":""
+                                                                        }
+                                                                     },
+                                                                     {
+                                                                        "key":"assignment_type",
+                                                                        "value":{
+                                                                           "type":"string",
+                                                                           "value":"Static"
+                                                                        }
+                                                                     },
+                                                                     {
+                                                                        "key":"address",
+                                                                        "value":{
+                                                                           "type":"string",
+                                                                           "value":""
+                                                                        }
+                                                                     }
+                                                                  ]
+                                                               }
+                                                            }
+                                                         ]
+                                                      }
+                                                   },
+                                                   {
+                                                      "key":"machine_id",
+                                                      "value":{
+                                                         "type":"string",
+                                                         "value":""
+                                                      }
+                                                   }
                                                 ]
-                                            }
-                                        }
-                                    ]
-                                }
-                            },
-                            {
-                                "key": "disks",
-                                "value": {
-                                    "type": "multiple",
-                                    "elementTypeId": "COMPLEX",
-                                    "items": [
-                                        {
-                                            "type": "complex",
-                                            "componentTypeId": "com.vmware.csp.iaas.blueprint.service",
-                                            "componentId": null,
-                                            "classId": "Infrastructure.Compute.Machine.MachineDisk",
-                                            "typeFilter": null,
-                                            "values": {
-                                                "entries": [
-                                                    {
-                                                        "key": "id",
-                                                        "value": {
-                                                            "type": "integer",
-                                                            "value": -1
-                                                        }
-                                                    },
-                                                    {
-                                                        "key": "userCreated",
-                                                        "value": {
-                                                            "type": "boolean",
-                                                            "value": false
-                                                        }
-                                                    },
-                                                    {
-                                                        "key": "volumeId",
-                                                        "value": {
-                                                            "type": "string",
-                                                            "value": "0"
-                                                        }
-                                                    },
-                                                    {
-                                                        "key": "is_clone",
-                                                        "value": {
-                                                            "type": "boolean",
-                                                            "value": true
-                                                        }
-                                                    },
-                                                    {
-                                                        "key": "initial_location",
-                                                        "value": {
-                                                            "type": "string",
-                                                            "value": ""
-                                                        }
-                                                    },
-                                                    {
-                                                        "key": "capacity",
-                                                        "value": {
-                                                            "type": "integer",
-                                                            "value": 50
-                                                        }
-                                                    },
-                                                    {
-                                                        "key": "label",
-                                                        "value": {
-                                                            "type": "string",
-                                                            "value": "Hard disk 1"
-                                                        }
-                                                    },
-                                                    {
-                                                        "key": "storage_reservation_policy",
-                                                        "value": {
-                                                            "type": "string",
-                                                            "value": ""
-                                                        }
-                                                    }
-                                                ]
-                                            }
-                                        }
-                                    ]
-                                }
-                            },
-                            {
-                                "key": "memory",
-                                "value": {
-                                    "type": "integer",
-                                    "value": 2048
-                                }
-                            },
-                            {
-                                "key": "lease_days",
-                                "value": {
-                                    "type": "integer",
-                                    "value": 0
-                                }
-                            },
-                            {
-                                "key": "storage",
-                                "value": {
-                                    "type": "integer",
-                                    "value": 50
-                                }
-                            },
-                            {
-                                "key": "display_location",
-                                "value": {
-                                    "type": "boolean",
-                                    "value": false
-                                }
-                            }
-                        ]
-                    }
-                }
-            },
-            {
-                "key": "subtenantId",
-                "value": {
-                    "type": "string",
-                    "value": "40d34c19-edfb-4c25-b291-0475b2a1d2d6"
-                }
+                                             }
+                                          }
+                                       ]
+                                    }
+                                 }
+                              ]
+                           }
+                        }
+                     }
+                  ]
+               }
             }
-        ]
-    },
-    "retriesRemaining": 3,
-    "requestedItemName": "vRA-MariaDB-Single-Instance",
-    "requestedItemDescription": "Merlin Glynn Created 10.09.2015",
-    "stateName": null,
-    "executionStatus": "STARTED",
-    "waitingStatus": "NOT_WAITING",
-    "approvalStatus": "PENDING",
-    "phase": "PENDING_PRE_APPROVAL",
-    "catalogItemRef": {
-        "id": "e06ff060-dc7a-4f46-a7a7-c32c031fa31e",
-        "label": "vRA-MariaDB-Single-Instance"
-    }
+         },
+         {
+            "key":"providerId",
+            "value":{
+               "type":"string",
+               "value":"f8660af0-deaf-4593-885a-81dac8b62a99"
+            }
+         },
+         {
+            "key":"_archiveDays",
+            "value":{
+               "type":"integer",
+               "value":7
+            }
+         },
+         {
+            "key":"subtenantId",
+            "value":{
+               "type":"string",
+               "value":"ef21a850-36d7-4be9-9609-e0a815509535"
+            }
+         },
+         {
+            "key":"_leaseDays",
+            "value":{
+               "type":"integer",
+               "value":7
+            }
+         },
+         {
+            "key":"providerBindingId",
+            "value":{
+               "type":"string",
+               "value":"MariaDB"
+            }
+         },
+         {
+            "key":"_number_of_instances",
+            "value":{
+               "type":"integer",
+               "value":1
+            }
+         }
+      ]
+   },
+   "retriesRemaining":3,
+   "requestedItemName":"MariaDB",
+   "requestedItemDescription":"Created by Merlin Glynn Nov 1, 2015",
+   "components":null,
+   "stateName":null,
+   "executionStatus":"STARTED",
+   "waitingStatus":"NOT_WAITING",
+   "approvalStatus":"PENDING",
+   "phase":"PENDING_PRE_APPROVAL",
+   "catalogItemRef":{
+      "id":"71d3235c-f5f9-4140-94a4-64d375cbd783",
+      "label":"MariaDB"
+   }
 }

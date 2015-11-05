@@ -8,7 +8,6 @@ import org.cloudfoundry.community.servicebroker.exception.ServiceBrokerException
 import org.cloudfoundry.community.servicebroker.model.Catalog;
 import org.cloudfoundry.community.servicebroker.vrealize.Application;
 import org.cloudfoundry.community.servicebroker.vrealize.TestConfig;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +18,6 @@ import com.google.gson.Gson;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = { Application.class })
-@Ignore
 public class CatalogServiceTest {
 
 	@Autowired

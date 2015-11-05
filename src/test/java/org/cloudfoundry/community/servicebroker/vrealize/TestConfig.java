@@ -24,14 +24,14 @@ import com.mongodb.MongoClient;
 @Configuration
 public class TestConfig {
 
-	public static final String SD_ID = "e06ff060-dc7a-4f46-a7a7-c32c031fa31e";
-	public static final String R_ID = "5c09a0f6-a19f-4ce9-904a-8f3bf8242ddc";
+	public static final String SD_ID = "71d3235c-f5f9-4140-94a4-64d375cbd783";
+	public static final String R_ID = "4331735d-4a47-4055-b82e-21eb7666f18f";
 	public static final String P_ID = "e06ff060-dc7a-4f46-a7a7-c32c031fa31e";
 	public static final String MONGO_DB_NAME = "test-mongo-db";
 
 	@Bean
 	Creds creds() {
-		return new Creds("vdude01@vra.lab", "P1v0t4l!", "lab");
+		return new Creds("vdude1", "P1v0t4l!", "lab");
 	}
 
 	@Bean

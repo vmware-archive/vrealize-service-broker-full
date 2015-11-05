@@ -26,7 +26,6 @@ import com.google.gson.JsonParser;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = { Application.class })
-@Ignore
 public class VraClientTest {
 
 	@Autowired
@@ -166,6 +165,7 @@ public class VraClientTest {
 	}
 
 	@Test
+	@Ignore
 	public void testGetDeleteRequestTemplate() throws ServiceBrokerException {
 		CreateServiceInstanceRequest req = new CreateServiceInstanceRequest();
 		VrServiceInstance si = VrServiceInstance.create(req,

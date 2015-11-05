@@ -164,6 +164,11 @@ public class VraClient {
 					OperationState.FAILED);
 		}
 
+		return getRequestStatus(token, requestId);
+	}
+
+	public ServiceInstanceLastOperation getRequestStatus(String token,
+			String requestId) {
 		JsonElement je = vraRepository.getRequestStatus("Bearer " + token,
 				requestId);
 		if (je == null) {
@@ -239,10 +244,9 @@ public class VraClient {
 			return parameters;
 		}
 
-		// There must be a better way....
 		ReadContext ctx = JsonPath.parse(requestResponse.toString());
 		JSONArray ja = ctx
-				.read("$.requestData.entries[*].value.values.entries.value.items[?(@.classId == 'Infrastructure.CustomProperty')].values[*]");
+				.read("$.requestData.entries[*].value.values.entries[*]");
 
 		if (ja == null) {
 			return parameters;
@@ -250,13 +254,13 @@ public class VraClient {
 
 		for (int i = 0; i < ja.size(); i++) {
 			String key = ctx
-					.read("$.requestData.entries[*].value.values.entries.value.items[?(@.classId == 'Infrastructure.CustomProperty')].values["
-							+ i + "].entries[?(@.key == 'id')].[0].value.value");
+					.read("$.requestData.entries[*].value.values.entries[" + i
+							+ "].key");
 
 			Object value = ctx
-					.read("$.requestData.entries[*].value.values.entries.value.items[?(@.classId == 'Infrastructure.CustomProperty')].values["
-							+ i
-							+ "].entries[?(@.key == 'value')].[0].value.value");
+					.read("$.requestData.entries[*].value.values.entries[" + i
+							+ "].value.value");
+
 			parameters.put(key, value);
 		}
 		return parameters;
