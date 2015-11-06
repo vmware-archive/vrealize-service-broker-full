@@ -10,12 +10,12 @@ import java.util.Map;
 import org.cloudfoundry.community.servicebroker.exception.ServiceBrokerException;
 import org.cloudfoundry.community.servicebroker.exception.ServiceInstanceBindingExistsException;
 import org.cloudfoundry.community.servicebroker.model.OperationState;
+import org.cloudfoundry.community.servicebroker.model.ServiceInstance;
 import org.cloudfoundry.community.servicebroker.model.ServiceInstanceBinding;
 import org.cloudfoundry.community.servicebroker.model.ServiceInstanceLastOperation;
 import org.cloudfoundry.community.servicebroker.vrealize.Application;
 import org.cloudfoundry.community.servicebroker.vrealize.TestConfig;
 import org.cloudfoundry.community.servicebroker.vrealize.persistance.ServiceInstanceBindingRepository;
-import org.cloudfoundry.community.servicebroker.vrealize.persistance.VrServiceInstance;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -46,7 +46,7 @@ public class VrServiceInstanceBindingServiceTest {
 	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
 
-		VrServiceInstance si = TestConfig.getServiceInstance();
+		ServiceInstance si = TestConfig.getServiceInstance();
 		ServiceInstanceLastOperation silo = new ServiceInstanceLastOperation(
 				"anOp", OperationState.SUCCEEDED);
 		si.withLastOperation(silo);
@@ -56,12 +56,12 @@ public class VrServiceInstanceBindingServiceTest {
 
 		when(
 				vrServiceInstanceService
-						.saveInstance(any(VrServiceInstance.class)))
+						.saveInstance(any(ServiceInstance.class)))
 				.thenReturn(si);
 
 		when(
 				vrServiceInstanceService
-						.deleteInstance(any(VrServiceInstance.class)))
+						.deleteInstance(any(ServiceInstance.class)))
 				.thenReturn(si);
 
 		repo.deleteAll();
@@ -82,7 +82,7 @@ public class VrServiceInstanceBindingServiceTest {
 		Map<String, Object> m = b.getCredentials();
 		assertNotNull(m);
 		assertEquals("mysql://aUser:secret@aHost:1234/aDB",
-				m.get(VrServiceInstance.URI));
+				m.get(ServiceInstance.URI));
 		assertNotNull(b.getId());
 		assertEquals("anID", b.getServiceInstanceId());
 	}
@@ -98,7 +98,7 @@ public class VrServiceInstanceBindingServiceTest {
 		Map<String, Object> m = b.getCredentials();
 		assertNotNull(m);
 		assertEquals("mysql://aUser:secret@aHost:1234/aDB",
-				m.get(VrServiceInstance.URI));
+				m.get(ServiceInstance.URI));
 		String id = b.getId();
 		assertNotNull(id);
 

@@ -14,7 +14,6 @@ import org.cloudfoundry.community.servicebroker.model.UpdateServiceInstanceReque
 import org.cloudfoundry.community.servicebroker.service.ServiceInstanceService;
 import org.cloudfoundry.community.servicebroker.vrealize.VraClient;
 import org.cloudfoundry.community.servicebroker.vrealize.domain.Creds;
-import org.cloudfoundry.community.servicebroker.vrealize.persistance.VrServiceInstance;
 import org.cloudfoundry.community.servicebroker.vrealize.persistance.VrServiceInstanceRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -50,7 +49,7 @@ public class VrServiceInstanceService implements ServiceInstanceService {
 			return null;
 		}
 
-		VrServiceInstance si = getInstance(id);
+		ServiceInstance si = getInstance(id);
 
 		// check the last operation
 		ServiceInstanceLastOperation silo = si
@@ -146,11 +145,7 @@ public class VrServiceInstanceService implements ServiceInstanceService {
 		LOG.debug("service request response: " + response.toString());
 
 		String requestId = vraClient.getRequestId(response);
-		VrServiceInstance instance = VrServiceInstance.create(request,
-				requestId);
-
-		// add information from response to service instance parameters
-		instance.getParameters().putAll(vraClient.getParameters(response));
+		ServiceInstance instance = new ServiceInstance(request);
 
 		instance = saveInstance(instance);
 
@@ -169,7 +164,7 @@ public class VrServiceInstanceService implements ServiceInstanceService {
 					"invalid DeleteServiceInstanceRequest object.");
 		}
 
-		VrServiceInstance si = getInstance(request.getServiceInstanceId());
+		ServiceInstance si = getInstance(request.getServiceInstanceId());
 		if (si == null) {
 			throw new ServiceBrokerException("Service instance: "
 					+ request.getServiceInstanceId() + " not found.");
@@ -178,21 +173,21 @@ public class VrServiceInstanceService implements ServiceInstanceService {
 		String token = tokenService.getToken();
 
 		// get the delete request template from the resources
-		JsonElement template = vraClient.getDeleteRequestTemplate(token, si);
+		JsonElement template = vraClient.getDeleteRequestTemplate(token, si.getServiceInstanceId());
 
 		// customize the template
 		JsonElement edited = vraClient.prepareDeleteRequestTemplate(template,
 				si.getServiceInstanceId());
 
 		// request the delete with the template
-		JsonElement response = vraClient.postDeleteRequest(token, edited, si);
+		JsonElement response = vraClient.postDeleteRequest(token, edited, si.getServiceInstanceId());
 
 		LOG.debug("service request response: " + response.toString());
 
 		String requestId = vraClient.getRequestId(response);
 
 		// update si with new delete metadata
-		si = VrServiceInstance.delete(si, requestId);
+		si = ServiceInstance.delete(si, requestId);
 
 		LOG.info("unregistering service instance: " + si.getServiceInstanceId()
 				+ " requestId: " + requestId);
@@ -210,14 +205,14 @@ public class VrServiceInstanceService implements ServiceInstanceService {
 				"vRealize services are not updatable.");
 	}
 
-	private VrServiceInstance getInstance(String id) {
+	private ServiceInstance getInstance(String id) {
 		if (id == null) {
 			return null;
 		}
 		return repository.findOne(id);
 	}
 
-	VrServiceInstance deleteInstance(VrServiceInstance instance) {
+	ServiceInstance deleteInstance(ServiceInstance instance) {
 		if (instance == null || instance.getServiceInstanceId() == null) {
 			return null;
 		}
@@ -225,7 +220,7 @@ public class VrServiceInstanceService implements ServiceInstanceService {
 		return instance;
 	}
 
-	VrServiceInstance saveInstance(VrServiceInstance instance) {
+	ServiceInstance saveInstance(ServiceInstance instance) {
 		return repository.save(instance);
 	}
 }

@@ -8,11 +8,10 @@ import java.util.Map;
 import org.cloudfoundry.community.servicebroker.exception.ServiceBrokerException;
 import org.cloudfoundry.community.servicebroker.model.CreateServiceInstanceRequest;
 import org.cloudfoundry.community.servicebroker.model.ServiceDefinition;
+import org.cloudfoundry.community.servicebroker.model.ServiceInstance;
 import org.cloudfoundry.community.servicebroker.model.ServiceInstanceLastOperation;
-import org.cloudfoundry.community.servicebroker.vrealize.persistance.VrServiceInstance;
 import org.cloudfoundry.community.servicebroker.vrealize.service.CatalogService;
 import org.cloudfoundry.community.servicebroker.vrealize.service.TokenService;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,7 +43,7 @@ public class VraClientTest {
 	VraRepository repo;
 
 	@Test
-	public void testGetRequestTemplate() throws ServiceBrokerException {
+	public void testGetAndPrepRequestTemplate() throws ServiceBrokerException {
 		ServiceDefinition sd = catalogService
 				.getServiceDefinition(TestConfig.SD_ID);
 		assertNotNull(sd);
@@ -54,15 +53,8 @@ public class VraClientTest {
 
 		JsonElement template = client.getCreateRequestTemplate(token, sd);
 		assertNotNull(template);
-	}
-
-	@Test
-	public void testPrepareRequest() throws Exception {
-		JsonParser parser = new JsonParser();
-		JsonObject o = (JsonObject) parser.parse(TestConfig
-				.getContents("requestTemplate.json"));
-		String s = client.prepareCreateRequestTemplate(o, "abc123").toString();
-		assertEquals(TestConfig.getContents("filteredRequestTemplate.json"), s);
+		JsonObject jo = client.prepareCreateRequestTemplate(template, TestConfig.R_ID);
+		assertNotNull(jo);
 	}
 
 	@Test
@@ -79,9 +71,10 @@ public class VraClientTest {
 	@Test
 	public void testGetRequestStatus() throws ServiceBrokerException {
 		CreateServiceInstanceRequest req = new CreateServiceInstanceRequest();
+		req.withServiceInstanceId(TestConfig.R_ID);
 		String token = tokenService.getToken();
 
-		VrServiceInstance si = VrServiceInstance.create(req, TestConfig.R_ID);
+		ServiceInstance si = new ServiceInstance(req);
 		ServiceInstanceLastOperation silo = client.getRequestStatus(token, si);
 		assertNotNull(silo);
 		assertEquals("succeeded", silo.getState());
@@ -96,12 +89,12 @@ public class VraClientTest {
 		Map<String, Object> m = client.getParameters(je);
 		assertNotNull(m);
 		assertEquals(6, m.size());
-		assertEquals("3306", m.get(VrServiceInstance.PORT));
-		assertEquals("P1v0t4l!", m.get(VrServiceInstance.PASSWORD));
-		assertEquals("mysqluser", m.get(VrServiceInstance.USER_ID));
-		assertEquals("db01", m.get(VrServiceInstance.DB_ID));
+		assertEquals("3306", m.get(Constants.PORT));
+		assertEquals("P1v0t4l!", m.get(Constants.PASSWORD));
+		assertEquals("mysqluser", m.get(Constants.USER_ID));
+		assertEquals("db01", m.get(Constants.DB_ID));
 		// assertEquals("foo", m.get("HOST"));
-		assertEquals("mysql", m.get(VrServiceInstance.SERVICE_TYPE));
+		assertEquals("mysql", m.get(Constants.SERVICE_TYPE));
 	}
 
 	@Test
@@ -165,19 +158,22 @@ public class VraClientTest {
 	}
 
 	@Test
-	@Ignore
-	public void testGetDeleteRequestTemplate() throws ServiceBrokerException {
-		CreateServiceInstanceRequest req = new CreateServiceInstanceRequest();
-		VrServiceInstance si = VrServiceInstance.create(req,
-				"9ca10dee-730e-486a-9138-d8aade4913e2");
-		si = VrServiceInstance.delete(si,
-				"9ca10dee-730e-486a-9138-d8aade4913e2");
-
+	public void testGetAndPrepDeleteRequestTemplate() throws ServiceBrokerException {
 		String token = tokenService.getToken();
-		client.loadMetadata(token, si);
-
-		JsonElement je = client.getDeleteRequestTemplate(token, si);
+		JsonElement je = client.getDeleteRequestTemplate(token, TestConfig.R_ID);
 		assertNotNull(je);
+		JsonObject jo = client.prepareDeleteRequestTemplate(je, TestConfig.R_ID);
+		assertNotNull(jo);
+	}
+	
+	@Test
+	public void testDelete() throws ServiceBrokerException {
+		String token = tokenService.getToken();
+		JsonElement je = client.getDeleteRequestTemplate(token, TestConfig.R_ID);
+		assertNotNull(je);
+//		JsonObject jo = client.prepareDeleteRequestTemplate(je, TestConfig.R_ID);
+//		assertNotNull(jo);
+		client.postDeleteRequest(token, je.getAsJsonObject(), TestConfig.R_ID);
 	}
 
 	@Test
@@ -190,9 +186,9 @@ public class VraClientTest {
 		assertEquals(2, m.size());
 		assertEquals(
 				"https://vra.vra.lab/catalog-service/api/consumer/resources/d591e58d-b2cf-4061-aec1-7f41168b7a6d/actions/fe9af618-f21d-47a2-bebc-62d5914f6e6c/requests/template",
-				m.get(VrServiceInstance.DELETE_TEMPLATE_LINK));
+				m.get(Constants.DELETE_TEMPLATE_LINK));
 		assertEquals(
 				"https://vra.vra.lab/catalog-service/api/consumer/resources/d591e58d-b2cf-4061-aec1-7f41168b7a6d/actions/fe9af618-f21d-47a2-bebc-62d5914f6e6c/requests",
-				m.get(VrServiceInstance.DELETE_LINK));
+				m.get(Constants.DELETE_LINK));
 	}
 }
