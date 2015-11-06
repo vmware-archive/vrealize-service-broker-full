@@ -10,9 +10,9 @@ import org.cloudfoundry.community.servicebroker.model.CreateServiceInstanceBindi
 import org.cloudfoundry.community.servicebroker.model.CreateServiceInstanceRequest;
 import org.cloudfoundry.community.servicebroker.model.DeleteServiceInstanceBindingRequest;
 import org.cloudfoundry.community.servicebroker.model.DeleteServiceInstanceRequest;
+import org.cloudfoundry.community.servicebroker.model.ServiceInstance;
 import org.cloudfoundry.community.servicebroker.model.ServiceInstanceBinding;
 import org.cloudfoundry.community.servicebroker.vrealize.domain.Creds;
-import org.cloudfoundry.community.servicebroker.vrealize.persistance.VrServiceInstance;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
@@ -25,7 +25,7 @@ import com.mongodb.MongoClient;
 public class TestConfig {
 
 	public static final String SD_ID = "71d3235c-f5f9-4140-94a4-64d375cbd783";
-	public static final String R_ID = "4331735d-4a47-4055-b82e-21eb7666f18f";
+	public static final String R_ID = "b43ee047-b1f5-4f77-bf0f-c94f80fc1696";
 	public static final String P_ID = "e06ff060-dc7a-4f46-a7a7-c32c031fa31e";
 	public static final String MONGO_DB_NAME = "test-mongo-db";
 
@@ -56,7 +56,7 @@ public class TestConfig {
 	public static CreateServiceInstanceRequest getCreateServiceInstanceRequest() {
 		CreateServiceInstanceRequest req = new CreateServiceInstanceRequest(
 				SD_ID, "pId", "orgId", "spaceId", true, null);
-		req.withServiceInstanceId("anID");
+		req.withServiceInstanceId(R_ID);
 		return req;
 	}
 
@@ -68,20 +68,12 @@ public class TestConfig {
 		return dreq;
 	}
 
-	public static VrServiceInstance getServiceInstance() {
-		VrServiceInstance si = VrServiceInstance.create(
-				getCreateServiceInstanceRequest(), "12345");
-		si.getParameters().put(VrServiceInstance.SERVICE_TYPE, "mysql");
-		si.getParameters().put(VrServiceInstance.DB_ID, "aDB");
-		si.getParameters().put(VrServiceInstance.HOST, "aHost");
-		si.getParameters().put(VrServiceInstance.PASSWORD, "secret");
-		si.getParameters().put(VrServiceInstance.PORT, "1234");
-		si.getParameters().put(VrServiceInstance.USER_ID, "aUser");
-		return si;
+	public static ServiceInstance getServiceInstance() {
+		return new ServiceInstance(getCreateServiceInstanceRequest());
 	}
 
 	public static CreateServiceInstanceBindingRequest getCreateBindingRequest() {
-		VrServiceInstance si = getServiceInstance();
+		ServiceInstance si = getServiceInstance();
 		CreateServiceInstanceBindingRequest req = new CreateServiceInstanceBindingRequest(
 				si.getServiceDefinitionId(), si.getPlanId(), "anAppId",
 				si.getParameters());
@@ -99,7 +91,7 @@ public class TestConfig {
 	}
 
 	public static DeleteServiceInstanceBindingRequest getDeleteBindingRequest() {
-		VrServiceInstance si = getServiceInstance();
+		ServiceInstance si = getServiceInstance();
 		CreateServiceInstanceBindingRequest creq = getCreateBindingRequest();
 		DeleteServiceInstanceBindingRequest dreq = new DeleteServiceInstanceBindingRequest(
 				creq.getBindingId(), si, si.getServiceDefinitionId(),

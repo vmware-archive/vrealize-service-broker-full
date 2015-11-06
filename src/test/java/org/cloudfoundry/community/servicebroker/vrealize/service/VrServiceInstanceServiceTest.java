@@ -14,11 +14,12 @@ import org.cloudfoundry.community.servicebroker.model.Catalog;
 import org.cloudfoundry.community.servicebroker.model.DeleteServiceInstanceRequest;
 import org.cloudfoundry.community.servicebroker.model.OperationState;
 import org.cloudfoundry.community.servicebroker.model.ServiceDefinition;
+import org.cloudfoundry.community.servicebroker.model.ServiceInstance;
 import org.cloudfoundry.community.servicebroker.model.ServiceInstanceLastOperation;
 import org.cloudfoundry.community.servicebroker.vrealize.Application;
+import org.cloudfoundry.community.servicebroker.vrealize.Constants;
 import org.cloudfoundry.community.servicebroker.vrealize.TestConfig;
 import org.cloudfoundry.community.servicebroker.vrealize.VraClient;
-import org.cloudfoundry.community.servicebroker.vrealize.persistance.VrServiceInstance;
 import org.cloudfoundry.community.servicebroker.vrealize.persistance.VrServiceInstanceRepository;
 import org.junit.After;
 import org.junit.Before;
@@ -88,30 +89,30 @@ public class VrServiceInstanceServiceTest {
 				.thenCallRealMethod();
 
 		Map<String, Object> parameters = new HashMap<String, Object>();
-		parameters.put(VrServiceInstance.SERVICE_TYPE, "mysql");
-		parameters.put(VrServiceInstance.DB_ID, "aDB");
-		parameters.put(VrServiceInstance.HOST, "aHost");
-		parameters.put(VrServiceInstance.PASSWORD, "secret");
-		parameters.put(VrServiceInstance.PORT, "1234");
-		parameters.put(VrServiceInstance.USER_ID, "aUser");
+		parameters.put(Constants.SERVICE_TYPE, "mysql");
+		parameters.put(Constants.DB_ID, "aDB");
+		parameters.put(Constants.HOST, "aHost");
+		parameters.put(Constants.PASSWORD, "secret");
+		parameters.put(Constants.PORT, "1234");
+		parameters.put(Constants.USER_ID, "aUser");
 
 		when(vraClient.getParameters(any(JsonElement.class))).thenReturn(
 				parameters);
 
 		when(
 				vraClient.loadMetadata(Matchers.anyString(),
-						any(VrServiceInstance.class))).thenCallRealMethod();
+						any(ServiceInstance.class))).thenCallRealMethod();
 
 		ServiceInstanceLastOperation silo = new ServiceInstanceLastOperation(
 				"aRequestId", OperationState.SUCCEEDED);
 
 		when(
 				vraClient.getRequestStatus(Matchers.anyString(),
-						any(VrServiceInstance.class))).thenReturn(silo);
+						any(ServiceInstance.class))).thenReturn(silo);
 
 		when(
 				vraClient.getDeleteRequestTemplate(Matchers.anyString(),
-						any(VrServiceInstance.class))).thenReturn(
+						any(ServiceInstance.class))).thenReturn(
 				getJsonElement("deleteTemplate.json"));
 
 		when(
@@ -120,7 +121,7 @@ public class VrServiceInstanceServiceTest {
 
 		when(
 				vraClient.postDeleteRequest(Matchers.anyString(),
-						any(JsonElement.class), any(VrServiceInstance.class)))
+						any(JsonElement.class), any(ServiceInstance.class)))
 				.thenReturn(getJsonElement("deleteRequest.json"));
 
 		Catalog catalog = gson.fromJson(
@@ -141,7 +142,7 @@ public class VrServiceInstanceServiceTest {
 
 	@Test
 	public void testLifecycle() throws Exception {
-		VrServiceInstance instance = (VrServiceInstance) service
+		ServiceInstance instance = (ServiceInstance) service
 				.createServiceInstance(TestConfig
 						.getCreateServiceInstanceRequest());
 
@@ -159,7 +160,7 @@ public class VrServiceInstanceServiceTest {
 
 			// pretend this is taking a few seconds...
 			Thread.sleep(3000);
-			instance = (VrServiceInstance) service.getServiceInstance(instance
+			instance = (ServiceInstance) service.getServiceInstance(instance
 					.getServiceInstanceId());
 			assertNotNull(instance);
 			assertEquals("anID", instance.getServiceInstanceId());
@@ -174,7 +175,7 @@ public class VrServiceInstanceServiceTest {
 				instance.getServiceInstanceId(), TestConfig.SD_ID,
 				TestConfig.P_ID, true);
 
-		instance = (VrServiceInstance) service.deleteServiceInstance(dreq);
+		instance = (ServiceInstance) service.deleteServiceInstance(dreq);
 		assertNotNull(instance);
 		assertEquals("anID", instance.getServiceInstanceId());
 		state = instance.getServiceInstanceLastOperation().getState();
@@ -184,7 +185,7 @@ public class VrServiceInstanceServiceTest {
 		while (state.equals("in progress")) {
 			LOG.info("request status: " + state);
 			Thread.sleep(3000);
-			instance = (VrServiceInstance) service.getServiceInstance(instance
+			instance = (ServiceInstance) service.getServiceInstance(instance
 					.getServiceInstanceId());
 			assertNotNull(instance);
 			assertEquals("anID", instance.getServiceInstanceId());

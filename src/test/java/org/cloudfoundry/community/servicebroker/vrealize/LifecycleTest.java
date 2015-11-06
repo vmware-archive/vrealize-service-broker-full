@@ -5,12 +5,10 @@ import static org.junit.Assert.assertNotNull;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
-import org.cloudfoundry.community.servicebroker.model.OperationState;
 import org.cloudfoundry.community.servicebroker.model.ServiceDefinition;
 import org.cloudfoundry.community.servicebroker.model.ServiceInstanceLastOperation;
 import org.cloudfoundry.community.servicebroker.vrealize.service.CatalogService;
 import org.cloudfoundry.community.servicebroker.vrealize.service.TokenService;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +21,7 @@ import com.google.gson.JsonObject;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = { Application.class })
-@Ignore
+//@Ignore
 public class LifecycleTest {
 
 	private static final Logger LOG = Logger.getLogger(LifecycleTest.class);
@@ -68,13 +66,14 @@ public class LifecycleTest {
 				editedCreateTemplate, sd);
 		assertNotNull(requestResponse);
 		String requestId = client.getRequestId(requestResponse);
+		LOG.info("requestId is: " + requestId);
 		assertNotNull(requestId);
 
-		LOG.info("wait for request to complete....");
+		LOG.info("wait for create request to complete....");
 		ServiceInstanceLastOperation silo = client.getRequestStatus(token,
 				requestId);
 		assertNotNull(silo);
-		while (silo.getState().equals(OperationState.IN_PROGRESS.toString())) {
+		while (silo.getState().equals(Constants.OPERATION_STATE_IN_PROGRESS)) {
 			TimeUnit.SECONDS.sleep(10);
 			silo = client.getRequestStatus(token, requestId);
 			LOG.info("state is: " + silo.getState());
@@ -83,14 +82,32 @@ public class LifecycleTest {
 		LOG.info("state is: "
 				+ client.getRequestStatus(token, requestId).getState());
 
-		// get a delete template
-		// client.getDeleteRequestTemplate(token, si);
+		LOG.info("get a delete template.");
+		JsonElement deleteRequestTemplate = client.getDeleteRequestTemplate(
+				token, requestId);
+		assertNotNull(deleteRequestTemplate);
 
-		// post delete request
+		LOG.info("edit the delete template.");
+		JsonObject editedDeleteRequestTemplate = client
+				.prepareDeleteRequestTemplate(deleteRequestTemplate, requestId);
+		assertNotNull(editedDeleteRequestTemplate);
 
-		// wait for request to complete
+		LOG.info("posting delete request: " + editedDeleteRequestTemplate.toString());
+		JsonElement deleteResponse = client.postDeleteRequest(token,
+				editedDeleteRequestTemplate, requestId);
+		//assertNotNull(deleteResponse);
 
-		// done
+		LOG.info("wait for delete request to complete....");
+		silo = client.getRequestStatus(token, requestId);
+		assertNotNull(silo);
+		while (silo.getState().equals(Constants.OPERATION_STATE_IN_PROGRESS)) {
+			TimeUnit.SECONDS.sleep(10);
+			silo = client.getRequestStatus(token, requestId);
+			LOG.info("state is: " + silo.getState());
+		}
+
+		LOG.info("state is: "
+				+ client.getRequestStatus(token, requestId).getState());
 	}
 
 }
