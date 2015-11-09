@@ -84,22 +84,32 @@ public class VraClient {
 		String requestId = getRequestId(response);
 
 		VrServiceInstance instance = VrServiceInstance.create(request);
-
-		JsonElement resources = getRequestResources(token, requestId);
-
-		Map<String, String> links = getDeleteLinks(resources);
-		instance.getMetadata().putAll(links);
 		instance.getMetadata().put(VrServiceInstance.LOCATION, location);
 		instance.getMetadata().put(VrServiceInstance.CREATE_REQUEST_ID,
 				requestId);
+
+		// add information from response to service instance parameters
+		instance.getParameters().putAll(
+				getParametersFromCreateResponse(response.getBody()));
 
 		ServiceInstanceLastOperation silo = new ServiceInstanceLastOperation(
 				requestId, OperationState.IN_PROGRESS);
 		instance.withLastOperation(silo);
 
+		return instance;
+	}
+
+	VrServiceInstance loadDataFromResourceResponse(String token,
+			VrServiceInstance instance) throws ServiceBrokerException {
+		JsonElement resources = getRequestResources(token,
+				instance.getCreateRequestId());
+
+		Map<String, String> links = getDeleteLinks(resources);
+		instance.getMetadata().putAll(links);
+
 		// add information from response to service instance parameters
 		instance.getParameters().putAll(
-				getParameters(response.getBody(), resources));
+				getParametersFromResourceResponse(resources));
 
 		return instance;
 	}
@@ -108,17 +118,21 @@ public class VraClient {
 			throws ServiceBrokerException {
 		String token = tokenService.getToken();
 
-		// get the delete request template from the resources
-		JsonElement template = getDeleteRequestTemplate(token,
-				instance.getCreateRequestId());
+		String deleteTemplateLink = instance.getMetadata()
+				.get(VrServiceInstance.DELETE_TEMPLATE_LINK).toString();
+		String deleteTemplatePath = pathFromLink(deleteTemplateLink);
+		JsonElement template = vraRepository.getRequest("Bearer " + token,
+				deleteTemplatePath).getBody();
 
 		// customize the template
 		JsonElement edited = prepareDeleteRequestTemplate(template,
 				instance.getServiceInstanceId());
 
-		// request the delete with the template
-		ResponseEntity<JsonElement> response = postDeleteRequest(token, edited,
-				instance.getCreateRequestId());
+		String deleteLink = instance.getMetadata()
+				.get(VrServiceInstance.DELETE_LINK).toString();
+		String deletePath = pathFromLink(deleteLink);
+		ResponseEntity<JsonElement> response = vraRepository.postRequest(
+				"Bearer " + token, deletePath, edited);
 
 		LOG.debug("service request response: " + response.toString());
 
@@ -164,26 +178,6 @@ public class VraClient {
 		return vraRepository.postRequest("Bearer " + token,
 				getCreateRequestPath(sd), body);
 
-	}
-
-	ResponseEntity<JsonElement> postDeleteRequest(String token,
-			JsonElement body, String requestId) {
-
-		if (token == null || body == null || requestId == null) {
-			return null;
-		}
-
-		JsonElement requestResources = getRequestResources(token, requestId);
-		String deleteLink = getDeleteLink(requestResources);
-		return vraRepository.postRequest("Bearer " + token,
-				pathFromLink(deleteLink), body);
-	}
-
-	private String getDeleteLink(JsonElement requestResources) {
-		ReadContext ctx = JsonPath.parse(requestResources.toString());
-		return ctx
-				.read("$.content.[0].links[?(@.rel == 'POST: {com.vmware.csp.component.iaas.proxy.provider@resource.action.name.virtual.Destroy}')].href.[0]")
-				.toString();
 	}
 
 	JsonObject prepareCreateRequestTemplate(JsonElement template,
@@ -332,12 +326,20 @@ public class VraClient {
 		return o.toString();
 	}
 
-	Map<String, Object> getParameters(JsonElement requestResponse,
+	Map<String, Object> getParametersFromCreateResponse(JsonElement response)
+			throws ServiceBrokerException {
+
+		// get the custom parameters from the request info
+		Map<String, Object> m = Adaptors
+				.getParameters(getCustomValues(response));
+
+		return m;
+	}
+
+	Map<String, Object> getParametersFromResourceResponse(
 			JsonElement resourceViewResponse) throws ServiceBrokerException {
 
-		// get the custom parms from the request info
-		Map<String, Object> m = Adaptors
-				.getParameters(getCustomValues(requestResponse));
+		Map<String, Object> m = new HashMap<String, Object>();
 
 		// get the host from the resources view
 		String host = getHostIP(resourceViewResponse);
@@ -374,27 +376,9 @@ public class VraClient {
 		return parameters;
 	}
 
-	JsonElement getDeleteRequestTemplate(String token, String requestId) {
-		if (token == null || requestId == null) {
-			return null;
-		}
-
-		JsonElement requestResources = getRequestResources(token, requestId);
-		String deleteTemplateLink = getDeleteTemplateLink(requestResources);
-		return vraRepository.getRequest("Bearer " + token,
-				pathFromLink(deleteTemplateLink)).getBody();
-	}
-
 	private JsonElement getRequestResources(String token, String requestId) {
 		return vraRepository.getRequestResources("Bearer " + token, requestId)
 				.getBody();
-	}
-
-	private String getDeleteTemplateLink(JsonElement requestResources) {
-		ReadContext ctx = JsonPath.parse(requestResources.toString());
-		return ctx
-				.read("$.content.[0].links[?(@.rel == 'GET Template: {com.vmware.csp.component.iaas.proxy.provider@resource.action.name.virtual.Destroy}')].href.[0]")
-				.toString();
 	}
 
 	private String pathFromLink(String link) {

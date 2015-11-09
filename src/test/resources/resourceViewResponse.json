@@ -8,368 +8,79 @@
 			"links":[
 				{
 					"@type":"link",
-					"rel":"GET: Request",
-					"href":"https://vra.vra.lab/catalog-service/api/consumer/requests/85fe3026-1950-4fa7-a1fb-53d462556273"
-				},
-				{
-					"@type":"link",
-					"rel":"GET: Parent Resource",
-					"href":"https://vra.vra.lab/catalog-service/api/consumer/resourceViews/c4f862f2-a3a0-4843-91c2-9fb7a928c14e"
-				},
-				{
-					"@type":"link",
-					"rel":"GET Template: {com.vmware.csp.component.iaas.proxy.provider@resource.action.name.machine.ChangeLease}",
-					"href":"https://vra.vra.lab/catalog-service/api/consumer/resources/9eda0818-30dc-4408-bda3-07f4b2e7b902/actions/c0e625f1-182c-46c7-be89-a1b9065512d8/requests/template"
-				},
-				{
-					"@type":"link",
-					"rel":"POST: {com.vmware.csp.component.iaas.proxy.provider@resource.action.name.machine.ChangeLease}",
-					"href":"https://vra.vra.lab/catalog-service/api/consumer/resources/9eda0818-30dc-4408-bda3-07f4b2e7b902/actions/c0e625f1-182c-46c7-be89-a1b9065512d8/requests"
-				},
-				{
-					"@type":"link",
-					"rel":"GET Template: {com.vmware.csp.component.iaas.proxy.provider@csp.places.iaas.item.nowindow.ConnectViaNativeVmrc.label}",
-					"href":"https://vra.vra.lab/catalog-service/api/consumer/resources/9eda0818-30dc-4408-bda3-07f4b2e7b902/actions/a229e8c3-407f-4bf4-81aa-129888ff3101/requests/template"
-				},
-				{
-					"@type":"link",
-					"rel":"POST: {com.vmware.csp.component.iaas.proxy.provider@csp.places.iaas.item.nowindow.ConnectViaNativeVmrc.label}",
-					"href":"https://vra.vra.lab/catalog-service/api/consumer/resources/9eda0818-30dc-4408-bda3-07f4b2e7b902/actions/a229e8c3-407f-4bf4-81aa-129888ff3101/requests"
-				},
-				{
-					"@type":"link",
-					"rel":"GET Template: {com.vmware.csp.component.iaas.proxy.provider@csp.places.iaas.item.window.ConnectViaVmrc.label}",
-					"href":"https://vra.vra.lab/catalog-service/api/consumer/resources/9eda0818-30dc-4408-bda3-07f4b2e7b902/actions/8e9292a1-fa3f-43fc-8e37-f70b4f340465/requests/template"
-				},
-				{
-					"@type":"link",
-					"rel":"POST: {com.vmware.csp.component.iaas.proxy.provider@csp.places.iaas.item.window.ConnectViaVmrc.label}",
-					"href":"https://vra.vra.lab/catalog-service/api/consumer/resources/9eda0818-30dc-4408-bda3-07f4b2e7b902/actions/8e9292a1-fa3f-43fc-8e37-f70b4f340465/requests"
-				},
-				{
-					"@type":"link",
-					"rel":"GET Template: {com.vmware.csp.component.iaas.proxy.provider@csp.places.iaas.item.noform.ConnectViaRdp.label}",
-					"href":"https://vra.vra.lab/catalog-service/api/consumer/resources/9eda0818-30dc-4408-bda3-07f4b2e7b902/actions/94503916-e47c-4c6b-97d5-e66e028fad82/requests/template"
-				},
-				{
-					"@type":"link",
-					"rel":"POST: {com.vmware.csp.component.iaas.proxy.provider@csp.places.iaas.item.noform.ConnectViaRdp.label}",
-					"href":"https://vra.vra.lab/catalog-service/api/consumer/resources/9eda0818-30dc-4408-bda3-07f4b2e7b902/actions/94503916-e47c-4c6b-97d5-e66e028fad82/requests"
-				},
-				{
-					"@type":"link",
-					"rel":"GET Template: {com.vmware.csp.component.iaas.proxy.provider@resource.action.name.virtual.CreateSnapshot}",
-					"href":"https://vra.vra.lab/catalog-service/api/consumer/resources/9eda0818-30dc-4408-bda3-07f4b2e7b902/actions/11e05947-e471-4668-bb80-0492d5971d5f/requests/template"
-				},
-				{
-					"@type":"link",
-					"rel":"POST: {com.vmware.csp.component.iaas.proxy.provider@resource.action.name.virtual.CreateSnapshot}",
-					"href":"https://vra.vra.lab/catalog-service/api/consumer/resources/9eda0818-30dc-4408-bda3-07f4b2e7b902/actions/11e05947-e471-4668-bb80-0492d5971d5f/requests"
-				},
-				{
-					"@type":"link",
-					"rel":"GET Template: {com.vmware.csp.component.iaas.proxy.provider@resource.action.name.virtual.Destroy}",
-					"href":"https://vra.vra.lab/catalog-service/api/consumer/resources/9eda0818-30dc-4408-bda3-07f4b2e7b902/actions/2aea3bf0-d193-4149-906f-c6274a73314d/requests/template"
-				},
-				{
-					"@type":"link",
-					"rel":"POST: {com.vmware.csp.component.iaas.proxy.provider@resource.action.name.virtual.Destroy}",
-					"href":"https://vra.vra.lab/catalog-service/api/consumer/resources/9eda0818-30dc-4408-bda3-07f4b2e7b902/actions/2aea3bf0-d193-4149-906f-c6274a73314d/requests"
-				},
-				{
-					"@type":"link",
-					"rel":"GET Template: {com.vmware.csp.component.iaas.proxy.provider@resource.action.name.machine.Expire}",
-					"href":"https://vra.vra.lab/catalog-service/api/consumer/resources/9eda0818-30dc-4408-bda3-07f4b2e7b902/actions/1824a729-0e11-405c-874d-24e85f94a572/requests/template"
-				},
-				{
-					"@type":"link",
-					"rel":"POST: {com.vmware.csp.component.iaas.proxy.provider@resource.action.name.machine.Expire}",
-					"href":"https://vra.vra.lab/catalog-service/api/consumer/resources/9eda0818-30dc-4408-bda3-07f4b2e7b902/actions/1824a729-0e11-405c-874d-24e85f94a572/requests"
-				},
-				{
-					"@type":"link",
-					"rel":"GET Template: {com.vmware.csp.component.iaas.proxy.provider@csp.places.iaas.item.noform.GetExpirationReminder.label}",
-					"href":"https://vra.vra.lab/catalog-service/api/consumer/resources/9eda0818-30dc-4408-bda3-07f4b2e7b902/actions/ed140fe4-ce02-4450-82e9-1162acfe20b0/requests/template"
-				},
-				{
-					"@type":"link",
-					"rel":"POST: {com.vmware.csp.component.iaas.proxy.provider@csp.places.iaas.item.noform.GetExpirationReminder.label}",
-					"href":"https://vra.vra.lab/catalog-service/api/consumer/resources/9eda0818-30dc-4408-bda3-07f4b2e7b902/actions/ed140fe4-ce02-4450-82e9-1162acfe20b0/requests"
-				},
-				{
-					"@type":"link",
-					"rel":"GET Template: {com.vmware.csp.component.iaas.proxy.provider@resource.action.name.machine.InstallTools}",
-					"href":"https://vra.vra.lab/catalog-service/api/consumer/resources/9eda0818-30dc-4408-bda3-07f4b2e7b902/actions/15ebeaed-0163-4c0b-bfea-53278ab800ed/requests/template"
-				},
-				{
-					"@type":"link",
-					"rel":"POST: {com.vmware.csp.component.iaas.proxy.provider@resource.action.name.machine.InstallTools}",
-					"href":"https://vra.vra.lab/catalog-service/api/consumer/resources/9eda0818-30dc-4408-bda3-07f4b2e7b902/actions/15ebeaed-0163-4c0b-bfea-53278ab800ed/requests"
-				},
-				{
-					"@type":"link",
-					"rel":"GET Template: {com.vmware.csp.component.iaas.proxy.provider@resource.action.name.machine.Reset}",
-					"href":"https://vra.vra.lab/catalog-service/api/consumer/resources/9eda0818-30dc-4408-bda3-07f4b2e7b902/actions/e3e9d457-eac3-4e7d-a499-bbd30110fb6e/requests/template"
-				},
-				{
-					"@type":"link",
-					"rel":"POST: {com.vmware.csp.component.iaas.proxy.provider@resource.action.name.machine.Reset}",
-					"href":"https://vra.vra.lab/catalog-service/api/consumer/resources/9eda0818-30dc-4408-bda3-07f4b2e7b902/actions/e3e9d457-eac3-4e7d-a499-bbd30110fb6e/requests"
-				},
-				{
-					"@type":"link",
-					"rel":"GET Template: {com.vmware.csp.component.iaas.proxy.provider@resource.action.name.machine.PowerOff}",
-					"href":"https://vra.vra.lab/catalog-service/api/consumer/resources/9eda0818-30dc-4408-bda3-07f4b2e7b902/actions/104934e7-6aa2-4627-8dfb-e127ff3b6bf4/requests/template"
-				},
-				{
-					"@type":"link",
-					"rel":"POST: {com.vmware.csp.component.iaas.proxy.provider@resource.action.name.machine.PowerOff}",
-					"href":"https://vra.vra.lab/catalog-service/api/consumer/resources/9eda0818-30dc-4408-bda3-07f4b2e7b902/actions/104934e7-6aa2-4627-8dfb-e127ff3b6bf4/requests"
-				},
-				{
-					"@type":"link",
-					"rel":"GET Template: {com.vmware.csp.component.iaas.proxy.provider@resource.action.name.machine.Reboot}",
-					"href":"https://vra.vra.lab/catalog-service/api/consumer/resources/9eda0818-30dc-4408-bda3-07f4b2e7b902/actions/9676d7ee-a097-4127-bf21-4eb9a27b3b59/requests/template"
-				},
-				{
-					"@type":"link",
-					"rel":"POST: {com.vmware.csp.component.iaas.proxy.provider@resource.action.name.machine.Reboot}",
-					"href":"https://vra.vra.lab/catalog-service/api/consumer/resources/9eda0818-30dc-4408-bda3-07f4b2e7b902/actions/9676d7ee-a097-4127-bf21-4eb9a27b3b59/requests"
-				},
-				{
-					"@type":"link",
-					"rel":"GET Template: {com.vmware.csp.component.iaas.proxy.provider@resource.action.name.machine.Reconfigure}",
-					"href":"https://vra.vra.lab/catalog-service/api/consumer/resources/9eda0818-30dc-4408-bda3-07f4b2e7b902/actions/c8287f9e-e387-4626-92b1-8997c4a0ab30/requests/template"
-				},
-				{
-					"@type":"link",
-					"rel":"POST: {com.vmware.csp.component.iaas.proxy.provider@resource.action.name.machine.Reconfigure}",
-					"href":"https://vra.vra.lab/catalog-service/api/consumer/resources/9eda0818-30dc-4408-bda3-07f4b2e7b902/actions/c8287f9e-e387-4626-92b1-8997c4a0ab30/requests"
-				},
-				{
-					"@type":"link",
-					"rel":"GET Template: {com.vmware.csp.component.iaas.proxy.provider@resource.action.name.machine.Reprovision}",
-					"href":"https://vra.vra.lab/catalog-service/api/consumer/resources/9eda0818-30dc-4408-bda3-07f4b2e7b902/actions/1fa7d7ce-428f-4ee1-90ad-bf50f755fb0b/requests/template"
-				},
-				{
-					"@type":"link",
-					"rel":"POST: {com.vmware.csp.component.iaas.proxy.provider@resource.action.name.machine.Reprovision}",
-					"href":"https://vra.vra.lab/catalog-service/api/consumer/resources/9eda0818-30dc-4408-bda3-07f4b2e7b902/actions/1fa7d7ce-428f-4ee1-90ad-bf50f755fb0b/requests"
-				},
-				{
-					"@type":"link",
-					"rel":"GET Template: {com.vmware.csp.component.iaas.proxy.provider@resource.action.name.machine.Shutdown}",
-					"href":"https://vra.vra.lab/catalog-service/api/consumer/resources/9eda0818-30dc-4408-bda3-07f4b2e7b902/actions/10762800-eb3f-4e9e-9d76-c7035f05a959/requests/template"
-				},
-				{
-					"@type":"link",
-					"rel":"POST: {com.vmware.csp.component.iaas.proxy.provider@resource.action.name.machine.Shutdown}",
-					"href":"https://vra.vra.lab/catalog-service/api/consumer/resources/9eda0818-30dc-4408-bda3-07f4b2e7b902/actions/10762800-eb3f-4e9e-9d76-c7035f05a959/requests"
-				},
-				{
-					"@type":"link",
-					"rel":"GET Template: {com.vmware.csp.component.iaas.proxy.provider@resource.action.name.machine.Suspend}",
-					"href":"https://vra.vra.lab/catalog-service/api/consumer/resources/9eda0818-30dc-4408-bda3-07f4b2e7b902/actions/f238615a-32d1-46e8-8c7c-1a8d8db0996d/requests/template"
-				},
-				{
-					"@type":"link",
-					"rel":"POST: {com.vmware.csp.component.iaas.proxy.provider@resource.action.name.machine.Suspend}",
-					"href":"https://vra.vra.lab/catalog-service/api/consumer/resources/9eda0818-30dc-4408-bda3-07f4b2e7b902/actions/f238615a-32d1-46e8-8c7c-1a8d8db0996d/requests"
-				}
-			],
-			"resourceId":"9eda0818-30dc-4408-bda3-07f4b2e7b902",
-			"iconId":"Infrastructure.CatalogItem.Machine.Virtual.vSphere",
-			"name":"vralab-021",
-			"description":null,
-			"status":"On",
-			"catalogItemId":null,
-			"catalogItemLabel":null,
-			"requestId":"85fe3026-1950-4fa7-a1fb-53d462556273",
-			"resourceType":"Infrastructure.Virtual",
-			"owners":[
-				"VMware Dude"
-			],
-			"businessGroupId":"ef21a850-36d7-4be9-9609-e0a815509535",
-			"tenantId":"lab",
-			"dateCreated":"2015-11-06T21:43:44.292Z",
-			"lastUpdated":"2015-11-06T21:43:48.046Z",
-			"lease":{
-				"start":"2015-11-06T21:40:57.000Z",
-				"end":"2015-11-13T21:40:57.000Z"
-			},
-			"costs":{
-				"leaseRate":{
-					"type":"moneyTimeRate",
-					"cost":{
-						"type":"money",
-						"currencyCode":"USD",
-						"amount":0.0
-					},
-					"basis":{
-						"type":"timeSpan",
-						"unit":"DAYS",
-						"amount":1
-					}
-				}
-			},
-			"costToDate":{
-				"type":"money",
-				"currencyCode":"USD",
-				"amount":0.0
-			},
-			"totalCost":{
-				"type":"money",
-				"currencyCode":"USD",
-				"amount":0.0
-			},
-			"parentResourceId":"c4f862f2-a3a0-4843-91c2-9fb7a928c14e",
-			"hasChildren":false,
-			"data":{
-				"ChangeLease":true,
-				"ChangeOwner":true,
-				"Component":"mariadb",
-				"ConnectViaNativeVmrc":true,
-				"ConnectViaRdp":true,
-				"ConnectViaVmrc":true,
-				"CreateSnapshot":true,
-				"DISK_VOLUMES":[
-					{
-						"componentTypeId":"com.vmware.csp.component.iaas.proxy.provider",
-						"componentId":null,
-						"classId":"dynamicops.api.model.DiskInputModel",
-						"typeFilter":null,
-						"data":{
-							"DISK_CAPACITY":50,
-							"DISK_INPUT_ID":"DISK_INPUT_ID1",
-							"DISK_LABEL":"Hard disk 1"
-						}
-					}
-				],
-				"Destroy":true,
-				"EXTERNAL_REFERENCE_ID":"vm-468",
-				"Expire":true,
-				"GetExpirationReminder":true,
-				"IS_COMPONENT_MACHINE":false,
-				"InstallTools":true,
-				"MachineBlueprintName":"MariaDB",
-				"MachineCPU":1,
-				"MachineDailyCost":0.0,
-				"MachineDestructionDate":"2015-11-20T21:40:57.263Z",
-				"MachineExpirationDate":"2015-11-13T21:40:57.263Z",
-				"MachineGroupName":"bus-grp-VRALAB",
-				"MachineGuestOperatingSystem":null,
-				"MachineInterfaceDisplayName":"vSphere (vCenter)",
-				"MachineInterfaceType":"vSphere",
-				"MachineMemory":2048,
-				"MachineName":"vralab-021",
-				"MachineReservationName":"res-Cluster-02",
-				"MachineStorage":50,
-				"MachineType":"Virtual",
-				"NETWORK_LIST":[
-					{
-						"componentTypeId":"com.vmware.csp.component.iaas.proxy.provider",
-						"componentId":null,
-						"classId":"dynamicops.api.model.NetworkViewModel",
-						"typeFilter":null,
-						"data":{
-							"NETWORK_ADDRESS":"192.168.201.4",
-							"NETWORK_MAC_ADDRESS":"00:50:56:bb:87:c8",
-							"NETWORK_NAME":"vxw-dvs-38-virtualwire-1-sid-5000-PCF Deployment Network"
-						}
-					}
-				],
-				"PowerOff":true,
-				"Reboot":true,
-				"Reconfigure":true,
-				"Reprovision":true,
-				"Reset":true,
-				"SNAPSHOT_LIST":[
-					
-				],
-				"Shutdown":true,
-				"Suspend":true,
-				"ip_address":"192.168.201.16",
-				"machineId":"8e1b1adb-1e0d-4473-9d7e-e7dc258ff2ea"
-			}
-		},
-		{
-			"@type":"CatalogResourceView",
-			"links":[
-				{
-					"@type":"link",
 					"rel":"GET: Catalog Item",
 					"href":"https://vra.vra.lab/catalog-service/api/consumer/entitledCatalogItemViews/71d3235c-f5f9-4140-94a4-64d375cbd783"
 				},
 				{
 					"@type":"link",
 					"rel":"GET: Request",
-					"href":"https://vra.vra.lab/catalog-service/api/consumer/requests/85fe3026-1950-4fa7-a1fb-53d462556273"
+					"href":"https://vra.vra.lab/catalog-service/api/consumer/requests/8720ac04-9910-4426-b8b3-758f6e02e3bc"
 				},
 				{
 					"@type":"link",
 					"rel":"GET Template: {com.vmware.csp.component.cafe.composition@resource.action.deployment.changelease.name}",
-					"href":"https://vra.vra.lab/catalog-service/api/consumer/resources/c4f862f2-a3a0-4843-91c2-9fb7a928c14e/actions/34252f3f-de3f-49e9-9f43-2cc2bb4de899/requests/template"
+					"href":"https://vra.vra.lab/catalog-service/api/consumer/resources/06852d93-466d-4d73-80bc-78764b3d768a/actions/34252f3f-de3f-49e9-9f43-2cc2bb4de899/requests/template"
 				},
 				{
 					"@type":"link",
 					"rel":"POST: {com.vmware.csp.component.cafe.composition@resource.action.deployment.changelease.name}",
-					"href":"https://vra.vra.lab/catalog-service/api/consumer/resources/c4f862f2-a3a0-4843-91c2-9fb7a928c14e/actions/34252f3f-de3f-49e9-9f43-2cc2bb4de899/requests"
+					"href":"https://vra.vra.lab/catalog-service/api/consumer/resources/06852d93-466d-4d73-80bc-78764b3d768a/actions/34252f3f-de3f-49e9-9f43-2cc2bb4de899/requests"
 				},
 				{
 					"@type":"link",
 					"rel":"GET Template: {com.vmware.csp.component.cafe.composition@resource.action.deployment.changeowner.name}",
-					"href":"https://vra.vra.lab/catalog-service/api/consumer/resources/c4f862f2-a3a0-4843-91c2-9fb7a928c14e/actions/8f3ac194-39af-40e5-a5b8-0b6f4fb5ed90/requests/template"
+					"href":"https://vra.vra.lab/catalog-service/api/consumer/resources/06852d93-466d-4d73-80bc-78764b3d768a/actions/8f3ac194-39af-40e5-a5b8-0b6f4fb5ed90/requests/template"
 				},
 				{
 					"@type":"link",
 					"rel":"POST: {com.vmware.csp.component.cafe.composition@resource.action.deployment.changeowner.name}",
-					"href":"https://vra.vra.lab/catalog-service/api/consumer/resources/c4f862f2-a3a0-4843-91c2-9fb7a928c14e/actions/8f3ac194-39af-40e5-a5b8-0b6f4fb5ed90/requests"
+					"href":"https://vra.vra.lab/catalog-service/api/consumer/resources/06852d93-466d-4d73-80bc-78764b3d768a/actions/8f3ac194-39af-40e5-a5b8-0b6f4fb5ed90/requests"
 				},
 				{
 					"@type":"link",
 					"rel":"GET Template: {com.vmware.csp.component.cafe.composition@resource.action.deployment.destroy.name}",
-					"href":"https://vra.vra.lab/catalog-service/api/consumer/resources/c4f862f2-a3a0-4843-91c2-9fb7a928c14e/actions/051a18db-6bf5-4468-97e0-942330528c92/requests/template"
+					"href":"https://vra.vra.lab/catalog-service/api/consumer/resources/06852d93-466d-4d73-80bc-78764b3d768a/actions/051a18db-6bf5-4468-97e0-942330528c92/requests/template"
 				},
 				{
 					"@type":"link",
 					"rel":"POST: {com.vmware.csp.component.cafe.composition@resource.action.deployment.destroy.name}",
-					"href":"https://vra.vra.lab/catalog-service/api/consumer/resources/c4f862f2-a3a0-4843-91c2-9fb7a928c14e/actions/051a18db-6bf5-4468-97e0-942330528c92/requests"
+					"href":"https://vra.vra.lab/catalog-service/api/consumer/resources/06852d93-466d-4d73-80bc-78764b3d768a/actions/051a18db-6bf5-4468-97e0-942330528c92/requests"
 				},
 				{
 					"@type":"link",
 					"rel":"GET Template: {com.vmware.csp.component.cafe.composition@resource.action.deployment.archive.name}",
-					"href":"https://vra.vra.lab/catalog-service/api/consumer/resources/c4f862f2-a3a0-4843-91c2-9fb7a928c14e/actions/db59b48f-5ba1-48e7-807e-6960e8c042f2/requests/template"
+					"href":"https://vra.vra.lab/catalog-service/api/consumer/resources/06852d93-466d-4d73-80bc-78764b3d768a/actions/db59b48f-5ba1-48e7-807e-6960e8c042f2/requests/template"
 				},
 				{
 					"@type":"link",
 					"rel":"POST: {com.vmware.csp.component.cafe.composition@resource.action.deployment.archive.name}",
-					"href":"https://vra.vra.lab/catalog-service/api/consumer/resources/c4f862f2-a3a0-4843-91c2-9fb7a928c14e/actions/db59b48f-5ba1-48e7-807e-6960e8c042f2/requests"
+					"href":"https://vra.vra.lab/catalog-service/api/consumer/resources/06852d93-466d-4d73-80bc-78764b3d768a/actions/db59b48f-5ba1-48e7-807e-6960e8c042f2/requests"
 				},
 				{
 					"@type":"link",
 					"rel":"GET: Child Resources",
-					"href":"https://vra.vra.lab/catalog-service/api/consumer/resourceViews?managedOnly=false&withExtendedData=true&withOperations=true&%24filter=parentResource%20eq%20%27c4f862f2-a3a0-4843-91c2-9fb7a928c14e%27"
+					"href":"https://vra.vra.lab/catalog-service/api/consumer/resourceViews?managedOnly=false&withExtendedData=true&withOperations=true&%24filter=parentResource%20eq%20%2706852d93-466d-4d73-80bc-78764b3d768a%27"
 				}
 			],
-			"resourceId":"c4f862f2-a3a0-4843-91c2-9fb7a928c14e",
+			"resourceId":"06852d93-466d-4d73-80bc-78764b3d768a",
 			"iconId":"71d3235c-f5f9-4140-94a4-64d375cbd783",
-			"name":"MariaDB-73601948",
+			"name":"MariaDB-96605718",
 			"description":null,
 			"status":null,
 			"catalogItemId":"71d3235c-f5f9-4140-94a4-64d375cbd783",
 			"catalogItemLabel":"MariaDB",
-			"requestId":"85fe3026-1950-4fa7-a1fb-53d462556273",
+			"requestId":"8720ac04-9910-4426-b8b3-758f6e02e3bc",
 			"resourceType":"composition.resource.type.deployment",
 			"owners":[
 				"VMware Dude"
 			],
 			"businessGroupId":"ef21a850-36d7-4be9-9609-e0a815509535",
 			"tenantId":"lab",
-			"dateCreated":"2015-11-06T21:41:27.702Z",
-			"lastUpdated":"2015-11-06T21:43:48.046Z",
+			"dateCreated":"2015-11-09T15:01:36.813Z",
+			"lastUpdated":"2015-11-09T15:12:05.643Z",
 			"lease":{
-				"start":"2015-11-06T21:41:27.681Z",
-				"end":"2015-11-13T21:41:27.681Z"
+				"start":"2015-11-09T15:01:36.795Z",
+				"end":"2015-11-16T15:01:36.795Z"
 			},
 			"costs":{
 				"leaseRate":{
@@ -400,6 +111,295 @@
 			"hasChildren":true,
 			"data":{
 				
+			}
+		},
+		{
+			"@type":"CatalogResourceView",
+			"links":[
+				{
+					"@type":"link",
+					"rel":"GET: Request",
+					"href":"https://vra.vra.lab/catalog-service/api/consumer/requests/8720ac04-9910-4426-b8b3-758f6e02e3bc"
+				},
+				{
+					"@type":"link",
+					"rel":"GET: Parent Resource",
+					"href":"https://vra.vra.lab/catalog-service/api/consumer/resourceViews/06852d93-466d-4d73-80bc-78764b3d768a"
+				},
+				{
+					"@type":"link",
+					"rel":"GET Template: {com.vmware.csp.component.iaas.proxy.provider@resource.action.name.machine.ChangeLease}",
+					"href":"https://vra.vra.lab/catalog-service/api/consumer/resources/40b23ab8-4451-4522-9c29-cf8f2a6e23e3/actions/c0e625f1-182c-46c7-be89-a1b9065512d8/requests/template"
+				},
+				{
+					"@type":"link",
+					"rel":"POST: {com.vmware.csp.component.iaas.proxy.provider@resource.action.name.machine.ChangeLease}",
+					"href":"https://vra.vra.lab/catalog-service/api/consumer/resources/40b23ab8-4451-4522-9c29-cf8f2a6e23e3/actions/c0e625f1-182c-46c7-be89-a1b9065512d8/requests"
+				},
+				{
+					"@type":"link",
+					"rel":"GET Template: {com.vmware.csp.component.iaas.proxy.provider@csp.places.iaas.item.nowindow.ConnectViaNativeVmrc.label}",
+					"href":"https://vra.vra.lab/catalog-service/api/consumer/resources/40b23ab8-4451-4522-9c29-cf8f2a6e23e3/actions/a229e8c3-407f-4bf4-81aa-129888ff3101/requests/template"
+				},
+				{
+					"@type":"link",
+					"rel":"POST: {com.vmware.csp.component.iaas.proxy.provider@csp.places.iaas.item.nowindow.ConnectViaNativeVmrc.label}",
+					"href":"https://vra.vra.lab/catalog-service/api/consumer/resources/40b23ab8-4451-4522-9c29-cf8f2a6e23e3/actions/a229e8c3-407f-4bf4-81aa-129888ff3101/requests"
+				},
+				{
+					"@type":"link",
+					"rel":"GET Template: {com.vmware.csp.component.iaas.proxy.provider@csp.places.iaas.item.window.ConnectViaVmrc.label}",
+					"href":"https://vra.vra.lab/catalog-service/api/consumer/resources/40b23ab8-4451-4522-9c29-cf8f2a6e23e3/actions/8e9292a1-fa3f-43fc-8e37-f70b4f340465/requests/template"
+				},
+				{
+					"@type":"link",
+					"rel":"POST: {com.vmware.csp.component.iaas.proxy.provider@csp.places.iaas.item.window.ConnectViaVmrc.label}",
+					"href":"https://vra.vra.lab/catalog-service/api/consumer/resources/40b23ab8-4451-4522-9c29-cf8f2a6e23e3/actions/8e9292a1-fa3f-43fc-8e37-f70b4f340465/requests"
+				},
+				{
+					"@type":"link",
+					"rel":"GET Template: {com.vmware.csp.component.iaas.proxy.provider@csp.places.iaas.item.noform.ConnectViaRdp.label}",
+					"href":"https://vra.vra.lab/catalog-service/api/consumer/resources/40b23ab8-4451-4522-9c29-cf8f2a6e23e3/actions/94503916-e47c-4c6b-97d5-e66e028fad82/requests/template"
+				},
+				{
+					"@type":"link",
+					"rel":"POST: {com.vmware.csp.component.iaas.proxy.provider@csp.places.iaas.item.noform.ConnectViaRdp.label}",
+					"href":"https://vra.vra.lab/catalog-service/api/consumer/resources/40b23ab8-4451-4522-9c29-cf8f2a6e23e3/actions/94503916-e47c-4c6b-97d5-e66e028fad82/requests"
+				},
+				{
+					"@type":"link",
+					"rel":"GET Template: {com.vmware.csp.component.iaas.proxy.provider@resource.action.name.virtual.CreateSnapshot}",
+					"href":"https://vra.vra.lab/catalog-service/api/consumer/resources/40b23ab8-4451-4522-9c29-cf8f2a6e23e3/actions/11e05947-e471-4668-bb80-0492d5971d5f/requests/template"
+				},
+				{
+					"@type":"link",
+					"rel":"POST: {com.vmware.csp.component.iaas.proxy.provider@resource.action.name.virtual.CreateSnapshot}",
+					"href":"https://vra.vra.lab/catalog-service/api/consumer/resources/40b23ab8-4451-4522-9c29-cf8f2a6e23e3/actions/11e05947-e471-4668-bb80-0492d5971d5f/requests"
+				},
+				{
+					"@type":"link",
+					"rel":"GET Template: {com.vmware.csp.component.iaas.proxy.provider@resource.action.name.virtual.Destroy}",
+					"href":"https://vra.vra.lab/catalog-service/api/consumer/resources/40b23ab8-4451-4522-9c29-cf8f2a6e23e3/actions/2aea3bf0-d193-4149-906f-c6274a73314d/requests/template"
+				},
+				{
+					"@type":"link",
+					"rel":"POST: {com.vmware.csp.component.iaas.proxy.provider@resource.action.name.virtual.Destroy}",
+					"href":"https://vra.vra.lab/catalog-service/api/consumer/resources/40b23ab8-4451-4522-9c29-cf8f2a6e23e3/actions/2aea3bf0-d193-4149-906f-c6274a73314d/requests"
+				},
+				{
+					"@type":"link",
+					"rel":"GET Template: {com.vmware.csp.component.iaas.proxy.provider@resource.action.name.machine.Expire}",
+					"href":"https://vra.vra.lab/catalog-service/api/consumer/resources/40b23ab8-4451-4522-9c29-cf8f2a6e23e3/actions/1824a729-0e11-405c-874d-24e85f94a572/requests/template"
+				},
+				{
+					"@type":"link",
+					"rel":"POST: {com.vmware.csp.component.iaas.proxy.provider@resource.action.name.machine.Expire}",
+					"href":"https://vra.vra.lab/catalog-service/api/consumer/resources/40b23ab8-4451-4522-9c29-cf8f2a6e23e3/actions/1824a729-0e11-405c-874d-24e85f94a572/requests"
+				},
+				{
+					"@type":"link",
+					"rel":"GET Template: {com.vmware.csp.component.iaas.proxy.provider@csp.places.iaas.item.noform.GetExpirationReminder.label}",
+					"href":"https://vra.vra.lab/catalog-service/api/consumer/resources/40b23ab8-4451-4522-9c29-cf8f2a6e23e3/actions/ed140fe4-ce02-4450-82e9-1162acfe20b0/requests/template"
+				},
+				{
+					"@type":"link",
+					"rel":"POST: {com.vmware.csp.component.iaas.proxy.provider@csp.places.iaas.item.noform.GetExpirationReminder.label}",
+					"href":"https://vra.vra.lab/catalog-service/api/consumer/resources/40b23ab8-4451-4522-9c29-cf8f2a6e23e3/actions/ed140fe4-ce02-4450-82e9-1162acfe20b0/requests"
+				},
+				{
+					"@type":"link",
+					"rel":"GET Template: {com.vmware.csp.component.iaas.proxy.provider@resource.action.name.machine.InstallTools}",
+					"href":"https://vra.vra.lab/catalog-service/api/consumer/resources/40b23ab8-4451-4522-9c29-cf8f2a6e23e3/actions/15ebeaed-0163-4c0b-bfea-53278ab800ed/requests/template"
+				},
+				{
+					"@type":"link",
+					"rel":"POST: {com.vmware.csp.component.iaas.proxy.provider@resource.action.name.machine.InstallTools}",
+					"href":"https://vra.vra.lab/catalog-service/api/consumer/resources/40b23ab8-4451-4522-9c29-cf8f2a6e23e3/actions/15ebeaed-0163-4c0b-bfea-53278ab800ed/requests"
+				},
+				{
+					"@type":"link",
+					"rel":"GET Template: {com.vmware.csp.component.iaas.proxy.provider@resource.action.name.machine.Reset}",
+					"href":"https://vra.vra.lab/catalog-service/api/consumer/resources/40b23ab8-4451-4522-9c29-cf8f2a6e23e3/actions/e3e9d457-eac3-4e7d-a499-bbd30110fb6e/requests/template"
+				},
+				{
+					"@type":"link",
+					"rel":"POST: {com.vmware.csp.component.iaas.proxy.provider@resource.action.name.machine.Reset}",
+					"href":"https://vra.vra.lab/catalog-service/api/consumer/resources/40b23ab8-4451-4522-9c29-cf8f2a6e23e3/actions/e3e9d457-eac3-4e7d-a499-bbd30110fb6e/requests"
+				},
+				{
+					"@type":"link",
+					"rel":"GET Template: {com.vmware.csp.component.iaas.proxy.provider@resource.action.name.machine.PowerOff}",
+					"href":"https://vra.vra.lab/catalog-service/api/consumer/resources/40b23ab8-4451-4522-9c29-cf8f2a6e23e3/actions/104934e7-6aa2-4627-8dfb-e127ff3b6bf4/requests/template"
+				},
+				{
+					"@type":"link",
+					"rel":"POST: {com.vmware.csp.component.iaas.proxy.provider@resource.action.name.machine.PowerOff}",
+					"href":"https://vra.vra.lab/catalog-service/api/consumer/resources/40b23ab8-4451-4522-9c29-cf8f2a6e23e3/actions/104934e7-6aa2-4627-8dfb-e127ff3b6bf4/requests"
+				},
+				{
+					"@type":"link",
+					"rel":"GET Template: {com.vmware.csp.component.iaas.proxy.provider@resource.action.name.machine.Reboot}",
+					"href":"https://vra.vra.lab/catalog-service/api/consumer/resources/40b23ab8-4451-4522-9c29-cf8f2a6e23e3/actions/9676d7ee-a097-4127-bf21-4eb9a27b3b59/requests/template"
+				},
+				{
+					"@type":"link",
+					"rel":"POST: {com.vmware.csp.component.iaas.proxy.provider@resource.action.name.machine.Reboot}",
+					"href":"https://vra.vra.lab/catalog-service/api/consumer/resources/40b23ab8-4451-4522-9c29-cf8f2a6e23e3/actions/9676d7ee-a097-4127-bf21-4eb9a27b3b59/requests"
+				},
+				{
+					"@type":"link",
+					"rel":"GET Template: {com.vmware.csp.component.iaas.proxy.provider@resource.action.name.machine.Reconfigure}",
+					"href":"https://vra.vra.lab/catalog-service/api/consumer/resources/40b23ab8-4451-4522-9c29-cf8f2a6e23e3/actions/c8287f9e-e387-4626-92b1-8997c4a0ab30/requests/template"
+				},
+				{
+					"@type":"link",
+					"rel":"POST: {com.vmware.csp.component.iaas.proxy.provider@resource.action.name.machine.Reconfigure}",
+					"href":"https://vra.vra.lab/catalog-service/api/consumer/resources/40b23ab8-4451-4522-9c29-cf8f2a6e23e3/actions/c8287f9e-e387-4626-92b1-8997c4a0ab30/requests"
+				},
+				{
+					"@type":"link",
+					"rel":"GET Template: {com.vmware.csp.component.iaas.proxy.provider@resource.action.name.machine.Reprovision}",
+					"href":"https://vra.vra.lab/catalog-service/api/consumer/resources/40b23ab8-4451-4522-9c29-cf8f2a6e23e3/actions/1fa7d7ce-428f-4ee1-90ad-bf50f755fb0b/requests/template"
+				},
+				{
+					"@type":"link",
+					"rel":"POST: {com.vmware.csp.component.iaas.proxy.provider@resource.action.name.machine.Reprovision}",
+					"href":"https://vra.vra.lab/catalog-service/api/consumer/resources/40b23ab8-4451-4522-9c29-cf8f2a6e23e3/actions/1fa7d7ce-428f-4ee1-90ad-bf50f755fb0b/requests"
+				},
+				{
+					"@type":"link",
+					"rel":"GET Template: {com.vmware.csp.component.iaas.proxy.provider@resource.action.name.machine.Shutdown}",
+					"href":"https://vra.vra.lab/catalog-service/api/consumer/resources/40b23ab8-4451-4522-9c29-cf8f2a6e23e3/actions/10762800-eb3f-4e9e-9d76-c7035f05a959/requests/template"
+				},
+				{
+					"@type":"link",
+					"rel":"POST: {com.vmware.csp.component.iaas.proxy.provider@resource.action.name.machine.Shutdown}",
+					"href":"https://vra.vra.lab/catalog-service/api/consumer/resources/40b23ab8-4451-4522-9c29-cf8f2a6e23e3/actions/10762800-eb3f-4e9e-9d76-c7035f05a959/requests"
+				},
+				{
+					"@type":"link",
+					"rel":"GET Template: {com.vmware.csp.component.iaas.proxy.provider@resource.action.name.machine.Suspend}",
+					"href":"https://vra.vra.lab/catalog-service/api/consumer/resources/40b23ab8-4451-4522-9c29-cf8f2a6e23e3/actions/f238615a-32d1-46e8-8c7c-1a8d8db0996d/requests/template"
+				},
+				{
+					"@type":"link",
+					"rel":"POST: {com.vmware.csp.component.iaas.proxy.provider@resource.action.name.machine.Suspend}",
+					"href":"https://vra.vra.lab/catalog-service/api/consumer/resources/40b23ab8-4451-4522-9c29-cf8f2a6e23e3/actions/f238615a-32d1-46e8-8c7c-1a8d8db0996d/requests"
+				}
+			],
+			"resourceId":"40b23ab8-4451-4522-9c29-cf8f2a6e23e3",
+			"iconId":"Infrastructure.CatalogItem.Machine.Virtual.vSphere",
+			"name":"vralab-023",
+			"description":null,
+			"status":"On",
+			"catalogItemId":null,
+			"catalogItemLabel":null,
+			"requestId":"8720ac04-9910-4426-b8b3-758f6e02e3bc",
+			"resourceType":"Infrastructure.Virtual",
+			"owners":[
+				"VMware Dude"
+			],
+			"businessGroupId":"ef21a850-36d7-4be9-9609-e0a815509535",
+			"tenantId":"lab",
+			"dateCreated":"2015-11-09T15:04:04.371Z",
+			"lastUpdated":"2015-11-09T15:04:09.004Z",
+			"lease":{
+				"start":"2015-11-09T15:00:51.000Z",
+				"end":"2015-11-16T15:00:51.000Z"
+			},
+			"costs":{
+				"leaseRate":{
+					"type":"moneyTimeRate",
+					"cost":{
+						"type":"money",
+						"currencyCode":"USD",
+						"amount":0.0
+					},
+					"basis":{
+						"type":"timeSpan",
+						"unit":"DAYS",
+						"amount":1
+					}
+				}
+			},
+			"costToDate":{
+				"type":"money",
+				"currencyCode":"USD",
+				"amount":0.0
+			},
+			"totalCost":{
+				"type":"money",
+				"currencyCode":"USD",
+				"amount":0.0
+			},
+			"parentResourceId":"06852d93-466d-4d73-80bc-78764b3d768a",
+			"hasChildren":false,
+			"data":{
+				"ChangeLease":true,
+				"ChangeOwner":true,
+				"Component":"mariadb",
+				"ConnectViaNativeVmrc":true,
+				"ConnectViaRdp":true,
+				"ConnectViaVmrc":true,
+				"CreateSnapshot":true,
+				"DISK_VOLUMES":[
+					{
+						"componentTypeId":"com.vmware.csp.component.iaas.proxy.provider",
+						"componentId":null,
+						"classId":"dynamicops.api.model.DiskInputModel",
+						"typeFilter":null,
+						"data":{
+							"DISK_CAPACITY":50,
+							"DISK_INPUT_ID":"DISK_INPUT_ID1",
+							"DISK_LABEL":"Hard disk 1"
+						}
+					}
+				],
+				"Destroy":true,
+				"EXTERNAL_REFERENCE_ID":"vm-470",
+				"Expire":true,
+				"GetExpirationReminder":true,
+				"IS_COMPONENT_MACHINE":false,
+				"InstallTools":true,
+				"MachineBlueprintName":"MariaDB",
+				"MachineCPU":1,
+				"MachineDailyCost":0.0,
+				"MachineDestructionDate":"2015-11-23T15:00:51.483Z",
+				"MachineExpirationDate":"2015-11-16T15:00:51.483Z",
+				"MachineGroupName":"bus-grp-VRALAB",
+				"MachineGuestOperatingSystem":null,
+				"MachineInterfaceDisplayName":"vSphere (vCenter)",
+				"MachineInterfaceType":"vSphere",
+				"MachineMemory":2048,
+				"MachineName":"vralab-023",
+				"MachineReservationName":"res-Cluster-02",
+				"MachineStorage":50,
+				"MachineType":"Virtual",
+				"NETWORK_LIST":[
+					{
+						"componentTypeId":"com.vmware.csp.component.iaas.proxy.provider",
+						"componentId":null,
+						"classId":"dynamicops.api.model.NetworkViewModel",
+						"typeFilter":null,
+						"data":{
+							"NETWORK_ADDRESS":"192.168.201.3",
+							"NETWORK_MAC_ADDRESS":"00:50:56:bb:b9:0d",
+							"NETWORK_NAME":"vxw-dvs-38-virtualwire-1-sid-5000-PCF Deployment Network"
+						}
+					}
+				],
+				"PowerOff":true,
+				"Reboot":true,
+				"Reconfigure":true,
+				"Reprovision":true,
+				"Reset":true,
+				"SNAPSHOT_LIST":[
+					
+				],
+				"Shutdown":true,
+				"Suspend":true,
+				"ip_address":"192.168.201.17",
+				"machineId":"dea4faa9-6ba5-4d4b-a4d3-b606bbc56b8d"
 			}
 		}
 	],
