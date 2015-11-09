@@ -45,38 +45,38 @@ public class VrServiceInstanceService implements ServiceInstanceService {
 			return null;
 		}
 
-		VrServiceInstance si = getInstance(id);
+		VrServiceInstance instance = getInstance(id);
 
 		// check the last operation
-		ServiceInstanceLastOperation silo = si
+		ServiceInstanceLastOperation silo = instance
 				.getServiceInstanceLastOperation();
 		if (silo == null || silo.getState() == null) {
 			LOG.error("ServiceInstance: " + id + " has no last operation.");
-			deleteInstance(si);
+			deleteInstance(instance);
 			return null;
 		}
 
-		if (!si.isInProgress()) {
-			return si;
+		// if the instance is not in progress just return it.
+		if (!instance.isInProgress()) {
+			return instance;
 		}
 
-		// still in progress, let's check up on things...
+		// if still in progress, let's check up on things...
 		String currentRequestId = silo.getDescription();
 		if (currentRequestId == null) {
 			LOG.error("ServiceInstance: " + id + " last operation has no id.");
-			deleteInstance(si);
+			deleteInstance(instance);
 			return null;
 		}
 
-		String state = si.getServiceInstanceLastOperation().getState();
+		String state = instance.getServiceInstanceLastOperation().getState();
 		LOG.info("service instance id: " + id + " request id: "
 				+ currentRequestId + " is in state: " + state);
-
 
 		LOG.info("checking on status of request id: " + currentRequestId);
 		ServiceInstanceLastOperation status;
 		try {
-			status = vraClient.getRequestStatus(si);
+			status = vraClient.getRequestStatus(instance);
 		} catch (ServiceBrokerException e) {
 			LOG.error("unable to get status of request: " + id, e);
 			return null;
@@ -84,14 +84,16 @@ public class VrServiceInstanceService implements ServiceInstanceService {
 
 		LOG.info("request: " + id + " status is: " + status.getState());
 
-		si.withLastOperation(status);
+		instance.withLastOperation(status);
 
 		// if this is a delete request and was successful, remove the instance
-		if (si.isCurrentOperationSuccessful() && si.isCurrentOperationDelete()) {
-			deleteInstance(si);
+		if (instance.isCurrentOperationSuccessful()
+				&& instance.isCurrentOperationDelete()) {
+			deleteInstance(instance);
 		}
 
-		return si;
+		// otherwise save the instance with the new last operation
+		return repository.save(instance);
 	}
 
 	@Override
