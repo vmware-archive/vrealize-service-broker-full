@@ -88,10 +88,6 @@ public class VraClient {
 		instance.getMetadata().put(VrServiceInstance.CREATE_REQUEST_ID,
 				requestId);
 
-		// add information from response to service instance parameters
-		instance.getParameters().putAll(
-				getParametersFromCreateResponse(response.getBody()));
-
 		ServiceInstanceLastOperation silo = new ServiceInstanceLastOperation(
 				requestId, OperationState.IN_PROGRESS);
 		instance.withLastOperation(silo);
@@ -99,17 +95,31 @@ public class VraClient {
 		return instance;
 	}
 
+	public void loadCredentials(VrServiceInstance instance)
+			throws ServiceBrokerException {
+		String token = tokenService.getToken();
+
+		String locationPath = pathFromLink(instance.getLocation().toString());
+		JsonElement requestResponse = vraRepository.getRequest(
+				"Bearer " + token, locationPath).getBody();
+
+		instance.getParameters().putAll(
+				getParametersFromCreateResponse(requestResponse));
+
+		JsonElement resourcesResponse = getRequestResources(token, instance
+				.getCreateRequestId().toString());
+
+		instance.getParameters().putAll(
+				getParametersFromResourceResponse(resourcesResponse));
+	}
+
 	VrServiceInstance loadDataFromResourceResponse(String token,
 			VrServiceInstance instance) throws ServiceBrokerException {
-		JsonElement resources = getRequestResources(token,
-				instance.getCreateRequestId());
+		JsonElement resources = getRequestResources(token, instance
+				.getCreateRequestId().toString());
 
 		Map<String, String> links = getDeleteLinks(resources);
 		instance.getMetadata().putAll(links);
-
-		// add information from response to service instance parameters
-		instance.getParameters().putAll(
-				getParametersFromResourceResponse(resources));
 
 		return instance;
 	}

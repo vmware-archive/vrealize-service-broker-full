@@ -143,12 +143,12 @@ public class VrServiceInstance extends ServiceInstance {
 		return getServiceInstanceLastOperation().getDescription();
 	}
 
-	public String getCreateRequestId() {
-		return getMetadata().get(CREATE_REQUEST_ID).toString();
+	public Object getCreateRequestId() {
+		return getMetadata().get(CREATE_REQUEST_ID);
 	}
 
-	public String getLocation() {
-		return getMetadata().get(VrServiceInstance.LOCATION).toString();
+	public Object getLocation() {
+		return getMetadata().get(VrServiceInstance.LOCATION);
 	}
 
 	public String getId() {
@@ -161,5 +161,9 @@ public class VrServiceInstance extends ServiceInstance {
 
 	public Map<String, Object> getCredentials() throws ServiceBrokerException {
 		return Adaptors.getCredentials(this);
+	}
+
+	public boolean hasCredentials() {
+		return Adaptors.hasCredentials(this);
 	}
 }

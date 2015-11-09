@@ -63,7 +63,7 @@ public class LifecycleTest {
 		VrServiceInstance instance = client.createInstance(
 				TestConfig.getCreateServiceInstanceRequest(sd), sd);
 
-		String requestId = instance.getCreateRequestId();
+		Object requestId = instance.getCreateRequestId();
 		assertNotNull(requestId);
 
 		String status = instance.getServiceInstanceLastOperation().getState();
@@ -71,7 +71,7 @@ public class LifecycleTest {
 
 		LOG.info("request status is: " + status + " requestId is: " + requestId);
 
-		String location = instance.getLocation();
+		Object location = instance.getLocation();
 		assertNotNull(location);
 
 		LOG.info("location: " + location);
@@ -79,18 +79,18 @@ public class LifecycleTest {
 		LOG.info("wait for create request to complete....");
 
 		ServiceInstanceLastOperation silo = client.getRequestStatus(token,
-				requestId);
+				requestId.toString());
 		assertNotNull(silo);
 		while (silo.getState().equals(
 				VrServiceInstance.OPERATION_STATE_IN_PROGRESS)) {
 			TimeUnit.SECONDS.sleep(10);
-			silo = client.getRequestStatus(token, requestId);
+			silo = client.getRequestStatus(token, requestId.toString());
 			LOG.info("state is: " + silo.getState() + ": "
 					+ silo.getDescription());
 		}
 
 		LOG.info("state is: "
-				+ client.getRequestStatus(token, requestId).getState());
+				+ client.getRequestStatus(token, requestId.toString()).getState());
 	}
 
 	@Test
