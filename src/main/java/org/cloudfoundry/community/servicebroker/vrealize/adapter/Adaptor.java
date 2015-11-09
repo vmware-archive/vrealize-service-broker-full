@@ -14,4 +14,6 @@ public interface Adaptor {
 
 	Map<String, Object> toParameters(Map<String, Object> vrCustomKeyValues);
 
+	boolean hasCredentials(VrServiceInstance instance);
+
 }

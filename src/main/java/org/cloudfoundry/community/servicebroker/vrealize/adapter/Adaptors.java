@@ -19,8 +19,8 @@ public class Adaptors {
 	public static Map<String, Object> getParameters(
 			Map<String, Object> vrCustomKeyValues)
 			throws ServiceBrokerException {
-		Object serviceType = vrCustomKeyValues.get(
-				VrServiceInstance.SERVICE_TYPE);
+		Object serviceType = vrCustomKeyValues
+				.get(VrServiceInstance.SERVICE_TYPE);
 
 		if (serviceType == null) {
 			throw new ServiceBrokerException(
@@ -76,5 +76,16 @@ public class Adaptors {
 	// TODO figure out some clever way to make this more adaptable
 	private static void initAdaptors() {
 		ADAPTORS.add(new MySqlAdapter());
+	}
+
+	public static boolean hasCredentials(VrServiceInstance instance) {
+		if (instance == null
+				|| instance.getParameters() == null
+				|| instance.getParameters().get(VrServiceInstance.SERVICE_TYPE) == null) {
+			return false;
+		}
+		Adaptor adaptor = getAdaptor(instance.getParameters()
+				.get(VrServiceInstance.SERVICE_TYPE).toString());
+		return adaptor.hasCredentials(instance);
 	}
 }
