@@ -11,6 +11,7 @@ import org.cloudfoundry.community.servicebroker.model.CreateServiceInstanceReque
 import org.cloudfoundry.community.servicebroker.model.DeleteServiceInstanceBindingRequest;
 import org.cloudfoundry.community.servicebroker.model.DeleteServiceInstanceRequest;
 import org.cloudfoundry.community.servicebroker.model.OperationState;
+import org.cloudfoundry.community.servicebroker.model.ServiceDefinition;
 import org.cloudfoundry.community.servicebroker.model.ServiceInstanceBinding;
 import org.cloudfoundry.community.servicebroker.model.ServiceInstanceLastOperation;
 import org.cloudfoundry.community.servicebroker.vrealize.domain.Creds;
@@ -62,6 +63,15 @@ public class TestConfig {
 		return req;
 	}
 
+	public static CreateServiceInstanceRequest getCreateServiceInstanceRequest(
+			ServiceDefinition sd) {
+		CreateServiceInstanceRequest req = new CreateServiceInstanceRequest(
+				sd.getId(), sd.getPlans().get(0).getId(), "testOrgId",
+				"testSpaceId", true, null);
+		req.withServiceInstanceId("anID");
+		return req;
+	}
+
 	public static DeleteServiceInstanceRequest getDeleteServiceInstanceRequest() {
 		CreateServiceInstanceRequest creq = getCreateServiceInstanceRequest();
 		DeleteServiceInstanceRequest dreq = new DeleteServiceInstanceRequest(
@@ -83,7 +93,7 @@ public class TestConfig {
 		ServiceInstanceLastOperation silo = new ServiceInstanceLastOperation(
 				"aRequestId", OperationState.IN_PROGRESS);
 		si.withLastOperation(silo);
-		
+
 		si.getMetadata().put(VrServiceInstance.CREATE_REQUEST_ID, "aRequestId");
 		return si;
 	}

@@ -135,38 +135,38 @@ public class VraClientTest {
 	}
 
 	@Test
-	public void testGetLinks() throws Exception {
+	public void testGetParmsAndMeta() throws Exception {
 		JsonParser parser = new JsonParser();
-		JsonElement je = parser.parse(TestConfig
-				.getContents("requestResources.json"));
-		Map<String, String> m = client.getDeleteLinks(je);
-		assertNotNull(m);
-		assertEquals(2, m.size());
-		assertEquals(
-				"https://vra.vra.lab/catalog-service/api/consumer/resources/d591e58d-b2cf-4061-aec1-7f41168b7a6d/actions/fe9af618-f21d-47a2-bebc-62d5914f6e6c/requests/template",
-				m.get(VrServiceInstance.DELETE_TEMPLATE_LINK));
-		assertEquals(
-				"https://vra.vra.lab/catalog-service/api/consumer/resources/d591e58d-b2cf-4061-aec1-7f41168b7a6d/actions/fe9af618-f21d-47a2-bebc-62d5914f6e6c/requests",
-				m.get(VrServiceInstance.DELETE_LINK));
-	}
-
-	@Test
-	public void testGetParameters() throws Exception {
-		JsonParser parser = new JsonParser();
-		JsonElement lr = parser.parse(TestConfig
-				.getContents("locationResponse.json"));
+		JsonElement cr = parser.parse(TestConfig
+				.getContents("requestResponse.json"));
 
 		JsonElement rvr = parser.parse(TestConfig
 				.getContents("resourceViewResponse.json"));
 
-		Map<String, Object> m = client.getParameters(lr, rvr);
-		assertNotNull(m);
-		assertEquals(6, m.size());
-		assertEquals("3306", m.get(VrServiceInstance.PORT));
-		assertEquals("P1v0t4l!", m.get(VrServiceInstance.PASSWORD));
-		assertEquals("mysqluser", m.get(VrServiceInstance.USER_ID));
-		assertEquals("db01", m.get(VrServiceInstance.DB_ID));
-		assertEquals("mysql", m.get(VrServiceInstance.SERVICE_TYPE));
-		assertEquals("192.168.201.16", m.get("HOST"));
+		Map<String, Object> parms1 = client.getParametersFromCreateResponse(cr);
+		Map<String, Object> parms2 = client
+				.getParametersFromResourceResponse(rvr);
+		Map<String, String> meta = client.getDeleteLinks(rvr);
+
+		assertNotNull(parms1);
+		assertEquals(6, parms1.size());
+		assertEquals("3306", parms1.get(VrServiceInstance.PORT));
+		assertEquals("P1v0t4l!", parms1.get(VrServiceInstance.PASSWORD));
+		assertEquals("mysqluser", parms1.get(VrServiceInstance.USER_ID));
+		assertEquals("db01", parms1.get(VrServiceInstance.DB_ID));
+		assertEquals("mysql", parms1.get(VrServiceInstance.SERVICE_TYPE));
+
+		assertNotNull(parms2);
+		assertEquals(1, parms2.size());
+		assertEquals("192.168.201.17", parms2.get(VrServiceInstance.HOST));
+
+		assertNotNull(meta);
+		assertEquals(2, meta.size());
+		assertEquals(
+				"https://vra.vra.lab/catalog-service/api/consumer/resources/06852d93-466d-4d73-80bc-78764b3d768a/actions/051a18db-6bf5-4468-97e0-942330528c92/requests/template",
+				meta.get(VrServiceInstance.DELETE_TEMPLATE_LINK));
+		assertEquals(
+				"https://vra.vra.lab/catalog-service/api/consumer/resources/06852d93-466d-4d73-80bc-78764b3d768a/actions/051a18db-6bf5-4468-97e0-942330528c92/requests",
+				meta.get(VrServiceInstance.DELETE_LINK));
 	}
 }

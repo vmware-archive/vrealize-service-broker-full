@@ -147,6 +147,10 @@ public class VrServiceInstance extends ServiceInstance {
 		return getMetadata().get(CREATE_REQUEST_ID).toString();
 	}
 
+	public String getLocation() {
+		return getMetadata().get(VrServiceInstance.LOCATION).toString();
+	}
+
 	public String getId() {
 		return id;
 	}
