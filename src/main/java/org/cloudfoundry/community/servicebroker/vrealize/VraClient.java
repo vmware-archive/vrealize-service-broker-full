@@ -11,20 +11,22 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.UUID;
 
 import net.minidev.json.JSONArray;
 
+import org.apache.log4j.Logger;
 import org.cloudfoundry.community.servicebroker.exception.ServiceBrokerException;
+import org.cloudfoundry.community.servicebroker.model.CreateServiceInstanceRequest;
 import org.cloudfoundry.community.servicebroker.model.OperationState;
 import org.cloudfoundry.community.servicebroker.model.ServiceDefinition;
-import org.cloudfoundry.community.servicebroker.model.ServiceInstance;
 import org.cloudfoundry.community.servicebroker.model.ServiceInstanceLastOperation;
 import org.cloudfoundry.community.servicebroker.vrealize.adapter.Adaptors;
 import org.cloudfoundry.community.servicebroker.vrealize.domain.Creds;
-import org.jboss.logging.Logger;
+import org.cloudfoundry.community.servicebroker.vrealize.persistance.VrServiceInstance;
+import org.cloudfoundry.community.servicebroker.vrealize.service.TokenService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.google.gson.Gson;
@@ -35,9 +37,16 @@ import com.jayway.jsonpath.ReadContext;
 
 @Service
 public class VraClient {
-	
+
 	private static final Logger LOG = Logger.getLogger(VraClient.class);
-	
+
+	public static final String SUCCESSFUL = "SUCCESSFUL";
+	public static final String UNSUBMITTED = "UNSUBMITTED";
+	public static final String SUBMITTED = "SUBMITTED";
+	public static final String PENDING_PRE_APPROVAL = "PENDING_PRE_APPROVAL";
+	public static final String IN_PROGRESS = "IN_PROGRESS";
+	public static final String PENDING_POST_APPROVAL = "PENDING_POST_APPROVAL";
+
 	@Autowired
 	private VraRepository vraRepository;
 
@@ -50,14 +59,87 @@ public class VraClient {
 	@Autowired
 	String serviceUri;
 
-	public JsonElement getCreateRequestTemplate(String token,
-			ServiceDefinition sd) {
+	@Autowired
+	TokenService tokenService;
+
+	public VrServiceInstance createInstance(
+			CreateServiceInstanceRequest request, ServiceDefinition sd)
+			throws ServiceBrokerException {
+		String token = tokenService.getToken();
+
+		// get a template for the request
+		JsonElement template = getCreateRequestTemplate(token, sd);
+
+		// customize the template
+		JsonElement edited = prepareCreateRequestTemplate(template,
+				request.getServiceInstanceId());
+
+		// request the request with the request
+		ResponseEntity<JsonElement> response = postCreateRequest(token, edited,
+				sd);
+
+		LOG.info("service request response: " + response.toString());
+
+		String location = getLocation(response);
+		String requestId = getRequestId(response);
+
+		VrServiceInstance instance = VrServiceInstance.create(request);
+
+		JsonElement resources = getRequestResources(token, requestId);
+
+		Map<String, String> links = getDeleteLinks(resources);
+		instance.getMetadata().putAll(links);
+		instance.getMetadata().put(VrServiceInstance.LOCATION, location);
+		instance.getMetadata().put(VrServiceInstance.CREATE_REQUEST_ID,
+				requestId);
+
+		ServiceInstanceLastOperation silo = new ServiceInstanceLastOperation(
+				requestId, OperationState.IN_PROGRESS);
+		instance.withLastOperation(silo);
+
+		// add information from response to service instance parameters
+		instance.getParameters().putAll(
+				getParameters(response.getBody(), resources));
+
+		return instance;
+	}
+
+	public VrServiceInstance deleteInstance(VrServiceInstance instance)
+			throws ServiceBrokerException {
+		String token = tokenService.getToken();
+
+		// get the delete request template from the resources
+		JsonElement template = getDeleteRequestTemplate(token,
+				instance.getCreateRequestId());
+
+		// customize the template
+		JsonElement edited = prepareDeleteRequestTemplate(template,
+				instance.getServiceInstanceId());
+
+		// request the delete with the template
+		ResponseEntity<JsonElement> response = postDeleteRequest(token, edited,
+				instance.getCreateRequestId());
+
+		LOG.debug("service request response: " + response.toString());
+
+		String requestId = getRequestId(response);
+
+		// update instance with new delete metadata
+		VrServiceInstance.delete(instance, requestId);
+		return instance;
+	}
+
+	private String getLocation(ResponseEntity<JsonElement> response) {
+		return response.getHeaders().getLocation().toString();
+	}
+
+	JsonElement getCreateRequestTemplate(String token, ServiceDefinition sd) {
 		if (token == null || sd == null) {
 			return null;
 		}
 
 		return vraRepository.getRequest("Bearer " + token,
-				getGetRequestPath(sd));
+				getGetRequestPath(sd)).getBody();
 	}
 
 	private String getGetRequestPath(ServiceDefinition sd) {
@@ -72,8 +154,8 @@ public class VraClient {
 		return fullUri.substring(serviceUri.length() + 1);
 	}
 
-	public JsonElement postCreateRequest(String token, JsonElement body,
-			ServiceDefinition sd) {
+	ResponseEntity<JsonElement> postCreateRequest(String token,
+			JsonElement body, ServiceDefinition sd) {
 
 		if (token == null || body == null || sd == null) {
 			return null;
@@ -84,39 +166,41 @@ public class VraClient {
 
 	}
 
-	public JsonElement postDeleteRequest(String token, JsonElement body,
-			String requestId) {
+	ResponseEntity<JsonElement> postDeleteRequest(String token,
+			JsonElement body, String requestId) {
 
 		if (token == null || body == null || requestId == null) {
 			return null;
 		}
-		
+
 		JsonElement requestResources = getRequestResources(token, requestId);
 		String deleteLink = getDeleteLink(requestResources);
-		return vraRepository.postRequest("Bearer " + token, pathFromLink(deleteLink), body);
-
-//		return vraRepository.postRequest("Bearer " + token, si.getMetadata()
-//				.get(Constants.DELETE_LINK).toString(), body);
-
+		return vraRepository.postRequest("Bearer " + token,
+				pathFromLink(deleteLink), body);
 	}
 
-	public JsonObject prepareCreateRequestTemplate(JsonElement template) throws ServiceBrokerException {
+	private String getDeleteLink(JsonElement requestResources) {
+		ReadContext ctx = JsonPath.parse(requestResources.toString());
+		return ctx
+				.read("$.content.[0].links[?(@.rel == 'POST: {com.vmware.csp.component.iaas.proxy.provider@resource.action.name.virtual.Destroy}')].href.[0]")
+				.toString();
+	}
+
+	JsonObject prepareCreateRequestTemplate(JsonElement template,
+			String serviceInstanceId) throws ServiceBrokerException {
 		JsonObject jo = removeFields(template.getAsJsonObject(),
 				getContents("fieldsToFilter.txt"));
-		
-		//create a unique id to tag the request so we can correlate it later.
-		//we can't use the requestId here, because it has not been created yet.
-		
-		String id = UUID.randomUUID().toString();
-		LOG.info("submitting request to vR with description: " + id);
 
-		jo.addProperty("description", id);
+		LOG.info("submitting request to vR for serviceInstance: "
+				+ serviceInstanceId);
+
+		jo.addProperty("description", serviceInstanceId);
 		jo.addProperty("reasons", "CF service broker request.");
 
 		return jo;
 	}
 
-	public JsonObject prepareDeleteRequestTemplate(JsonElement template,
+	JsonObject prepareDeleteRequestTemplate(JsonElement template,
 			String serviceInstanceId) throws ServiceBrokerException {
 
 		JsonObject jo = template.getAsJsonObject();
@@ -154,29 +238,27 @@ public class VraClient {
 		}
 	}
 
-	public ServiceInstanceLastOperation getRequestStatus(String token,
-			ServiceInstance si) {
-		if (token == null || si == null
-				|| si.getServiceInstanceLastOperation() == null) {
+	public ServiceInstanceLastOperation getRequestStatus(VrServiceInstance si)
+			throws ServiceBrokerException {
+		if (si == null || si.getServiceInstanceLastOperation() == null) {
 			return new ServiceInstanceLastOperation(
 					"Unable to get request status: invalid request.",
 					OperationState.FAILED);
 		}
 
-		String requestId = si.getServiceInstanceId();
+		String requestId = si.getCurrentOperationRequestId();
 		if (requestId == null) {
 			return new ServiceInstanceLastOperation(
 					"Unable to get requestId from last operation.",
 					OperationState.FAILED);
 		}
 
-		return getRequestStatus(token, requestId);
+		return getRequestStatus(tokenService.getToken(), requestId);
 	}
 
-	public ServiceInstanceLastOperation getRequestStatus(String token,
-			String requestId) {
+	ServiceInstanceLastOperation getRequestStatus(String token, String requestId) {
 		JsonElement je = vraRepository.getRequestStatus("Bearer " + token,
-				requestId);
+				requestId).getBody();
 		if (je == null) {
 			return new ServiceInstanceLastOperation(
 					"Unable to get request status: nothing returned from vR service.",
@@ -211,14 +293,14 @@ public class VraClient {
 			return OperationState.FAILED;
 		}
 
-		if (Constants.SUCCESSFUL.equals(vrStatus)) {
+		if (SUCCESSFUL.equals(vrStatus)) {
 			return OperationState.SUCCEEDED;
 		}
 
-		if (Constants.UNSUBMITTED.equals(vrStatus) || Constants.SUBMITTED.equals(vrStatus)
-				|| Constants.PENDING_PRE_APPROVAL.equals(vrStatus)
-				|| Constants.IN_PROGRESS.equals(vrStatus)
-				|| Constants.PENDING_POST_APPROVAL.equals(vrStatus)) {
+		if (UNSUBMITTED.equals(vrStatus) || SUBMITTED.equals(vrStatus)
+				|| PENDING_PRE_APPROVAL.equals(vrStatus)
+				|| IN_PROGRESS.equals(vrStatus)
+				|| PENDING_POST_APPROVAL.equals(vrStatus)) {
 			return OperationState.IN_PROGRESS;
 		}
 
@@ -226,12 +308,12 @@ public class VraClient {
 
 	}
 
-	public String getRequestId(JsonElement requestResponse) {
+	String getRequestId(ResponseEntity<JsonElement> requestResponse) {
 		if (requestResponse == null) {
 			return null;
 		}
 
-		JsonElement je = requestResponse.getAsJsonObject().get("id");
+		JsonElement je = requestResponse.getBody().getAsJsonObject().get("id");
 		if (je == null) {
 			return null;
 		}
@@ -239,12 +321,32 @@ public class VraClient {
 		return je.getAsString();
 	}
 
-	public Map<String, Object> getParameters(JsonElement requestResponse)
-			throws ServiceBrokerException {
-		return Adaptors.getParameters(getCustomValues(requestResponse));
+	private String getHostIP(JsonElement requestResponse) {
+		if (requestResponse == null) {
+			return null;
+		}
+
+		ReadContext ctx = JsonPath.parse(requestResponse.toString());
+		Object o = ctx.read("$.content[*].data.ip_address[0]");
+
+		return o.toString();
 	}
 
-	public Map<String, Object> getCustomValues(JsonElement requestResponse) {
+	Map<String, Object> getParameters(JsonElement requestResponse,
+			JsonElement resourceViewResponse) throws ServiceBrokerException {
+
+		// get the custom parms from the request info
+		Map<String, Object> m = Adaptors
+				.getParameters(getCustomValues(requestResponse));
+
+		// get the host from the resources view
+		String host = getHostIP(resourceViewResponse);
+		m.put(VrServiceInstance.HOST, host);
+
+		return m;
+	}
+
+	private Map<String, Object> getCustomValues(JsonElement requestResponse) {
 		Map<String, Object> parameters = new HashMap<String, Object>();
 		if (requestResponse == null) {
 			return parameters;
@@ -272,57 +374,44 @@ public class VraClient {
 		return parameters;
 	}
 
-	public JsonElement getDeleteRequestTemplate(String token,
-			String requestId) {
+	JsonElement getDeleteRequestTemplate(String token, String requestId) {
 		if (token == null || requestId == null) {
 			return null;
 		}
-		
+
 		JsonElement requestResources = getRequestResources(token, requestId);
 		String deleteTemplateLink = getDeleteTemplateLink(requestResources);
-		return vraRepository.getRequest("Bearer " + token, pathFromLink(deleteTemplateLink));
+		return vraRepository.getRequest("Bearer " + token,
+				pathFromLink(deleteTemplateLink)).getBody();
 	}
 
-	public JsonElement getRequestResources(String token, String requestId) {
-		return vraRepository.getRequestResources("Bearer " + token,
-				requestId);
+	private JsonElement getRequestResources(String token, String requestId) {
+		return vraRepository.getRequestResources("Bearer " + token, requestId)
+				.getBody();
 	}
-	
+
 	private String getDeleteTemplateLink(JsonElement requestResources) {
 		ReadContext ctx = JsonPath.parse(requestResources.toString());
-		return ctx.read("$.content.[0].links[?(@.rel == 'GET Template: {com.vmware.csp.component.iaas.proxy.provider@resource.action.name.virtual.Destroy}')].href.[0]").toString();
+		return ctx
+				.read("$.content.[0].links[?(@.rel == 'GET Template: {com.vmware.csp.component.iaas.proxy.provider@resource.action.name.virtual.Destroy}')].href.[0]")
+				.toString();
 	}
-	
-	private String getDeleteLink(JsonElement requestResources) {
-		ReadContext ctx = JsonPath.parse(requestResources.toString());
-		return ctx.read("$.content.[0].links[?(@.rel == 'POST: {com.vmware.csp.component.iaas.proxy.provider@resource.action.name.virtual.Destroy}')].href.[0]").toString();
-	}
-	
+
 	private String pathFromLink(String link) {
 		return link.substring(serviceUri.length() + 1);
 	}
 
-	public Map<String, String> getDeleteLinks(JsonElement resources) {
+	Map<String, String> getDeleteLinks(JsonElement resources) {
 		Map<String, String> map = new HashMap<String, String>();
 		ReadContext ctx = JsonPath.parse(resources.toString());
-		
 
 		JSONArray o = ctx
 				.read("$.content.[0].links[?(@.rel == 'GET Template: {com.vmware.csp.component.cafe.composition@resource.action.deployment.destroy.name}')].href");
-		map.put(Constants.DELETE_TEMPLATE_LINK, o.get(0).toString());
+		map.put(VrServiceInstance.DELETE_TEMPLATE_LINK, o.get(0).toString());
 
 		o = ctx.read("$.content.[0].links[?(@.rel == 'POST: {com.vmware.csp.component.cafe.composition@resource.action.deployment.destroy.name}')].href");
-		map.put(Constants.DELETE_LINK, o.get(0).toString());
+		map.put(VrServiceInstance.DELETE_LINK, o.get(0).toString());
 
 		return map;
 	}
-
-//	public ServiceInstance loadMetadata(String token,
-//			ServiceInstance instance) {
-//		JsonElement je = getRequestResources(token, instance);
-//		Map<String, String> links = getDeleteLinks(je);
-//		instance.getMetadata().putAll(links);
-//
-//		return instance;
-//	}
 }
