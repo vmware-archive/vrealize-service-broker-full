@@ -4,8 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.cloudfoundry.community.servicebroker.exception.ServiceBrokerException;
-import org.cloudfoundry.community.servicebroker.model.ServiceInstance;
-import org.cloudfoundry.community.servicebroker.vrealize.Constants;
+import org.cloudfoundry.community.servicebroker.vrealize.persistance.VrServiceInstance;
 
 public class MySqlAdapter implements Adaptor {
 
@@ -21,16 +20,16 @@ public class MySqlAdapter implements Adaptor {
 	 * @throws ServiceBrokerException
 	 */
 	@Override
-	public Map<String, Object> getCredentials(ServiceInstance instance)
+	public Map<String, Object> getCredentials(VrServiceInstance instance)
 			throws ServiceBrokerException {
 
 		Object dbType = instance.getParameters().get(
-				Constants.SERVICE_TYPE);
-		Object userId = instance.getParameters().get(Constants.USER_ID);
-		Object pw = instance.getParameters().get(Constants.PASSWORD);
-		Object host = instance.getParameters().get(Constants.HOST);
-		Object port = instance.getParameters().get(Constants.PORT);
-		Object dbId = instance.getParameters().get(Constants.DB_ID);
+				VrServiceInstance.SERVICE_TYPE);
+		Object userId = instance.getParameters().get(VrServiceInstance.USER_ID);
+		Object pw = instance.getParameters().get(VrServiceInstance.PASSWORD);
+		Object host = instance.getParameters().get(VrServiceInstance.HOST);
+		Object port = instance.getParameters().get(VrServiceInstance.PORT);
+		Object dbId = instance.getParameters().get(VrServiceInstance.DB_ID);
 
 		if (dbType == null || userId == null || pw == null || host == null
 				|| port == null || dbId == null) {
@@ -61,12 +60,12 @@ public class MySqlAdapter implements Adaptor {
 			Map<String, Object> vrCustomKeyValues) {
 		Map<String, Object> m = new HashMap<String, Object>();
 
-		m.put(Constants.USER_ID, vrCustomKeyValues.get("mysql_user"));
-		m.put(Constants.PASSWORD, vrCustomKeyValues.get("mysql_passwd"));
-		m.put(Constants.DB_ID, vrCustomKeyValues.get("mysql_dbname"));
-		m.put(Constants.HOST, vrCustomKeyValues.get("foo"));
-		m.put(Constants.PORT, vrCustomKeyValues.get("mysql_port"));
-		m.put(Constants.SERVICE_TYPE, getServiceType());
+		m.put(VrServiceInstance.USER_ID, vrCustomKeyValues.get("mysql_user"));
+		m.put(VrServiceInstance.PASSWORD, vrCustomKeyValues.get("mysql_passwd"));
+		m.put(VrServiceInstance.DB_ID, vrCustomKeyValues.get("mysql_dbname"));
+		m.put(VrServiceInstance.HOST, vrCustomKeyValues.get("foo"));
+		m.put(VrServiceInstance.PORT, vrCustomKeyValues.get("mysql_port"));
+		m.put(VrServiceInstance.SERVICE_TYPE, getServiceType());
 
 		return m;
 	}

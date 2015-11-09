@@ -4,12 +4,12 @@ import org.cloudfoundry.community.servicebroker.exception.ServiceBrokerException
 import org.cloudfoundry.community.servicebroker.exception.ServiceInstanceBindingExistsException;
 import org.cloudfoundry.community.servicebroker.model.CreateServiceInstanceBindingRequest;
 import org.cloudfoundry.community.servicebroker.model.DeleteServiceInstanceBindingRequest;
-import org.cloudfoundry.community.servicebroker.model.ServiceInstance;
 import org.cloudfoundry.community.servicebroker.model.ServiceInstanceBinding;
 import org.cloudfoundry.community.servicebroker.service.ServiceInstanceBindingService;
 import org.cloudfoundry.community.servicebroker.service.ServiceInstanceService;
 import org.cloudfoundry.community.servicebroker.vrealize.VraClient;
 import org.cloudfoundry.community.servicebroker.vrealize.persistance.ServiceInstanceBindingRepository;
+import org.cloudfoundry.community.servicebroker.vrealize.persistance.VrServiceInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -43,7 +43,7 @@ public class VrServiceInstanceBindingService implements
 		}
 
 		String serviceInstanceId = request.getServiceInstanceId();
-		ServiceInstance si = (ServiceInstance) serviceInstanceService
+		VrServiceInstance si = (VrServiceInstance) serviceInstanceService
 				.getServiceInstance(serviceInstanceId);
 
 		if (si == null) {

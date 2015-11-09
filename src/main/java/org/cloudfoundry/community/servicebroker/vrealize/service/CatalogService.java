@@ -33,7 +33,7 @@ public class CatalogService implements
 		try {
 			String token = tokenService.getToken();
 			return gson.fromJson(
-					vraRepository.getEntitledCatalogItems("Bearer " + token),
+					vraRepository.getEntitledCatalogItems("Bearer " + token).getBody(),
 					Catalog.class);
 		} catch (Exception e) {
 			LOG.error("Error retrieving catalog.", e);

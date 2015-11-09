@@ -5,30 +5,22 @@ import java.util.List;
 import java.util.Map;
 
 import org.cloudfoundry.community.servicebroker.exception.ServiceBrokerException;
-import org.cloudfoundry.community.servicebroker.model.ServiceInstance;
-import org.cloudfoundry.community.servicebroker.vrealize.Constants;
-import org.cloudfoundry.community.servicebroker.vrealize.VraClient;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.cloudfoundry.community.servicebroker.vrealize.persistance.VrServiceInstance;
 
-@Service
 public class Adaptors {
-	
-	@Autowired
-	VraClient client;
 
-	private final List<Adaptor> adaptors = new ArrayList<Adaptor>();
+	private static final List<Adaptor> ADAPTORS = new ArrayList<Adaptor>();
 
-	public Map<String, Object> getCredentials(ServiceInstance instance)
+	public static Map<String, Object> getCredentials(VrServiceInstance instance)
 			throws ServiceBrokerException {
 		return getAdaptor(instance).getCredentials(instance);
 	}
 
-	public Map<String, Object> getParameters(
+	public static Map<String, Object> getParameters(
 			Map<String, Object> vrCustomKeyValues)
 			throws ServiceBrokerException {
 		Object serviceType = vrCustomKeyValues.get(
-				Constants.SERVICE_TYPE);
+				VrServiceInstance.SERVICE_TYPE);
 
 		if (serviceType == null) {
 			throw new ServiceBrokerException(
@@ -44,17 +36,15 @@ public class Adaptors {
 		return adaptor.toParameters(vrCustomKeyValues);
 	}
 
-	private Adaptor getAdaptor(ServiceInstance instance)
+	private static Adaptor getAdaptor(VrServiceInstance instance)
 			throws ServiceBrokerException {
 
-		if (instance == null) {
+		if (instance == null || instance.getParameters() == null) {
 			throw new ServiceBrokerException("invalid service instance.");
 		}
-		
-		Map parms = client.getParameters(instance.getServiceInstanceId());
 
-		Object type = parms.get(
-				Constants.SERVICE_TYPE);
+		Object type = instance.getParameters().get(
+				VrServiceInstance.SERVICE_TYPE);
 
 		if (type == null) {
 			throw new ServiceBrokerException("service type not set.");
@@ -70,12 +60,12 @@ public class Adaptors {
 		return adaptor;
 	}
 
-	private Adaptor getAdaptor(String type) {
-		if (adaptors.isEmpty()) {
+	private static Adaptor getAdaptor(String type) {
+		if (ADAPTORS.isEmpty()) {
 			initAdaptors();
 		}
 
-		for (Adaptor adaptor : adaptors) {
+		for (Adaptor adaptor : ADAPTORS) {
 			if (adaptor.getServiceType().equals(type)) {
 				return adaptor;
 			}
@@ -84,7 +74,7 @@ public class Adaptors {
 	}
 
 	// TODO figure out some clever way to make this more adaptable
-	private void initAdaptors() {
-		adaptors.add(new MySqlAdapter());
+	private static void initAdaptors() {
+		ADAPTORS.add(new MySqlAdapter());
 	}
 }

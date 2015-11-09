@@ -3,11 +3,11 @@ package org.cloudfoundry.community.servicebroker.vrealize.adapter;
 import java.util.Map;
 
 import org.cloudfoundry.community.servicebroker.exception.ServiceBrokerException;
-import org.cloudfoundry.community.servicebroker.model.ServiceInstance;
+import org.cloudfoundry.community.servicebroker.vrealize.persistance.VrServiceInstance;
 
 public interface Adaptor {
 
-	Map<String, Object> getCredentials(ServiceInstance instance)
+	Map<String, Object> getCredentials(VrServiceInstance instance)
 			throws ServiceBrokerException;
 
 	String getServiceType();
