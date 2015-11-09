@@ -46,6 +46,7 @@ public class VraClient {
 	public static final String PENDING_PRE_APPROVAL = "PENDING_PRE_APPROVAL";
 	public static final String IN_PROGRESS = "IN_PROGRESS";
 	public static final String PENDING_POST_APPROVAL = "PENDING_POST_APPROVAL";
+	public static final String POST_APPROVED = "POST_APPROVED";
 
 	@Autowired
 	private VraRepository vraRepository;
@@ -263,11 +264,14 @@ public class VraClient {
 	ServiceInstanceLastOperation getRequestStatus(String token, String requestId) {
 		JsonElement je = vraRepository.getRequestStatus("Bearer " + token,
 				requestId).getBody();
+
 		if (je == null) {
 			return new ServiceInstanceLastOperation(
 					"Unable to get request status: nothing returned from vR service.",
 					OperationState.FAILED);
 		}
+
+		System.out.println("##########" + je.toString());
 
 		return getLastOperation(je);
 	}
@@ -292,7 +296,7 @@ public class VraClient {
 				vrStatusToOperationState(state.getAsString()));
 	}
 
-	private OperationState vrStatusToOperationState(String vrStatus) {
+	OperationState vrStatusToOperationState(String vrStatus) {
 		if (vrStatus == null) {
 			return OperationState.FAILED;
 		}
@@ -304,7 +308,8 @@ public class VraClient {
 		if (UNSUBMITTED.equals(vrStatus) || SUBMITTED.equals(vrStatus)
 				|| PENDING_PRE_APPROVAL.equals(vrStatus)
 				|| IN_PROGRESS.equals(vrStatus)
-				|| PENDING_POST_APPROVAL.equals(vrStatus)) {
+				|| PENDING_POST_APPROVAL.equals(vrStatus)
+				|| POST_APPROVED.equals(vrStatus)) {
 			return OperationState.IN_PROGRESS;
 		}
 

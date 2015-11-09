@@ -8,6 +8,7 @@ import static org.junit.Assert.assertTrue;
 import java.util.Map;
 
 import org.cloudfoundry.community.servicebroker.exception.ServiceBrokerException;
+import org.cloudfoundry.community.servicebroker.model.OperationState;
 import org.cloudfoundry.community.servicebroker.model.ServiceDefinition;
 import org.cloudfoundry.community.servicebroker.model.ServiceInstanceLastOperation;
 import org.cloudfoundry.community.servicebroker.vrealize.persistance.VrServiceInstance;
@@ -189,5 +190,29 @@ public class VraClientTest {
 		assertNotNull(instance.getCredentials());
 		assertEquals("mysql://mysqluser:P1v0t4l!@192.168.201.17:3306/db01",
 				instance.getCredentials().get(VrServiceInstance.URI));
+	}
+
+	@Test
+	public void testStateTranslation() {
+		assertEquals(OperationState.FAILED,
+				client.vrStatusToOperationState(null));
+		assertEquals(OperationState.FAILED,
+				client.vrStatusToOperationState(""));
+		assertEquals(OperationState.FAILED,
+				client.vrStatusToOperationState("foo"));
+		assertEquals(OperationState.IN_PROGRESS,
+				client.vrStatusToOperationState(VraClient.IN_PROGRESS));
+		assertEquals(OperationState.IN_PROGRESS,
+				client.vrStatusToOperationState(VraClient.PENDING_POST_APPROVAL));
+		assertEquals(OperationState.IN_PROGRESS,
+				client.vrStatusToOperationState(VraClient.PENDING_PRE_APPROVAL));
+		assertEquals(OperationState.IN_PROGRESS,
+				client.vrStatusToOperationState(VraClient.POST_APPROVED));
+		assertEquals(OperationState.IN_PROGRESS,
+				client.vrStatusToOperationState(VraClient.SUBMITTED));
+		assertEquals(OperationState.IN_PROGRESS,
+				client.vrStatusToOperationState(VraClient.UNSUBMITTED));
+		assertEquals(OperationState.SUCCEEDED,
+				client.vrStatusToOperationState(VraClient.SUCCESSFUL));
 	}
 }
