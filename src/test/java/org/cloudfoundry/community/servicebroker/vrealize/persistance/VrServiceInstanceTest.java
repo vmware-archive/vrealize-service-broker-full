@@ -30,7 +30,7 @@ public class VrServiceInstanceTest {
 		assertFalse(si.isCurrentOperationDelete());
 		assertFalse(si.isCurrentOperationSuccessful());
 		assertTrue(si.isInProgress());
-		assertEquals("12345", si.getServiceInstanceLastOperation()
+		assertEquals("aRequestId", si.getServiceInstanceLastOperation()
 				.getDescription());
 
 		// failed create request
@@ -40,7 +40,7 @@ public class VrServiceInstanceTest {
 		assertFalse(si.isCurrentOperationDelete());
 		assertFalse(si.isCurrentOperationSuccessful());
 		assertFalse(si.isInProgress());
-		assertEquals("12345", si.getServiceInstanceLastOperation()
+		assertEquals("aRequestId", si.getServiceInstanceLastOperation()
 				.getDescription());
 
 		// succeeded create request
@@ -50,7 +50,7 @@ public class VrServiceInstanceTest {
 		assertFalse(si.isCurrentOperationDelete());
 		assertTrue(si.isCurrentOperationSuccessful());
 		assertFalse(si.isInProgress());
-		assertEquals("12345", si.getServiceInstanceLastOperation()
+		assertEquals("aRequestId", si.getServiceInstanceLastOperation()
 				.getDescription());
 
 		// new delete request added to existing si
@@ -64,7 +64,7 @@ public class VrServiceInstanceTest {
 				.getDescription());
 		assertEquals("23456",
 				si.getMetadata().get(VrServiceInstance.DELETE_REQUEST_ID));
-		assertEquals("12345",
+		assertEquals("aRequestId",
 				si.getMetadata().get(VrServiceInstance.CREATE_REQUEST_ID));
 
 		// delete failed
@@ -78,7 +78,7 @@ public class VrServiceInstanceTest {
 				.getDescription());
 		assertEquals("23456",
 				si.getMetadata().get(VrServiceInstance.DELETE_REQUEST_ID));
-		assertEquals("12345",
+		assertEquals("aRequestId",
 				si.getMetadata().get(VrServiceInstance.CREATE_REQUEST_ID));
 
 		// delete succeeded
@@ -92,7 +92,7 @@ public class VrServiceInstanceTest {
 				.getDescription());
 		assertEquals("23456",
 				si.getMetadata().get(VrServiceInstance.DELETE_REQUEST_ID));
-		assertEquals("12345",
+		assertEquals("aRequestId",
 				si.getMetadata().get(VrServiceInstance.CREATE_REQUEST_ID));
 
 		// System.out.println(gson.toJson(si));

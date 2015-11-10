@@ -5,8 +5,9 @@ applications:
   instances: 1
   path: target/vrealize-service-broker-0.1.0.jar
   buildpack: https://github.com/cf-platform-eng/java-buildpack
+  services: [ vra-broker-repo ]
   env:
     SERVICE_URI: https://vra.vra.lab
-    VRA_USER_ID: vdude01@vra.lab
+    VRA_USER_ID: vdude1
     VRA_USER_PASSWORD: P1v0t4l!
     VRA_TENANT: lab

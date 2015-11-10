@@ -7,6 +7,8 @@ import org.cloudfoundry.community.servicebroker.exception.ServiceBrokerException
 import org.cloudfoundry.community.servicebroker.vrealize.VraRepository;
 import org.cloudfoundry.community.servicebroker.vrealize.domain.Creds;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 import feign.FeignException;
@@ -24,9 +26,14 @@ public class TokenService {
 
 	public String getToken() throws ServiceBrokerException {
 		try {
-			Map<String, String> m = vraRepository.getToken(creds);
-			if (m.containsKey("id")) {
-				return m.get("id");
+			ResponseEntity<Map<String, String>> m = vraRepository
+					.getToken(creds);
+			if (!m.getStatusCode().equals(HttpStatus.OK)) {
+				throw new ServiceBrokerException(m.getStatusCode().toString());
+			}
+
+			if (m.getBody().containsKey("id")) {
+				return m.getBody().get("id");
 			} else {
 				throw new ServiceBrokerException(
 						"unable to get token from response.");
@@ -35,21 +42,5 @@ public class TokenService {
 			LOG.error(e);
 			throw new ServiceBrokerException(e);
 		}
-	}
-
-	public boolean checkToken(String token) {
-		Map<String, String> resp = null;
-		try {
-			resp = vraRepository.checkToken(token);
-		} catch (FeignException e) {
-			LOG.warn(e);
-			return false;
-		}
-
-		if (resp == null) {
-			return false;
-		}
-
-		return true;
 	}
 }

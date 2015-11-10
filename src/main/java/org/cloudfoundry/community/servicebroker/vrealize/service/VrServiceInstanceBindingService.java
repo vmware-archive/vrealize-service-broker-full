@@ -6,7 +6,6 @@ import org.cloudfoundry.community.servicebroker.model.CreateServiceInstanceBindi
 import org.cloudfoundry.community.servicebroker.model.DeleteServiceInstanceBindingRequest;
 import org.cloudfoundry.community.servicebroker.model.ServiceInstanceBinding;
 import org.cloudfoundry.community.servicebroker.service.ServiceInstanceBindingService;
-import org.cloudfoundry.community.servicebroker.service.ServiceInstanceService;
 import org.cloudfoundry.community.servicebroker.vrealize.VraClient;
 import org.cloudfoundry.community.servicebroker.vrealize.persistance.ServiceInstanceBindingRepository;
 import org.cloudfoundry.community.servicebroker.vrealize.persistance.VrServiceInstance;
@@ -21,7 +20,7 @@ public class VrServiceInstanceBindingService implements
 	private VraClient vraClient;
 
 	@Autowired
-	ServiceInstanceService serviceInstanceService;
+	VrServiceInstanceService serviceInstanceService;
 
 	@Autowired
 	ServiceInstanceBindingRepository repository;
@@ -55,6 +54,12 @@ public class VrServiceInstanceBindingService implements
 		if (si.isInProgress()) {
 			throw new ServiceBrokerException(
 					"ServiceInstance operation is still in progress.");
+		}
+
+		// do we have all the info we need to create credentials?
+		if (!si.hasCredentials()) {
+			vraClient.loadCredentials(si);
+			serviceInstanceService.saveInstance(si);
 		}
 
 		ServiceInstanceBinding binding = new ServiceInstanceBinding(bindingId,

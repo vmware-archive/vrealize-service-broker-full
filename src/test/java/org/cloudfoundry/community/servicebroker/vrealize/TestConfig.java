@@ -10,7 +10,10 @@ import org.cloudfoundry.community.servicebroker.model.CreateServiceInstanceBindi
 import org.cloudfoundry.community.servicebroker.model.CreateServiceInstanceRequest;
 import org.cloudfoundry.community.servicebroker.model.DeleteServiceInstanceBindingRequest;
 import org.cloudfoundry.community.servicebroker.model.DeleteServiceInstanceRequest;
+import org.cloudfoundry.community.servicebroker.model.OperationState;
+import org.cloudfoundry.community.servicebroker.model.ServiceDefinition;
 import org.cloudfoundry.community.servicebroker.model.ServiceInstanceBinding;
+import org.cloudfoundry.community.servicebroker.model.ServiceInstanceLastOperation;
 import org.cloudfoundry.community.servicebroker.vrealize.domain.Creds;
 import org.cloudfoundry.community.servicebroker.vrealize.persistance.VrServiceInstance;
 import org.springframework.context.annotation.Bean;
@@ -60,6 +63,15 @@ public class TestConfig {
 		return req;
 	}
 
+	public static CreateServiceInstanceRequest getCreateServiceInstanceRequest(
+			ServiceDefinition sd) {
+		CreateServiceInstanceRequest req = new CreateServiceInstanceRequest(
+				sd.getId(), sd.getPlans().get(0).getId(), "testOrgId",
+				"testSpaceId", true, null);
+		req.withServiceInstanceId("anID");
+		return req;
+	}
+
 	public static DeleteServiceInstanceRequest getDeleteServiceInstanceRequest() {
 		CreateServiceInstanceRequest creq = getCreateServiceInstanceRequest();
 		DeleteServiceInstanceRequest dreq = new DeleteServiceInstanceRequest(
@@ -69,14 +81,20 @@ public class TestConfig {
 	}
 
 	public static VrServiceInstance getServiceInstance() {
-		VrServiceInstance si = VrServiceInstance.create(
-				getCreateServiceInstanceRequest(), "12345");
+		VrServiceInstance si = VrServiceInstance
+				.create(getCreateServiceInstanceRequest());
 		si.getParameters().put(VrServiceInstance.SERVICE_TYPE, "mysql");
 		si.getParameters().put(VrServiceInstance.DB_ID, "aDB");
 		si.getParameters().put(VrServiceInstance.HOST, "aHost");
 		si.getParameters().put(VrServiceInstance.PASSWORD, "secret");
 		si.getParameters().put(VrServiceInstance.PORT, "1234");
 		si.getParameters().put(VrServiceInstance.USER_ID, "aUser");
+
+		ServiceInstanceLastOperation silo = new ServiceInstanceLastOperation(
+				"aRequestId", OperationState.IN_PROGRESS);
+		si.withLastOperation(silo);
+
+		si.getMetadata().put(VrServiceInstance.CREATE_REQUEST_ID, "aRequestId");
 		return si;
 	}
 
