@@ -44,6 +44,7 @@ public class VraClient {
 	public static final String UNSUBMITTED = "UNSUBMITTED";
 	public static final String SUBMITTED = "SUBMITTED";
 	public static final String PENDING_PRE_APPROVAL = "PENDING_PRE_APPROVAL";
+	public static final String PRE_APPROVED = "PRE_APPROVED";
 	public static final String IN_PROGRESS = "IN_PROGRESS";
 	public static final String PENDING_POST_APPROVAL = "PENDING_POST_APPROVAL";
 	public static final String POST_APPROVED = "POST_APPROVED";
@@ -271,7 +272,7 @@ public class VraClient {
 					OperationState.FAILED);
 		}
 
-		System.out.println("##########" + je.toString());
+		// System.out.println("##########" + je.toString());
 
 		return getLastOperation(je);
 	}
@@ -292,8 +293,13 @@ public class VraClient {
 					OperationState.FAILED);
 		}
 
-		return new ServiceInstanceLastOperation(id.getAsString(),
-				vrStatusToOperationState(state.getAsString()));
+		String requestId = id.getAsString();
+		String vrState = state.getAsString();
+
+		LOG.info("vra status for request id: " + requestId + " : " + vrState);
+
+		return new ServiceInstanceLastOperation(requestId,
+				vrStatusToOperationState(vrState));
 	}
 
 	OperationState vrStatusToOperationState(String vrStatus) {
@@ -307,6 +313,7 @@ public class VraClient {
 
 		if (UNSUBMITTED.equals(vrStatus) || SUBMITTED.equals(vrStatus)
 				|| PENDING_PRE_APPROVAL.equals(vrStatus)
+				|| PRE_APPROVED.equals(vrStatus)
 				|| IN_PROGRESS.equals(vrStatus)
 				|| PENDING_POST_APPROVAL.equals(vrStatus)
 				|| POST_APPROVED.equals(vrStatus)) {
