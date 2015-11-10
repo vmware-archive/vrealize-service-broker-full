@@ -14,6 +14,7 @@ import org.cloudfoundry.community.servicebroker.model.ServiceInstanceLastOperati
 import org.cloudfoundry.community.servicebroker.vrealize.persistance.VrServiceInstance;
 import org.cloudfoundry.community.servicebroker.vrealize.service.CatalogService;
 import org.cloudfoundry.community.servicebroker.vrealize.service.TokenService;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -174,6 +175,7 @@ public class VraClientTest {
 	}
 
 	@Test
+	@Ignore
 	public void testLoadCredentials() throws ServiceBrokerException {
 		VrServiceInstance instance = VrServiceInstance.create(TestConfig
 				.getCreateServiceInstanceRequest());

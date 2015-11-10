@@ -77,12 +77,11 @@ public class VrServiceInstanceService implements ServiceInstanceService {
 		ServiceInstanceLastOperation status;
 		try {
 			status = vraClient.getRequestStatus(instance);
+			LOG.info("request: " + id + " status is: " + status.getState());
 		} catch (ServiceBrokerException e) {
 			LOG.error("unable to get status of request: " + id, e);
 			return null;
 		}
-
-		LOG.info("request: " + id + " status is: " + status.getState());
 
 		instance.withLastOperation(status);
 
@@ -93,7 +92,7 @@ public class VrServiceInstanceService implements ServiceInstanceService {
 		}
 
 		// otherwise save the instance with the new last operation
-		return repository.save(instance);
+		return saveInstance(instance);
 	}
 
 	@Override
