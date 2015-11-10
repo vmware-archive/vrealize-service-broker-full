@@ -8,6 +8,7 @@ import org.cloudfoundry.community.servicebroker.vrealize.domain.CatalogTranslato
 import org.cloudfoundry.community.servicebroker.vrealize.domain.PlanTranslator;
 import org.cloudfoundry.community.servicebroker.vrealize.domain.ServiceDefinitionTranslator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.netflix.feign.support.ResponseEntityDecoder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
@@ -28,7 +29,7 @@ public class DefaultConfig {
 
 	@Bean
 	public BrokerApiVersion brokerApiVersion() {
-		return new BrokerApiVersion("2.6");
+		return new BrokerApiVersion("2.7");
 	}
 
 	@Bean
@@ -54,7 +55,7 @@ public class DefaultConfig {
 	@Bean
 	public VraRepository vraRepository() {
 		return Feign.builder().encoder(new GsonEncoder())
-				.decoder(new GsonDecoder())
+				.decoder(new ResponseEntityDecoder(new GsonDecoder()))
 				.target(VraRepository.class, serviceUri);
 	}
 

@@ -22,6 +22,7 @@ public class VrServiceInstance extends ServiceInstance {
 
 	// some "known" keys to store stuff under
 	// metatdata keys
+	public static final String LOCATION = "LOCATION";
 	public static final String CREATE_REQUEST_ID = "CREATE_REQUEST_ID";
 	public static final String DELETE_REQUEST_ID = "DELETE_REQUEST_ID";
 	public static final String CREATE_TEMPLATE_LINK = "CREATE_TEMPLATE_LINK";
@@ -53,13 +54,11 @@ public class VrServiceInstance extends ServiceInstance {
 	@JsonProperty("metadata")
 	private final Map<String, Object> metadata = new HashMap<String, Object>();
 
-	public static VrServiceInstance create(
-			CreateServiceInstanceRequest request, String createRequestId) {
+	public static VrServiceInstance create(CreateServiceInstanceRequest request) {
 		VrServiceInstance instance = new VrServiceInstance(request);
-		ServiceInstanceLastOperation silo = new ServiceInstanceLastOperation(
-				createRequestId, OperationState.IN_PROGRESS);
-		instance.withLastOperation(silo);
-		instance.getMetadata().put(CREATE_REQUEST_ID, createRequestId);
+		// ServiceInstanceLastOperation silo = new ServiceInstanceLastOperation(
+		// createRequestId, OperationState.IN_PROGRESS);
+		// instance.withLastOperation(silo);
 		instance.withAsync(true);
 		instance.setId(instance.getServiceInstanceId());
 
@@ -144,8 +143,12 @@ public class VrServiceInstance extends ServiceInstance {
 		return getServiceInstanceLastOperation().getDescription();
 	}
 
-	public String getCreateRequestId() {
-		return getMetadata().get(CREATE_REQUEST_ID).toString();
+	public Object getCreateRequestId() {
+		return getMetadata().get(CREATE_REQUEST_ID);
+	}
+
+	public Object getLocation() {
+		return getMetadata().get(VrServiceInstance.LOCATION);
 	}
 
 	public String getId() {
@@ -158,5 +161,9 @@ public class VrServiceInstance extends ServiceInstance {
 
 	public Map<String, Object> getCredentials() throws ServiceBrokerException {
 		return Adaptors.getCredentials(this);
+	}
+
+	public boolean hasCredentials() {
+		return Adaptors.hasCredentials(this);
 	}
 }

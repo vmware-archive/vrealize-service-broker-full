@@ -74,4 +74,13 @@ public class MySqlAdapter implements Adaptor {
 		return SERVICE_TYPE;
 	}
 
+	public boolean hasCredentials(VrServiceInstance instance) {
+		try {
+			getCredentials(instance);
+			return true;
+		} catch (ServiceBrokerException e) {
+			return false;
+		}
+	}
+
 }

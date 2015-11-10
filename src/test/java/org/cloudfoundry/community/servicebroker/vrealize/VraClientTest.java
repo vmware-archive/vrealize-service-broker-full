@@ -1,12 +1,14 @@
 package org.cloudfoundry.community.servicebroker.vrealize;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Map;
 
 import org.cloudfoundry.community.servicebroker.exception.ServiceBrokerException;
-import org.cloudfoundry.community.servicebroker.model.CreateServiceInstanceRequest;
+import org.cloudfoundry.community.servicebroker.model.OperationState;
 import org.cloudfoundry.community.servicebroker.model.ServiceDefinition;
 import org.cloudfoundry.community.servicebroker.model.ServiceInstanceLastOperation;
 import org.cloudfoundry.community.servicebroker.vrealize.persistance.VrServiceInstance;
@@ -66,42 +68,14 @@ public class VraClientTest {
 	}
 
 	@Test
-	public void testGetRequestId() throws Exception {
+	public void testGetRequestStatus() throws Exception {
 		JsonParser parser = new JsonParser();
-		JsonElement o = (JsonElement) parser.parse(TestConfig
+		JsonElement je = parser.parse(TestConfig
 				.getContents("requestResponse.json"));
-		assertNotNull(o);
-		String s = client.getRequestId(o);
-		assertNotNull(s);
-		assertEquals(TestConfig.R_ID, s);
-	}
 
-	@Test
-	public void testGetRequestStatus() throws ServiceBrokerException {
-		CreateServiceInstanceRequest req = new CreateServiceInstanceRequest();
-		String token = tokenService.getToken();
-
-		VrServiceInstance si = VrServiceInstance.create(req, TestConfig.R_ID);
-		ServiceInstanceLastOperation silo = client.getRequestStatus(token, si);
+		ServiceInstanceLastOperation silo = client.getLastOperation(je);
 		assertNotNull(silo);
-		assertEquals("succeeded", silo.getState());
-	}
-
-	@Test
-	public void testGetParameters() throws Exception {
-		String json = TestConfig.getContents("requestResponse.json");
-		JsonParser parser = new JsonParser();
-		JsonElement je = parser.parse(json);
-
-		Map<String, Object> m = client.getParameters(je);
-		assertNotNull(m);
-		assertEquals(6, m.size());
-		assertEquals("3306", m.get(VrServiceInstance.PORT));
-		assertEquals("P1v0t4l!", m.get(VrServiceInstance.PASSWORD));
-		assertEquals("mysqluser", m.get(VrServiceInstance.USER_ID));
-		assertEquals("db01", m.get(VrServiceInstance.DB_ID));
-		// assertEquals("foo", m.get("HOST"));
-		assertEquals("mysql", m.get(VrServiceInstance.SERVICE_TYPE));
+		assertEquals("in progress", silo.getState());
 	}
 
 	@Test
@@ -165,34 +139,82 @@ public class VraClientTest {
 	}
 
 	@Test
-	@Ignore
-	public void testGetDeleteRequestTemplate() throws ServiceBrokerException {
-		CreateServiceInstanceRequest req = new CreateServiceInstanceRequest();
-		VrServiceInstance si = VrServiceInstance.create(req,
-				"9ca10dee-730e-486a-9138-d8aade4913e2");
-		si = VrServiceInstance.delete(si,
-				"9ca10dee-730e-486a-9138-d8aade4913e2");
+	public void testGetParmsAndMeta() throws Exception {
+		JsonParser parser = new JsonParser();
+		JsonElement cr = parser.parse(TestConfig
+				.getContents("requestResponse.json"));
 
-		String token = tokenService.getToken();
-		client.loadMetadata(token, si);
+		JsonElement rvr = parser.parse(TestConfig
+				.getContents("resourceViewResponse.json"));
 
-		JsonElement je = client.getDeleteRequestTemplate(token, si);
-		assertNotNull(je);
+		Map<String, Object> parms1 = client.getParametersFromCreateResponse(cr);
+		Map<String, Object> parms2 = client
+				.getParametersFromResourceResponse(rvr);
+		Map<String, String> meta = client.getDeleteLinks(rvr);
+
+		assertNotNull(parms1);
+		assertEquals(6, parms1.size());
+		assertEquals("3306", parms1.get(VrServiceInstance.PORT));
+		assertEquals("P1v0t4l!", parms1.get(VrServiceInstance.PASSWORD));
+		assertEquals("mysqluser", parms1.get(VrServiceInstance.USER_ID));
+		assertEquals("db01", parms1.get(VrServiceInstance.DB_ID));
+		assertEquals("mysql", parms1.get(VrServiceInstance.SERVICE_TYPE));
+
+		assertNotNull(parms2);
+		assertEquals(1, parms2.size());
+		assertEquals("192.168.201.17", parms2.get(VrServiceInstance.HOST));
+
+		assertNotNull(meta);
+		assertEquals(2, meta.size());
+		assertEquals(
+				"https://vra.vra.lab/catalog-service/api/consumer/resources/06852d93-466d-4d73-80bc-78764b3d768a/actions/051a18db-6bf5-4468-97e0-942330528c92/requests/template",
+				meta.get(VrServiceInstance.DELETE_TEMPLATE_LINK));
+		assertEquals(
+				"https://vra.vra.lab/catalog-service/api/consumer/resources/06852d93-466d-4d73-80bc-78764b3d768a/actions/051a18db-6bf5-4468-97e0-942330528c92/requests",
+				meta.get(VrServiceInstance.DELETE_LINK));
 	}
 
 	@Test
-	public void testGetLinks() throws Exception {
-		JsonParser parser = new JsonParser();
-		JsonElement je = parser.parse(TestConfig
-				.getContents("requestResources.json"));
-		Map<String, String> m = client.getDeleteLinks(je);
-		assertNotNull(m);
-		assertEquals(2, m.size());
-		assertEquals(
-				"https://vra.vra.lab/catalog-service/api/consumer/resources/d591e58d-b2cf-4061-aec1-7f41168b7a6d/actions/fe9af618-f21d-47a2-bebc-62d5914f6e6c/requests/template",
-				m.get(VrServiceInstance.DELETE_TEMPLATE_LINK));
-		assertEquals(
-				"https://vra.vra.lab/catalog-service/api/consumer/resources/d591e58d-b2cf-4061-aec1-7f41168b7a6d/actions/fe9af618-f21d-47a2-bebc-62d5914f6e6c/requests",
-				m.get(VrServiceInstance.DELETE_LINK));
+	@Ignore
+	public void testLoadCredentials() throws ServiceBrokerException {
+		VrServiceInstance instance = VrServiceInstance.create(TestConfig
+				.getCreateServiceInstanceRequest());
+		assertNotNull(instance);
+		instance.getMetadata()
+				.put(VrServiceInstance.LOCATION,
+						"https://vra.vra.lab/catalog-service/api/consumer/requests/8720ac04-9910-4426-b8b3-758f6e02e3bc");
+		instance.getMetadata().put(VrServiceInstance.CREATE_REQUEST_ID,
+				"8720ac04-9910-4426-b8b3-758f6e02e3bc");
+
+		assertFalse(instance.hasCredentials());
+		client.loadCredentials(instance);
+		assertTrue(instance.hasCredentials());
+		assertNotNull(instance.getCredentials());
+		assertEquals("mysql://mysqluser:P1v0t4l!@192.168.201.17:3306/db01",
+				instance.getCredentials().get(VrServiceInstance.URI));
+	}
+
+	@Test
+	public void testStateTranslation() {
+		assertEquals(OperationState.FAILED,
+				client.vrStatusToOperationState(null));
+		assertEquals(OperationState.FAILED,
+				client.vrStatusToOperationState(""));
+		assertEquals(OperationState.FAILED,
+				client.vrStatusToOperationState("foo"));
+		assertEquals(OperationState.IN_PROGRESS,
+				client.vrStatusToOperationState(VraClient.IN_PROGRESS));
+		assertEquals(OperationState.IN_PROGRESS,
+				client.vrStatusToOperationState(VraClient.PENDING_POST_APPROVAL));
+		assertEquals(OperationState.IN_PROGRESS,
+				client.vrStatusToOperationState(VraClient.PENDING_PRE_APPROVAL));
+		assertEquals(OperationState.IN_PROGRESS,
+				client.vrStatusToOperationState(VraClient.POST_APPROVED));
+		assertEquals(OperationState.IN_PROGRESS,
+				client.vrStatusToOperationState(VraClient.SUBMITTED));
+		assertEquals(OperationState.IN_PROGRESS,
+				client.vrStatusToOperationState(VraClient.UNSUBMITTED));
+		assertEquals(OperationState.SUCCEEDED,
+				client.vrStatusToOperationState(VraClient.SUCCESSFUL));
 	}
 }
