@@ -120,29 +120,10 @@ public class VrServiceInstanceService implements ServiceInstanceService {
 							+ request.getServiceDefinitionId());
 		}
 
-		// String token = tokenService.getToken();
+		LOG.info("creating service instance: " + request.getServiceInstanceId()
+				+ " service definition: " + request.getServiceDefinitionId());
 
 		VrServiceInstance instance = vraClient.createInstance(request, sd);
-
-		// // get a template for the request
-		// JsonElement template = vraClient.getCreateRequestTemplate(token, sd);
-		//
-		// // customize the template
-		// JsonElement edited = vraClient.prepareCreateRequestTemplate(template,
-		// request.getServiceInstanceId());
-		//
-		// // request the request with the request
-		// ResponseEntity<JsonElement> response =
-		// vraClient.postCreateRequest(token, edited, sd);
-		//
-		// LOG.info("service request response: " + response.toString());
-		//
-		// String requestId = vraClient.getRequestId(response.getBody());
-		// VrServiceInstance instance = VrServiceInstance.create(request,
-		// location);
-		//
-		// // add information from response to service instance parameters
-		// instance.getParameters().putAll(vraClient.getParameters(response.getBody()));
 
 		instance = saveInstance(instance);
 
@@ -170,28 +151,9 @@ public class VrServiceInstanceService implements ServiceInstanceService {
 					+ request.getServiceInstanceId() + " not found.");
 		}
 
-		vraClient.deleteInstance(instance);
+		LOG.info("deleting service instance: " + request.getServiceInstanceId());
 
-		// String token = tokenService.getToken();
-		//
-		// // get the delete request template from the resources
-		// JsonElement template = vraClient.getDeleteRequestTemplate(token,
-		// si.getCreateRequestId());
-		//
-		// // customize the template
-		// JsonElement edited = vraClient.prepareDeleteRequestTemplate(template,
-		// si.getServiceInstanceId());
-		//
-		// // request the delete with the template
-		// ResponseEntity<JsonElement> response =
-		// vraClient.postDeleteRequest(token, edited, si.getCreateRequestId());
-		//
-		// LOG.debug("service request response: " + response.toString());
-		//
-		// String requestId = vraClient.getRequestId(response.getBody());
-		//
-		// // update si with new delete metadata
-		// si = VrServiceInstance.delete(si, requestId);
+		instance = deleteInstance(instance);
 
 		LOG.info("unregistering service instance: "
 				+ instance.getServiceInstanceId()
