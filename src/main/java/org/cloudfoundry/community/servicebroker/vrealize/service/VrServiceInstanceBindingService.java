@@ -1,5 +1,6 @@
 package org.cloudfoundry.community.servicebroker.vrealize.service;
 
+import org.apache.log4j.Logger;
 import org.cloudfoundry.community.servicebroker.exception.ServiceBrokerException;
 import org.cloudfoundry.community.servicebroker.exception.ServiceInstanceBindingExistsException;
 import org.cloudfoundry.community.servicebroker.model.CreateServiceInstanceBindingRequest;
@@ -15,6 +16,9 @@ import org.springframework.stereotype.Service;
 @Service
 public class VrServiceInstanceBindingService implements
 		ServiceInstanceBindingService {
+
+	private static final Logger LOG = Logger
+			.getLogger(VrServiceInstanceBindingService.class);
 
 	@Autowired
 	private VraClient vraClient;
@@ -56,6 +60,10 @@ public class VrServiceInstanceBindingService implements
 					"ServiceInstance operation is still in progress.");
 		}
 
+		LOG.info("creating binding for service instance: "
+				+ request.getServiceInstanceId() + " service: "
+				+ request.getServiceInstanceId());
+
 		// do we have all the info we need to create credentials?
 		if (!si.hasCredentials()) {
 			vraClient.loadCredentials(si);
@@ -65,6 +73,8 @@ public class VrServiceInstanceBindingService implements
 		ServiceInstanceBinding binding = new ServiceInstanceBinding(bindingId,
 				serviceInstanceId, si.getCredentials(), null,
 				request.getAppGuid());
+
+		LOG.info("saving binding: " + binding.getId());
 
 		return repository.save(binding);
 	}
@@ -81,6 +91,10 @@ public class VrServiceInstanceBindingService implements
 			throw new ServiceBrokerException("binding with id: "
 					+ request.getBindingId() + " does not exist.");
 		}
+
+		LOG.info("deleting binding for service instance: "
+				+ request.getBindingId() + " service instance: "
+				+ request.getInstance());
 
 		repository.delete(binding);
 		return binding;

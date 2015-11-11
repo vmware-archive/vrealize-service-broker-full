@@ -16,8 +16,11 @@ import org.cloudfoundry.community.servicebroker.model.ServiceInstanceBinding;
 import org.cloudfoundry.community.servicebroker.model.ServiceInstanceLastOperation;
 import org.cloudfoundry.community.servicebroker.vrealize.domain.Creds;
 import org.cloudfoundry.community.servicebroker.vrealize.persistance.VrServiceInstance;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.core.env.Environment;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
@@ -25,26 +28,28 @@ import com.mongodb.Mongo;
 import com.mongodb.MongoClient;
 
 @Configuration
+@PropertySource("classpath:test.properties")
 public class TestConfig {
 
 	public static final String SD_ID = "71d3235c-f5f9-4140-94a4-64d375cbd783";
-	public static final String R_ID = "4331735d-4a47-4055-b82e-21eb7666f18f";
-	public static final String P_ID = "e06ff060-dc7a-4f46-a7a7-c32c031fa31e";
-	public static final String MONGO_DB_NAME = "test-mongo-db";
+
+	@Autowired
+	Environment env;
 
 	@Bean
 	Creds creds() {
-		return new Creds("vdude1", "P1v0t4l!", "lab");
+		return new Creds(env.getProperty("vRuser"),
+				env.getProperty("vRpass"), env.getProperty("vRtenant"));
 	}
 
 	@Bean
 	String serviceUri() {
-		return "https://vra.vra.lab";
+		return env.getProperty("vRserviceUri");
 	}
 
 	public @Bean MongoTemplate mongoTemplate(Mongo mongo)
 			throws UnknownHostException {
-		return new MongoTemplate(mongo, MONGO_DB_NAME);
+		return new MongoTemplate(mongo, "test-mongo-db");
 	}
 
 	public @Bean MongoClient mongoClient() throws UnknownHostException {
