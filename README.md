@@ -4,11 +4,11 @@ POC service broker that exposes vRealize blueprint services to cloud foundry.
 
 ##Prerequisits
 ###Environment
-The vrealize-service-broker requires a PCF that supports the 2.7 service broker API (PCF 1.6 and above). More information on this can be found [here](https://docs.pivotal.io/pivotalcf/services).
-vrealize-service-broker makes use of a mongodb datastore to hold metadata and binding information. This can be provided by installing the (mongodb tile)[https://network.pivotal.io/products/p-mongodb] into your PCF environment.
-The vrealize-service-broker has been developed against the vR 7.0 beta, current as of the ime of this writing (Nov. 11, 2015). The vRAutomation REST API end-points must be accessible to the broker.
-A MariaDB blueprint should be created and made available to a vR user, and this vR user credentials will be used to communicate with the vR RERT API by the broker.
-A local mongodb service should be installed and run on the development environment. Tips on how to set this up can be found [here](https://spring.io/guides/gs/accessing-data-mongodb/).
+* The vrealize-service-broker requires a PCF that supports the 2.7 service broker API (PCF 1.6 and above). More information on this can be found [here](https://docs.pivotal.io/pivotalcf/services).
+* vrealize-service-broker makes use of a mongodb datastore to hold metadata and binding information. This can be provided by installing the (mongodb tile)[https://network.pivotal.io/products/p-mongodb] into your PCF environment.
+* The vrealize-service-broker has been developed against the vR 7.0 beta, current as of the ime of this writing (Nov. 11, 2015). The vRAutomation REST API end-points must be accessible to the broker.
+* A MariaDB blueprint should be created and made available to a vR user, and this vR user credentials will be used to communicate with the vR RERT API by the broker.
+* A local mongodb service should be installed and run on the development environment. Tips on how to set this up can be found [here](https://spring.io/guides/gs/accessing-data-mongodb/).
 
 ###Certificates
 The vrA API requires SSL: if you are using a self-signed certificate you will need to install it into your local JDK certificate vault. Information on how to do this can be found [here](http://alvinalexander.com/java/java-keytool-keystore-certificates).
@@ -21,8 +21,10 @@ Copy the certificate text into a file called vra.cer
 Load the cert via this command:
 ```bash
 sudo keytool -keystore <path to your cacerts file> -importcert -alias vra -file <path to your vra.cer file>
+```
+This certificate must be provided to the buildpack that will be used during deployment of the broker as well. Information on this can be found [here](https://github.com/cloudfoundry/java-buildpack). 
 
-This certificate must be provided to the buildpack that will be used during deployment of the broker as well. Information on this can be found [here](https://github.com/cloudfoundry/java-buildpack). Generally, you will fork the java buildpack, add a copy of the cacerts file you updated above, and check the forked buildpack into an accessible github repository. Details on this process canbe found [here](https://johnpfield.wordpress.com/2014/09/19/customizing-the-cloud-foundry-java-buildpack/).
+Generally, you will fork the java buildpack, add a copy of the cacerts file you updated above, and check the forked buildpack into an accessible github repository. Details on this process canbe found [here](https://johnpfield.wordpress.com/2014/09/19/customizing-the-cloud-foundry-java-buildpack/).
 
 ##Building
 You will need to download, build and maven-install the appropriate version of the [spring-boot-cf-service-broker] (https://github.com/cloudfoundry-community/spring-boot-cf-service-broker). As of the time of this writing, this would be the code in branch "async-cleanup".
@@ -43,8 +45,7 @@ mvn clean install -dskipTests=true
 ```
 
 ##Testing
-Provided the tasks above have been completed, test are configured by editing the test.properties file in the src/main/resources directory to add in the appropariate vRA user credentials and API endpoint.
-Ensure that a local mongo db is installed (as per prerequisits, above).
+Provided the tasks above have been completed, test are configured by editing the test.properties file in the src/main/resources directory. Also, ensure that a local mongo db is installed (as per prerequisits, above).
 
 Tests are run in the usual maven manner:
 ```bash
@@ -88,7 +89,7 @@ Look for a log entry such as:
 ```
 OUT Using default security password: bbc452a4-27e6-4d7b-b23a-4232ee5575345
 ```
-##Register the Broker Instance
+###Register the Broker Instance
 General information about this task can be found [here](https://docs.cloudfoundry.org/services/managing-service-brokers.html).
 Get the url of the broker application via this command:
 ```bash
@@ -140,9 +141,7 @@ MariaDB     MariaDB       Created by Merlin Glynn Nov 1, 2015
 ##Use the broker
 Deploy a simple database application to PCF and have it bind to the services. 
 
-One such app is the quote-service app that can be found [here](https://github.com/cf-platform-eng/quote-service/tree/mysql).
-
-Clone the github repo, checkout the mysql branch, and follow the instructions on the github site (for the mysql branch) to set up a service for the quote-service.
+One such app is the quote-service app that can be found [here](https://github.com/cf-platform-eng/quote-service/tree/mysql). Follow the instructions on the github site (for the "mysql" branch) to use this example project to demo the broker.
 
 ##Tear down the broker
 To tear the broker down, delete the services bound to it, unregister the broker, and then delete the broker app itself.
