@@ -149,7 +149,7 @@ One such app is the [quote-service app](https://github.com/cf-platform-eng/quote
 To tear the broker down, delete any services bound to it, unregister the broker, and then delete the broker app itself.
 ```bash
 $ cf delete quote-service
-$ cf cf delete-service testds
+$ cf delete-service testds
 $ cf delete-service-broker vrealize-service-broker
 $ cf delete vrealize-service-broker
 $ cf delete-service vra-broker-repo
