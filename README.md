@@ -41,7 +41,7 @@ Then checkout and build this project
 $ cd ~/<your workspace dir>
 $ git clone https://github.com/cf-platform-eng/vrealize-service-broker.git
 $ cd vrealize-service-broker
-$ mvn clean install -dskipTests=true
+$ mvn clean install -DskipTests=true
 ```
 
 ##Testing
