@@ -26,14 +26,15 @@ This certificate must also be provided to the [buildpack](https://github.com/clo
 Generally, you will fork the java buildpack, add a copy of the cacerts file you updated above, and check the forked buildpack into an accessible github repository. Details on this process are [here](https://johnpfield.wordpress.com/2014/09/19/customizing-the-cloud-foundry-java-buildpack/).
 
 ##Building
-You will need to download, build and maven-install the appropriate version of the [spring-boot-cf-service-broker] (https://github.com/cloudfoundry-community/spring-boot-cf-service-broker). As of the time of this writing, this would be the code in branch "async-cleanup".
+You will need to download, build and install the appropriate version of the [spring-boot-cf-service-broker] (https://github.com/cloudfoundry-community/spring-boot-cf-service-broker). As of the time of this writing, this would be the code in branch "async-cleanup".
 
 ```bash
 $ cd ~/<your workspace dir>
 $ git clone https://github.com/cloudfoundry-community/spring-boot-cf-service-broker.git
 $ cd spring-boot-cf-service-broker
 $ git checkout async-cleanup
-$ mvn clean install
+$ ./gradlew clean build
+$ mvn install:install-file -Dfile=build/libs/spring-boot-cf-service-broker-2.5.0.jar -DgroupId=org.cloudfoundry -DartifactId=spring-boot-cf-service-broker -Dversion=2.5.0 -Dpackaging=jar
 ```
 Then checkout and build this project
 ```bash
