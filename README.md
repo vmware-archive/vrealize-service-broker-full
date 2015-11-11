@@ -78,5 +78,79 @@ cf push
 ```
 
 ##Registering the Broker
-Once the app is pushed successfully, register and validate the app as follows:
+Once the app is pushed successfully, register and validate the the broker as follows:
+###Read the broker security token from the logs
+Run the following command and look for the broker's security password (there will be a new password generated each time the broker is pushed or restarted).
+```bash
+cf logs vrealize-service-broker --recent
+```
+Look for a log entry such as:
+```
+OUT Using default security password: bbc452a4-27e6-4d7b-b23a-4232ee5575345
+```
+##Register the Broker Instance
+General information about this task can be found [here](https://docs.cloudfoundry.org/services/managing-service-brokers.html).
+Get the url of the broker application via this command:
+```bash
+$ cf apps
+Getting apps in org yourOrg / space dev as admin...
+OK
+
+name                      requested state   instances   memory   disk   urls   
+vrealize-service-broker   started           1/1         512M     1G     vrealize-service-broker.your.host   
+```
+Register the broker:
+```bash
+cf create-service-broker vrealize-service-broker user <the broker password> <the broker url>
+```
+List service brokers and verify the vr service broker shows up:
+```bash
+$ cf service-brokers
+Getting service brokers as admin...
+
+name                      url   
+p-mongodb                 https://mongodb.host:443   
+vrealize-service-broker   http://vrealize-service-broker.host
+```
+Enable service access:
+```bash
+$ cf service-access
+Getting service access as admin...
+broker: p-mongodb
+   service     plan          access   orgs   
+   p-mongodb   development   all         
+
+broker: vrealize-service-broker
+   service      plan         access   orgs   
+   MariaDB      MariaDB      none
+   
+$ cf enable-service-access MariaDB
+```
+Check out the services available in the broker:
+```bash
+$ cf marketplace
+Getting services from marketplace in org jgordon / space dev as admin...
+OK
+
+service     plans         description   
+MariaDB     MariaDB       Created by Merlin Glynn Nov 1, 2015
+...
+```
+
+##Use the broker
+Deploy a simple database application to PCF and have it bind to the services. 
+
+One such app is the quote-service app that can be found [here](https://github.com/cf-platform-eng/quote-service/tree/mysql).
+
+Clone the github repo, checkout the mysql branch, and follow the instructions on the github site (for the mysql branch) to set up a service for the quote-service.
+
+##Tear down the broker
+To tear the broker down, delete the services bound to it, unregister the broker, and then delete the broker app itself.
+```bash
+$ cf delete quote-service
+$ cf cf delete-service testds
+$ cf delete-service-broker vrealize-service-broker
+$ cf delete vrealize-service-broker
+```
+If the broker becomes "stuck," [see this](https://docs.cloudfoundry.org/services/managing-service-brokers.html#purge-service) to knock it out.
 
