@@ -17,12 +17,11 @@ This command will display the cert:
 ```bash
 $ openssl s_client -connect <your.vra.api.server>:443 -showcerts
 ```
-Copy the certificate text into a file called vra.cer
-Load the cert via this command:
+Copy the certificate text into a file called vra.cer. Load the cert via this command:
 ```bash
 $ sudo keytool -keystore <path to your cacerts file> -importcert -alias vra -file <path to your vra.cer file>
 ```
-This certificate must be provided to the buildpack that will be used during deployment of the broker as well. Information on this can be found [here](https://github.com/cloudfoundry/java-buildpack). 
+This certificate must also be provided to the [buildpack](https://github.com/cloudfoundry/java-buildpack) that will be used during deployment of the broker. 
 
 Generally, you will fork the java buildpack, add a copy of the cacerts file you updated above, and check the forked buildpack into an accessible github repository. Details on this process are [here](https://johnpfield.wordpress.com/2014/09/19/customizing-the-cloud-foundry-java-buildpack/).
 
@@ -45,7 +44,7 @@ $ mvn clean install -dskipTests=true
 ```
 
 ##Testing
-Provided the tasks above have been completed, tests are configured by editing the test.properties file in the src/main/resources directory. Ensure that a local mongodb is installed and running(as per prerequisits, above).
+Provided the tasks above have been completed, tests are configured by editing the test.properties file in the src/main/resources directory. Ensure that a local mongodb is installed and running (as per prerequisits, above).
 
 Tests are run in the usual maven manner:
 ```bash
@@ -106,7 +105,7 @@ To register the broker:
 ```bash
 $ cf create-service-broker vrealize-service-broker user <the broker password> <the broker url>
 ```
-To list service brokers and verify the vr service broker shows up:
+To list service brokers and verify the vR service broker shows up:
 ```bash
 $ cf service-brokers
 Getting service brokers as admin...
@@ -143,10 +142,10 @@ MariaDB     MariaDB       Created by Merlin Glynn Nov 1, 2015
 ##Using the broker
 Deploy a simple database application to PCF and have it bind to the services. 
 
-One such app is the quote-service app that can be found [here](https://github.com/cf-platform-eng/quote-service/tree/mysql). Follow the instructions on the github site (for the "mysql" branch) to use this example project to demo the broker.
+One such app is the [quote-service app](https://github.com/cf-platform-eng/quote-service/tree/mysql). Follow the instructions on the github site (for the "mysql" branch) to use this example project to demo the broker.
 
 ##Tearing down the broker
-To tear the broker down, delete the services bound to it, unregister the broker, and then delete the broker app itself.
+To tear the broker down, delete any services bound to it, unregister the broker, and then delete the broker app itself.
 ```bash
 $ cf delete quote-service
 $ cf cf delete-service testds
