@@ -55,7 +55,7 @@ $ mvn clean install
 ##Deploying to PCF
 Create a mongodb service in your PCF environment:
 ```bash
-$ cf cs p-mongodb development vra-broker-repo
+$ cf create-service p-mongodb development vra-broker-repo
 ```
 Edit the manifest.yml file:
 ```
@@ -104,7 +104,7 @@ vrealize-service-broker   started           1/1         512M     1G     vrealize
 ```
 To register the broker:
 ```bash
-$ cf create-service-broker vrealize-service-broker user <the broker password> <the broker url>
+$ cf create-service-broker vrealize-service-broker user <the broker password> http://<the broker url>
 ```
 To list service brokers and verify the vR service broker shows up:
 ```bash
@@ -152,5 +152,6 @@ $ cf delete quote-service
 $ cf cf delete-service testds
 $ cf delete-service-broker vrealize-service-broker
 $ cf delete vrealize-service-broker
+$ cf delete-service vra-broker-repo
 ```
 If the broker becomes "stuck," [see this](https://docs.cloudfoundry.org/services/managing-service-brokers.html#purge-service) to knock it out.
