@@ -2,7 +2,7 @@
 
 A service broker POC that exposes vRealize blueprint services for use within Cloud Foundry.
 
-##Prerequisits
+##Prerequisites
 ###Environment
 * The vrealize-service-broker requires a PCF that supports the 2.7 service broker API (PCF 1.6 and above). More information on this can be found [here](https://docs.pivotal.io/pivotalcf/services).
 * vrealize-service-broker makes use of a mongodb datastore to hold metadata and binding information. This can be provided by installing the [mongodb tile](https://network.pivotal.io/products/p-mongodb).
