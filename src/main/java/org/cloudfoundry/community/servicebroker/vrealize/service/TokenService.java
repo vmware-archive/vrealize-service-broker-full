@@ -3,7 +3,7 @@ package org.cloudfoundry.community.servicebroker.vrealize.service;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.cloudfoundry.community.servicebroker.exception.ServiceBrokerException;
+import org.springframework.cloud.servicebroker.exception.ServiceBrokerException;
 import org.cloudfoundry.community.servicebroker.vrealize.VraRepository;
 import org.cloudfoundry.community.servicebroker.vrealize.domain.Creds;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,8 +1,8 @@
 package org.cloudfoundry.community.servicebroker.vrealize.service;
 
 import org.apache.log4j.Logger;
-import org.cloudfoundry.community.servicebroker.model.Catalog;
-import org.cloudfoundry.community.servicebroker.model.ServiceDefinition;
+import org.springframework.cloud.servicebroker.model.Catalog;
+import org.springframework.cloud.servicebroker.model.ServiceDefinition;
 import org.cloudfoundry.community.servicebroker.vrealize.VraClient;
 import org.cloudfoundry.community.servicebroker.vrealize.VraRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +12,7 @@ import com.google.gson.Gson;
 
 @Service
 public class CatalogService implements
-		org.cloudfoundry.community.servicebroker.service.CatalogService {
+		org.springframework.cloud.servicebroker.service.CatalogService {
 
 	private static final Logger LOG = Logger.getLogger(CatalogService.class);
 

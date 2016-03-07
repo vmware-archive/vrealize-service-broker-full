@@ -1,19 +1,19 @@
 package org.cloudfoundry.community.servicebroker.vrealize.adapter;
 
-import java.util.Map;
-
-import org.cloudfoundry.community.servicebroker.exception.ServiceBrokerException;
 import org.cloudfoundry.community.servicebroker.vrealize.persistance.VrServiceInstance;
+import org.springframework.cloud.servicebroker.exception.ServiceBrokerException;
+
+import java.util.Map;
 
 public interface Adaptor {
 
-	Map<String, Object> getCredentials(VrServiceInstance instance)
-			throws ServiceBrokerException;
+    Map<String, Object> getCredentials(VrServiceInstance instance)
+            throws ServiceBrokerException;
 
-	String getServiceType();
+    String getServiceType();
 
-	Map<String, Object> toParameters(Map<String, Object> vrCustomKeyValues);
+    Map<String, Object> toParameters(Map<String, Object> vrCustomKeyValues);
 
-	boolean hasCredentials(VrServiceInstance instance);
+    boolean hasCredentials(VrServiceInstance instance);
 
 }

@@ -11,19 +11,19 @@ import org.springframework.core.env.Environment;
 @Profile("cloud")
 public class CloudConfig {
 
-	@Autowired
-	private Environment env;
+    @Autowired
+    private Environment env;
 
-	@Bean
-	Creds creds() {
-		return new Creds(env.getProperty("VRA_USER_ID"),
-				env.getProperty("VRA_USER_PASSWORD"),
-				env.getProperty("VRA_TENANT"));
-	}
+    @Bean
+    Creds creds() {
+        return new Creds(env.getProperty("VRA_USER_ID"),
+                env.getProperty("VRA_USER_PASSWORD"),
+                env.getProperty("VRA_TENANT"));
+    }
 
-	@Bean
-	String serviceUri() {
-		return env.getProperty("SERVICE_URI");
-	}
+    @Bean
+    String serviceUri() {
+        return env.getProperty("SERVICE_URI");
+    }
 
 }

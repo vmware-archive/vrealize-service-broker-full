@@ -1,102 +1,98 @@
 package org.cloudfoundry.community.servicebroker.vrealize.service;
 
 import org.apache.log4j.Logger;
-import org.cloudfoundry.community.servicebroker.exception.ServiceBrokerException;
-import org.cloudfoundry.community.servicebroker.exception.ServiceInstanceBindingExistsException;
-import org.cloudfoundry.community.servicebroker.model.CreateServiceInstanceBindingRequest;
-import org.cloudfoundry.community.servicebroker.model.DeleteServiceInstanceBindingRequest;
-import org.cloudfoundry.community.servicebroker.model.ServiceInstanceBinding;
-import org.cloudfoundry.community.servicebroker.service.ServiceInstanceBindingService;
 import org.cloudfoundry.community.servicebroker.vrealize.VraClient;
 import org.cloudfoundry.community.servicebroker.vrealize.persistance.ServiceInstanceBindingRepository;
 import org.cloudfoundry.community.servicebroker.vrealize.persistance.VrServiceInstance;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.servicebroker.exception.ServiceBrokerException;
+import org.springframework.cloud.servicebroker.exception.ServiceInstanceBindingExistsException;
+import org.springframework.cloud.servicebroker.model.*;
+import org.springframework.cloud.servicebroker.service.ServiceInstanceBindingService;
 import org.springframework.stereotype.Service;
 
 @Service
 public class VrServiceInstanceBindingService implements
-		ServiceInstanceBindingService {
+        ServiceInstanceBindingService {
 
-	private static final Logger LOG = Logger
-			.getLogger(VrServiceInstanceBindingService.class);
+    private static final Logger LOG = Logger
+            .getLogger(VrServiceInstanceBindingService.class);
 
-	@Autowired
-	private VraClient vraClient;
+    @Autowired
+    private VraClient vraClient;
 
-	@Autowired
-	VrServiceInstanceService serviceInstanceService;
+    @Autowired
+    VrServiceInstanceService serviceInstanceService;
 
-	@Autowired
-	ServiceInstanceBindingRepository repository;
+    @Autowired
+    ServiceInstanceBindingRepository repository;
 
-	@Override
-	public ServiceInstanceBinding createServiceInstanceBinding(
-			CreateServiceInstanceBindingRequest request)
-			throws ServiceInstanceBindingExistsException,
-			ServiceBrokerException {
+    @Override
+    public CreateServiceInstanceBindingResponse createServiceInstanceBinding(
+            CreateServiceInstanceBindingRequest request)
+            throws ServiceInstanceBindingExistsException,
+            ServiceBrokerException {
 
-		String bindingId = request.getBindingId();
-		if (bindingId == null) {
-			throw new ServiceBrokerException("no bindingId in request.");
-		}
+        String bindingId = request.getBindingId();
 
-		ServiceInstanceBinding sib = repository.findOne(bindingId);
-		if (sib != null) {
-			throw new ServiceInstanceBindingExistsException(sib);
-		}
+        ServiceInstanceBinding sib = repository.findOne(bindingId);
+        if (sib != null) {
+            throw new ServiceInstanceBindingExistsException(request.getServiceInstanceId(), bindingId);
+        }
 
-		String serviceInstanceId = request.getServiceInstanceId();
-		VrServiceInstance si = (VrServiceInstance) serviceInstanceService
-				.getServiceInstance(serviceInstanceId);
+        String serviceInstanceId = request.getServiceInstanceId();
+        VrServiceInstance si = (VrServiceInstance) serviceInstanceService
+                .getServiceInstance(serviceInstanceId);
 
-		if (si == null) {
-			throw new ServiceBrokerException("service instance for binding: "
-					+ bindingId + " is missing.");
-		}
+        if (si == null) {
+            throw new ServiceBrokerException("service instance for binding: "
+                    + bindingId + " is missing.");
+        }
 
-		// not supposed to happen per the spec, but better check...
-		if (si.isInProgress()) {
-			throw new ServiceBrokerException(
-					"ServiceInstance operation is still in progress.");
-		}
+        // not supposed to happen per the spec, but better check...
+        if (si.isInProgress()) {
+            throw new ServiceBrokerException(
+                    "ServiceInstance operation is still in progress.");
+        }
 
-		LOG.info("creating binding for service instance: "
-				+ request.getServiceInstanceId() + " service: "
-				+ request.getServiceInstanceId());
+        LOG.info("creating binding for service instance: "
+                + request.getServiceInstanceId() + " service: "
+                + request.getServiceInstanceId());
 
-		// do we have all the info we need to create credentials?
-		if (!si.hasCredentials()) {
-			vraClient.loadCredentials(si);
-			serviceInstanceService.saveInstance(si);
-		}
+        // do we have all the info we need to create credentials?
+        if (!si.hasCredentials()) {
+            vraClient.loadCredentials(si);
+            serviceInstanceService.saveInstance(si);
+        }
 
-		ServiceInstanceBinding binding = new ServiceInstanceBinding(bindingId,
-				serviceInstanceId, si.getCredentials(), null,
-				request.getAppGuid());
+        ServiceInstanceBinding binding = new ServiceInstanceBinding(bindingId,
+                serviceInstanceId, si.getCredentials(), null,
+                request.getAppGuid());
 
-		LOG.info("saving binding: " + binding.getId());
+        LOG.info("saving binding: " + binding.getId());
 
-		return repository.save(binding);
-	}
+        repository.save(binding);
 
-	@Override
-	public ServiceInstanceBinding deleteServiceInstanceBinding(
-			DeleteServiceInstanceBindingRequest request)
-			throws ServiceBrokerException {
+        return new CreateServiceInstanceAppBindingResponse().withCredentials(si.getCredentials());
+    }
 
-		ServiceInstanceBinding binding = repository.findOne(request
-				.getBindingId());
+    @Override
+    public void deleteServiceInstanceBinding(
+            DeleteServiceInstanceBindingRequest request)
+            throws ServiceBrokerException {
 
-		if (binding == null) {
-			throw new ServiceBrokerException("binding with id: "
-					+ request.getBindingId() + " does not exist.");
-		}
+        ServiceInstanceBinding binding = repository.findOne(request
+                .getBindingId());
 
-		LOG.info("deleting binding for service instance: "
-				+ request.getBindingId() + " service instance: "
-				+ request.getInstance());
+        if (binding == null) {
+            throw new ServiceBrokerException("binding with id: "
+                    + request.getBindingId() + " does not exist.");
+        }
 
-		repository.delete(binding);
-		return binding;
-	}
+        LOG.info("deleting binding for service instance: "
+                + request.getBindingId() + " service instance: "
+                + request.getServiceInstanceId());
+
+        repository.delete(binding);
+    }
 }

@@ -1,45 +1,39 @@
 package org.cloudfoundry.community.servicebroker.vrealize.domain;
 
+import com.google.gson.*;
+import org.apache.log4j.Logger;
+import org.springframework.cloud.servicebroker.model.Catalog;
+import org.springframework.cloud.servicebroker.model.ServiceDefinition;
+
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
-import org.cloudfoundry.community.servicebroker.model.Catalog;
-import org.cloudfoundry.community.servicebroker.model.ServiceDefinition;
-
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonDeserializer;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParseException;
-
 public class CatalogTranslator implements JsonDeserializer<Catalog> {
 
-	private static final Logger LOG = Logger.getLogger(CatalogTranslator.class);
+    private static final Logger LOG = Logger.getLogger(CatalogTranslator.class);
 
-	private Gson gson;
+    private Gson gson;
 
-	public Catalog deserialize(JsonElement json, Type typeOfT,
-			JsonDeserializationContext context) throws JsonParseException {
+    public Catalog deserialize(JsonElement json, Type typeOfT,
+                               JsonDeserializationContext context) throws JsonParseException {
 
-		LOG.debug("processing catalog json: " + json);
+        LOG.debug("processing catalog json: " + json);
 
-		List<ServiceDefinition> sds = new ArrayList<ServiceDefinition>();
-		JsonArray content = json.getAsJsonObject().get("content")
-				.getAsJsonArray();
-		for (int i = 0; i < content.size(); i++) {
-			sds.add(gson.fromJson(content.get(i), ServiceDefinition.class));
-		}
-		return new Catalog(sds);
-	}
+        List<ServiceDefinition> sds = new ArrayList<ServiceDefinition>();
+        JsonArray content = json.getAsJsonObject().get("content")
+                .getAsJsonArray();
+        for (int i = 0; i < content.size(); i++) {
+            sds.add(gson.fromJson(content.get(i), ServiceDefinition.class));
+        }
+        return new Catalog(sds);
+    }
 
-	public Gson getGson() {
-		return gson;
-	}
+    public Gson getGson() {
+        return gson;
+    }
 
-	public void setGson(Gson gson) {
-		this.gson = gson;
-	}
+    public void setGson(Gson gson) {
+        this.gson = gson;
+    }
 }
