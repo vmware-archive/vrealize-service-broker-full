@@ -2,7 +2,6 @@ package org.cloudfoundry.community.servicebroker.vrealize.service;
 
 import org.apache.log4j.Logger;
 import org.cloudfoundry.community.servicebroker.vrealize.VraClient;
-import org.cloudfoundry.community.servicebroker.vrealize.domain.Creds;
 import org.cloudfoundry.community.servicebroker.vrealize.persistance.VrServiceInstance;
 import org.cloudfoundry.community.servicebroker.vrealize.persistance.VrServiceInstanceRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,9 +27,6 @@ public class VrServiceInstanceService implements ServiceInstanceService {
 
     @Autowired
     VrServiceInstanceRepository repository;
-
-    @Autowired
-    Creds creds;
 
     public VrServiceInstance getServiceInstance(String id) {
 

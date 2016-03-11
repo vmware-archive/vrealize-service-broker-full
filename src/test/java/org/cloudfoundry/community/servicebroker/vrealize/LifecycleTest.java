@@ -1,6 +1,5 @@
 package org.cloudfoundry.community.servicebroker.vrealize;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import org.apache.log4j.Logger;
@@ -30,7 +29,7 @@ public class LifecycleTest {
 
     private static final Logger LOG = Logger.getLogger(LifecycleTest.class);
 
-    private static final String R_ID = "8720ac04-9910-4426-b8b3-758f6e02e3bc";
+    private static final String R_ID = "e8ae8c36-056b-4a79-bd8c-b12646c66214";
 
     @Autowired
     private VraClient client;
@@ -40,12 +39,6 @@ public class LifecycleTest {
 
     @Autowired
     CatalogService catalogService;
-
-    @Autowired
-    Gson gson;
-
-    @Autowired
-    VraRepository repo;
 
     @Test
     public void testCreate() throws Exception {
