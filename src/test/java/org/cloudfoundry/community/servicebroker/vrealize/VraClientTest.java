@@ -173,7 +173,7 @@ public class VraClientTest {
     @Test
     @Ignore
     public void testLoadCredentials() throws ServiceBrokerException {
-        VrServiceInstance instance = VrServiceInstance.create(TestConfig
+        VrServiceInstance instance = new VrServiceInstance(TestConfig
                 .getCreateServiceInstanceRequest());
         assertNotNull(instance);
         instance.getMetadata()

@@ -1,6 +1,5 @@
 package org.cloudfoundry.community.servicebroker.vrealize.persistance;
 
-import com.google.gson.Gson;
 import org.cloudfoundry.community.servicebroker.vrealize.Application;
 import org.cloudfoundry.community.servicebroker.vrealize.TestConfig;
 import org.junit.After;
@@ -20,9 +19,6 @@ import static org.junit.Assert.assertNotNull;
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = {Application.class})
 public class VrServiceInstanceRepositoryTest {
-
-    @Autowired
-    Gson gson;
 
     @Autowired
     VrServiceInstanceRepository repository;
@@ -59,11 +55,11 @@ public class VrServiceInstanceRepositoryTest {
 
         VrServiceInstance si2 = repository.findOne(si.getId());
         assertNotNull(si2);
-        assertEquals("anID", si2.getServiceInstanceId());
+        assertEquals("anID", si2.getId());
 
         VrServiceInstance si3 = repository.findOne("anID");
         assertNotNull(si3);
-        assertEquals("anID", si3.getServiceInstanceId());
+        assertEquals("anID", si3.getId());
         assertEquals(TestConfig.SD_ID, si3.getServiceDefinitionId());
         assertNotNull(si3.getServiceInstanceLastOperation());
         assertEquals(OperationState.IN_PROGRESS, si3.getServiceInstanceLastOperation()

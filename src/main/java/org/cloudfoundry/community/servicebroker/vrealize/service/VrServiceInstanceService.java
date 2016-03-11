@@ -28,6 +28,17 @@ public class VrServiceInstanceService implements ServiceInstanceService {
     @Autowired
     VrServiceInstanceRepository repository;
 
+    private GetLastServiceOperationResponse lastOperation;
+
+    public GetLastServiceOperationResponse getServiceInstanceLastOperation() {
+        return lastOperation;
+    }
+
+    public VrServiceInstanceService withLastOperation(GetLastServiceOperationResponse lastOperation) {
+        this.lastOperation = lastOperation;
+        return this;
+    }
+
     public VrServiceInstance getServiceInstance(String id) {
 
         if (id == null || getInstance(id) == null) {
@@ -110,7 +121,7 @@ public class VrServiceInstanceService implements ServiceInstanceService {
         instance = saveInstance(instance);
 
         LOG.info("registered service instance: "
-                + instance.getServiceInstanceId()
+                + instance.getId()
                 + " requestId: "
                 + instance.getMetadata().get(
                 VrServiceInstance.CREATE_REQUEST_ID));
@@ -142,7 +153,7 @@ public class VrServiceInstanceService implements ServiceInstanceService {
         instance = deleteInstance(instance);
 
         LOG.info("unregistering service instance: "
-                + instance.getServiceInstanceId()
+                + instance.getId()
                 + " requestId: "
                 + instance.getMetadata().get(
                 VrServiceInstance.DELETE_REQUEST_ID));
@@ -166,10 +177,7 @@ public class VrServiceInstanceService implements ServiceInstanceService {
     }
 
     VrServiceInstance deleteInstance(VrServiceInstance instance) {
-        if (instance == null || instance.getServiceInstanceId() == null) {
-            return null;
-        }
-        repository.delete(instance.getServiceInstanceId());
+        repository.delete(instance.getId());
         return instance;
     }
 

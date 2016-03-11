@@ -79,7 +79,7 @@ public class VraClient {
         String location = getLocation(response);
         String requestId = getRequestId(response);
 
-        VrServiceInstance instance = VrServiceInstance.create(request);
+        VrServiceInstance instance = new VrServiceInstance(request);
         instance.getMetadata().put(VrServiceInstance.LOCATION, location);
         instance.getMetadata().put(VrServiceInstance.CREATE_REQUEST_ID,
                 requestId);
@@ -131,7 +131,7 @@ public class VraClient {
 
         // customize the template
         JsonElement edited = prepareDeleteRequestTemplate(template,
-                instance.getServiceInstanceId());
+                instance.getId());
 
         String deleteLink = instance.getMetadata()
                 .get(VrServiceInstance.DELETE_LINK).toString();

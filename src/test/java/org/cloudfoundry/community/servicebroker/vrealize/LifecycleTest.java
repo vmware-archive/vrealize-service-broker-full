@@ -151,7 +151,7 @@ public class LifecycleTest {
         ServiceDefinition sd = catalogService
                 .getServiceDefinition(TestConfig.SD_ID);
 
-        VrServiceInstance instance = VrServiceInstance.create(TestConfig
+        VrServiceInstance instance = new VrServiceInstance(TestConfig
                 .getCreateServiceInstanceRequest(sd));
 
         instance.getMetadata().put(VrServiceInstance.CREATE_REQUEST_ID, R_ID);

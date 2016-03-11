@@ -4,6 +4,7 @@ import org.apache.log4j.Logger;
 import org.cloudfoundry.community.servicebroker.vrealize.VraClient;
 import org.cloudfoundry.community.servicebroker.vrealize.persistance.ServiceInstanceBindingRepository;
 import org.cloudfoundry.community.servicebroker.vrealize.persistance.VrServiceInstance;
+import org.cloudfoundry.community.servicebroker.vrealize.persistance.VrServiceInstanceBinding;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.servicebroker.exception.ServiceBrokerException;
 import org.springframework.cloud.servicebroker.exception.ServiceInstanceBindingExistsException;
@@ -35,13 +36,13 @@ public class VrServiceInstanceBindingService implements
 
         String bindingId = request.getBindingId();
 
-        ServiceInstanceBinding sib = repository.findOne(bindingId);
+        VrServiceInstanceBinding sib = repository.findOne(bindingId);
         if (sib != null) {
             throw new ServiceInstanceBindingExistsException(request.getServiceInstanceId(), bindingId);
         }
 
         String serviceInstanceId = request.getServiceInstanceId();
-        VrServiceInstance si = (VrServiceInstance) serviceInstanceService
+        VrServiceInstance si = serviceInstanceService
                 .getServiceInstance(serviceInstanceId);
 
         if (si == null) {
@@ -65,9 +66,9 @@ public class VrServiceInstanceBindingService implements
             serviceInstanceService.saveInstance(si);
         }
 
-        ServiceInstanceBinding binding = new ServiceInstanceBinding(bindingId,
+        VrServiceInstanceBinding binding = new VrServiceInstanceBinding(bindingId,
                 serviceInstanceId, si.getCredentials(), null,
-                request.getAppGuid());
+                request.getBindResource());
 
         LOG.info("saving binding: " + binding.getId());
 
@@ -81,7 +82,7 @@ public class VrServiceInstanceBindingService implements
             DeleteServiceInstanceBindingRequest request)
             throws ServiceBrokerException {
 
-        ServiceInstanceBinding binding = repository.findOne(request
+        VrServiceInstanceBinding binding = repository.findOne(request
                 .getBindingId());
 
         if (binding == null) {

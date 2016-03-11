@@ -4,6 +4,7 @@ import org.cloudfoundry.community.servicebroker.vrealize.Application;
 import org.cloudfoundry.community.servicebroker.vrealize.TestConfig;
 import org.cloudfoundry.community.servicebroker.vrealize.persistance.ServiceInstanceBindingRepository;
 import org.cloudfoundry.community.servicebroker.vrealize.persistance.VrServiceInstance;
+import org.cloudfoundry.community.servicebroker.vrealize.persistance.VrServiceInstanceBinding;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -74,9 +75,8 @@ public class VrServiceInstanceBindingServiceTest {
     public void testBinding() throws ServiceBrokerException,
             ServiceInstanceBindingExistsException {
 
-        ServiceInstanceBinding b = TestConfig.getServiceInstanceBinding();
+        VrServiceInstanceBinding b = TestConfig.getServiceInstanceBinding();
         assertNotNull(b);
-        assertEquals("anAppId", b.getAppGuid());
         Map<String, Object> m = b.getCredentials();
         assertNotNull(m);
         assertEquals("mysql://aUser:secret@aHost:1234/aDB",

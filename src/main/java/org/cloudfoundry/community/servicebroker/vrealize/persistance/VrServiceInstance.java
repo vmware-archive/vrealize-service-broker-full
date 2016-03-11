@@ -12,10 +12,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Document
-public class VrServiceInstance extends ServiceInstance {
+public class VrServiceInstance {
 
-    // some "known" keys to store stuff under
-    // metatdata keys
+    // some "known" keys to store stuff under metatdata keys
     public static final String LOCATION = "LOCATION";
     public static final String CREATE_REQUEST_ID = "CREATE_REQUEST_ID";
     public static final String DELETE_REQUEST_ID = "DELETE_REQUEST_ID";
@@ -44,21 +43,25 @@ public class VrServiceInstance extends ServiceInstance {
     @JsonProperty("metadata")
     private final Map<String, Object> metadata = new HashMap<String, Object>();
 
-    public static VrServiceInstance create(CreateServiceInstanceRequest request) {
-        VrServiceInstance instance = new VrServiceInstance(request);
-        instance.withAsync(true);
-        instance.setId(instance.getServiceInstanceId());
+    @JsonSerialize
+    @JsonProperty("last_operation")
+    private GetLastServiceOperationResponse lastOperation;
 
-        return instance;
-    }
+    @JsonSerialize
+    @JsonProperty("service_id")
+    private String serviceDefinitionId;
 
-    public static VrServiceInstance update(VrServiceInstance instance,
-                                           OperationState state) {
-        GetLastServiceOperationResponse silo = new GetLastServiceOperationResponse().withDescription(instance.getServiceInstanceLastOperation().getDescription()).
-                withOperationState(state).withDeleteOperation(false);
-        instance.withLastOperation(silo);
-        return instance;
-    }
+    @JsonSerialize
+    @JsonProperty("plan_id")
+    private String planId;
+
+    @JsonSerialize
+    @JsonProperty("organization_guid")
+    private String organizationGuid;
+
+    @JsonSerialize
+    @JsonProperty("space_guid")
+    private String spaceGuid;
 
     public static VrServiceInstance delete(VrServiceInstance instance,
                                            String deleteRequestId) {
@@ -70,20 +73,45 @@ public class VrServiceInstance extends ServiceInstance {
         return instance;
     }
 
+    public GetLastServiceOperationResponse getServiceInstanceLastOperation() {
+        return lastOperation;
+    }
+
+    public VrServiceInstance withLastOperation(GetLastServiceOperationResponse lastOperation) {
+        this.lastOperation = lastOperation;
+        return this;
+    }
+
     public VrServiceInstance() {
         this(new CreateServiceInstanceRequest());
     }
 
     public VrServiceInstance(CreateServiceInstanceRequest request) {
-        super(request);
+        this.serviceDefinitionId = request.getServiceDefinitionId();
+        this.planId = request.getPlanId();
+        this.organizationGuid = request.getOrganizationGuid();
+        this.spaceGuid = request.getSpaceGuid();
+        this.id = request.getServiceInstanceId();
+        this.lastOperation = new GetLastServiceOperationResponse()
+                .withOperationState(OperationState.IN_PROGRESS)
+                .withDescription("Provisioning");
     }
 
     public VrServiceInstance(DeleteServiceInstanceRequest request) {
-        super(request);
+        this.id = request.getServiceInstanceId();
+        this.planId = request.getPlanId();
+        this.serviceDefinitionId = request.getServiceDefinitionId();
+        this.lastOperation = new GetLastServiceOperationResponse()
+                .withOperationState(OperationState.IN_PROGRESS)
+                .withDescription("Deprovisioning");
     }
 
     public VrServiceInstance(UpdateServiceInstanceRequest request) {
-        super(request);
+        this.id = request.getServiceInstanceId();
+        this.planId = request.getPlanId();
+        this.lastOperation = new GetLastServiceOperationResponse()
+                .withOperationState(OperationState.IN_PROGRESS)
+                .withDescription("Updating");
     }
 
     public Map<String, Object> getParameters() {
@@ -150,4 +178,21 @@ public class VrServiceInstance extends ServiceInstance {
     public boolean hasCredentials() {
         return Adaptors.hasCredentials(this);
     }
+
+    public String getServiceDefinitionId() {
+        return serviceDefinitionId;
+    }
+
+    public String getPlanId() {
+        return planId;
+    }
+
+    public String getOrganizationGuid() {
+        return organizationGuid;
+    }
+
+    public String getSpaceGuid() {
+        return spaceGuid;
+    }
+
 }

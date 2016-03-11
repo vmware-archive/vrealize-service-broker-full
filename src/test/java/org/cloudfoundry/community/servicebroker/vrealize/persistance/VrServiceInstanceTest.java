@@ -1,12 +1,11 @@
 package org.cloudfoundry.community.servicebroker.vrealize.persistance;
 
-import com.google.gson.Gson;
 import org.cloudfoundry.community.servicebroker.vrealize.Application;
 import org.cloudfoundry.community.servicebroker.vrealize.TestConfig;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.cloud.servicebroker.model.GetLastServiceOperationResponse;
 import org.springframework.cloud.servicebroker.model.OperationState;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -15,9 +14,6 @@ import static org.junit.Assert.*;
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = {Application.class})
 public class VrServiceInstanceTest {
-
-    @Autowired
-    Gson gson;
 
     @Test
     public void testStates() {
@@ -31,7 +27,7 @@ public class VrServiceInstanceTest {
                 .getDescription());
 
         // failed create request
-        VrServiceInstance.update(si, OperationState.FAILED);
+        update(si, OperationState.FAILED);
 
         assertTrue(si.isCurrentOperationCreate());
         assertFalse(si.isCurrentOperationDelete());
@@ -41,7 +37,7 @@ public class VrServiceInstanceTest {
                 .getDescription());
 
         // succeeded create request
-        VrServiceInstance.update(si, OperationState.SUCCEEDED);
+        update(si, OperationState.SUCCEEDED);
 
         assertTrue(si.isCurrentOperationCreate());
         assertFalse(si.isCurrentOperationDelete());
@@ -65,7 +61,7 @@ public class VrServiceInstanceTest {
                 si.getMetadata().get(VrServiceInstance.CREATE_REQUEST_ID));
 
         // delete failed
-        si = VrServiceInstance.update(si, OperationState.FAILED);
+        si = update(si, OperationState.FAILED);
 
         assertFalse(si.isCurrentOperationCreate());
         assertTrue(si.isCurrentOperationDelete());
@@ -79,7 +75,7 @@ public class VrServiceInstanceTest {
                 si.getMetadata().get(VrServiceInstance.CREATE_REQUEST_ID));
 
         // delete succeeded
-        si = VrServiceInstance.update(si, OperationState.SUCCEEDED);
+        si = update(si, OperationState.SUCCEEDED);
 
         assertFalse(si.isCurrentOperationCreate());
         assertTrue(si.isCurrentOperationDelete());
@@ -93,5 +89,13 @@ public class VrServiceInstanceTest {
                 si.getMetadata().get(VrServiceInstance.CREATE_REQUEST_ID));
 
         // System.out.println(gson.toJson(si));
+    }
+
+    private VrServiceInstance update(VrServiceInstance instance,
+                                     OperationState state) {
+        GetLastServiceOperationResponse silo = new GetLastServiceOperationResponse().withDescription(instance.getServiceInstanceLastOperation().getDescription()).
+                withOperationState(state).withDeleteOperation(false);
+        instance.withLastOperation(silo);
+        return instance;
     }
 }

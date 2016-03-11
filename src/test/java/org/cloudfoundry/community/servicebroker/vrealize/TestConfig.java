@@ -4,6 +4,7 @@ import com.mongodb.Mongo;
 import com.mongodb.MongoClient;
 import org.cloudfoundry.community.servicebroker.vrealize.domain.Creds;
 import org.cloudfoundry.community.servicebroker.vrealize.persistance.VrServiceInstance;
+import org.cloudfoundry.community.servicebroker.vrealize.persistance.VrServiceInstanceBinding;
 import org.cloudfoundry.community.servicebroker.vrealize.service.CatalogService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.servicebroker.exception.ServiceBrokerException;
@@ -86,8 +87,7 @@ public class TestConfig {
 //	}
 
     public static VrServiceInstance getServiceInstance() {
-        VrServiceInstance si = VrServiceInstance
-                .create(getCreateServiceInstanceRequest());
+        VrServiceInstance si = new VrServiceInstance(getCreateServiceInstanceRequest());
         si.getParameters().put(VrServiceInstance.SERVICE_TYPE, "mysql");
         si.getParameters().put(VrServiceInstance.DB_ID, "aDB");
         si.getParameters().put(VrServiceInstance.HOST, "aHost");
@@ -108,23 +108,23 @@ public class TestConfig {
                 si.getServiceDefinitionId(), si.getPlanId(), "anAppId",
                 si.getParameters());
         req.withBindingId("98765");
-        req.withServiceInstanceId(si.getServiceInstanceId());
+        req.withServiceInstanceId(si.getId());
         return req;
     }
 
-    public static ServiceInstanceBinding getServiceInstanceBinding()
+    public static VrServiceInstanceBinding getServiceInstanceBinding()
             throws ServiceBrokerException {
         CreateServiceInstanceBindingRequest req = getCreateBindingRequest();
-        return new ServiceInstanceBinding(req.getBindingId(),
+        return new VrServiceInstanceBinding(req.getBindingId(),
                 req.getServiceInstanceId(), getServiceInstance()
-                .getCredentials(), null, req.getAppGuid());
+                .getCredentials(), null, null);
     }
 
     public DeleteServiceInstanceBindingRequest getDeleteBindingRequest() {
         VrServiceInstance si = getServiceInstance();
         CreateServiceInstanceBindingRequest creq = getCreateBindingRequest();
         return new DeleteServiceInstanceBindingRequest(
-                si.getServiceInstanceId(),
+                si.getId(),
                 creq.getBindingId(), si.getServiceDefinitionId(),
                 si.getPlanId(), catalogService.getServiceDefinition(si.getServiceDefinitionId()));
     }

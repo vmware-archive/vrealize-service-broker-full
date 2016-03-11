@@ -1,6 +1,5 @@
 package org.cloudfoundry.community.servicebroker.vrealize.persistance;
 
-import com.google.gson.Gson;
 import org.cloudfoundry.community.servicebroker.vrealize.Application;
 import org.cloudfoundry.community.servicebroker.vrealize.TestConfig;
 import org.junit.After;
@@ -9,7 +8,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.cloud.servicebroker.model.ServiceInstanceBinding;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.List;
@@ -20,9 +18,6 @@ import static org.junit.Assert.assertNotNull;
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = {Application.class})
 public class ServiceInstanceBindingRepositoryTest {
-
-    @Autowired
-    Gson gson;
 
     @Autowired
     ServiceInstanceBindingRepository repository;
@@ -44,7 +39,7 @@ public class ServiceInstanceBindingRepositoryTest {
 
     @Test
     public void instanceInsertedSuccessfully() throws Exception {
-        ServiceInstanceBinding sib = TestConfig.getServiceInstanceBinding();
+        VrServiceInstanceBinding sib = TestConfig.getServiceInstanceBinding();
         assertEquals(0, repository.count());
 
         repository.save(sib);
@@ -59,20 +54,20 @@ public class ServiceInstanceBindingRepositoryTest {
 
     @Test
     public void instanceDeletedSuccessfully() throws Exception {
-        ServiceInstanceBinding sib = TestConfig.getServiceInstanceBinding();
+        VrServiceInstanceBinding sib = TestConfig.getServiceInstanceBinding();
         assertEquals(0, repository.count());
 
         sib = repository.save(sib);
         assertEquals(1, repository.count());
 
-        List<ServiceInstanceBinding> l = repository.findAll();
+        List<VrServiceInstanceBinding> l = repository.findAll();
         assertEquals(1, l.size());
 
-        ServiceInstanceBinding sib2 = repository.findOne(sib.getId());
+        VrServiceInstanceBinding sib2 = repository.findOne(sib.getId());
         assertNotNull(sib2);
         assertEquals("anID", sib2.getServiceInstanceId());
 
-        ServiceInstanceBinding sib3 = repository.findOne("98765");
+        VrServiceInstanceBinding sib3 = repository.findOne("98765");
         assertNotNull(sib3);
         assertEquals("anID", sib3.getServiceInstanceId());
         assertEquals("98765", sib3.getId());
