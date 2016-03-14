@@ -1,12 +1,13 @@
 package org.cloudfoundry.community.servicebroker.vrealize.persistance;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
  * Created by jgordon on 3/11/16.
  */
-public class VrServiceInstanceBinding {
+public class VrServiceInstanceBinding implements Serializable {
 
     private String id;
 

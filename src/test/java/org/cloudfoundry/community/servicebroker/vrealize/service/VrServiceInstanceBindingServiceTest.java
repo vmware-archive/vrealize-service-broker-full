@@ -2,7 +2,7 @@ package org.cloudfoundry.community.servicebroker.vrealize.service;
 
 import org.cloudfoundry.community.servicebroker.vrealize.Application;
 import org.cloudfoundry.community.servicebroker.vrealize.TestConfig;
-import org.cloudfoundry.community.servicebroker.vrealize.persistance.ServiceInstanceBindingRepository;
+import org.cloudfoundry.community.servicebroker.vrealize.persistance.LastOperation;
 import org.cloudfoundry.community.servicebroker.vrealize.persistance.VrServiceInstance;
 import org.cloudfoundry.community.servicebroker.vrealize.persistance.VrServiceInstanceBinding;
 import org.junit.After;
@@ -17,10 +17,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.cloud.servicebroker.exception.ServiceBrokerException;
 import org.springframework.cloud.servicebroker.exception.ServiceInstanceBindingExistsException;
-import org.springframework.cloud.servicebroker.model.*;
+import org.springframework.cloud.servicebroker.model.CreateServiceInstanceBindingRequest;
+import org.springframework.cloud.servicebroker.model.CreateServiceInstanceBindingResponse;
+import org.springframework.cloud.servicebroker.model.GetLastServiceOperationResponse;
+import org.springframework.cloud.servicebroker.model.OperationState;
+import org.springframework.data.redis.core.HashOperations;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import javax.annotation.Resource;
 import java.util.Map;
+import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -38,17 +45,20 @@ public class VrServiceInstanceBindingServiceTest {
     @Mock
     VrServiceInstanceService vrServiceInstanceService;
 
+    @Resource(name = "sibTemplate")
+    private HashOperations<String, String, VrServiceInstanceBinding> repo;
+
     @Autowired
-    ServiceInstanceBindingRepository repo;
+    @Resource(name = "sibTemplate")
+    private RedisTemplate<String, VrServiceInstanceBinding> template;
 
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
 
         VrServiceInstance si = TestConfig.getServiceInstance();
-        GetLastServiceOperationResponse silo = new GetLastServiceOperationResponse().withDescription("anOp").
-                withOperationState(OperationState.SUCCEEDED);
-        si.withLastOperation(silo);
+        LastOperation lo = new LastOperation(OperationState.SUCCEEDED, "anOp", false);
+        si.withLastOperation(lo);
 
         when(vrServiceInstanceService.getServiceInstance(Matchers.anyString()))
                 .thenReturn(si);
@@ -63,12 +73,18 @@ public class VrServiceInstanceBindingServiceTest {
                         .deleteInstance(any(VrServiceInstance.class)))
                 .thenReturn(si);
 
-        repo.deleteAll();
+        Set<String> keys = repo.keys(VrServiceInstanceBindingService.OBJECT_ID);
+        for (String key : keys) {
+            repo.delete(VrServiceInstanceBindingService.OBJECT_ID, key);
+        }
     }
 
     @After
     public void cleanUp() throws Exception {
-        repo.deleteAll();
+        Set<String> keys = repo.keys(VrServiceInstanceBindingService.OBJECT_ID);
+        for (String key : keys) {
+            repo.delete(VrServiceInstanceBindingService.OBJECT_ID, key);
+        }
     }
 
     @Test

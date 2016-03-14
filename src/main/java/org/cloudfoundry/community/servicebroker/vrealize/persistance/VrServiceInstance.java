@@ -4,15 +4,16 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.cloudfoundry.community.servicebroker.vrealize.adapter.Adaptors;
 import org.springframework.cloud.servicebroker.exception.ServiceBrokerException;
-import org.springframework.cloud.servicebroker.model.*;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.cloud.servicebroker.model.CreateServiceInstanceRequest;
+import org.springframework.cloud.servicebroker.model.DeleteServiceInstanceRequest;
+import org.springframework.cloud.servicebroker.model.OperationState;
+import org.springframework.cloud.servicebroker.model.UpdateServiceInstanceRequest;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-@Document
-public class VrServiceInstance {
+public class VrServiceInstance implements Serializable {
 
     // some "known" keys to store stuff under metatdata keys
     public static final String LOCATION = "LOCATION";
@@ -32,7 +33,8 @@ public class VrServiceInstance {
     // other keys
     public static final String URI = "uri";
 
-    @Id
+    @JsonSerialize
+    @JsonProperty("service_instance_id")
     private String id;
 
     @JsonSerialize
@@ -45,7 +47,7 @@ public class VrServiceInstance {
 
     @JsonSerialize
     @JsonProperty("last_operation")
-    private GetLastServiceOperationResponse lastOperation;
+    private LastOperation lastOperation;
 
     @JsonSerialize
     @JsonProperty("service_id")
@@ -63,21 +65,11 @@ public class VrServiceInstance {
     @JsonProperty("space_guid")
     private String spaceGuid;
 
-    public static VrServiceInstance delete(VrServiceInstance instance,
-                                           String deleteRequestId) {
-        instance.getMetadata().put(DELETE_REQUEST_ID, deleteRequestId);
-        GetLastServiceOperationResponse silo = new GetLastServiceOperationResponse().withDescription(deleteRequestId).
-                withDeleteOperation(true).withOperationState(OperationState.IN_PROGRESS);
-        instance.withLastOperation(silo);
-
-        return instance;
-    }
-
-    public GetLastServiceOperationResponse getServiceInstanceLastOperation() {
+    public LastOperation getServiceInstanceLastOperation() {
         return lastOperation;
     }
 
-    public VrServiceInstance withLastOperation(GetLastServiceOperationResponse lastOperation) {
+    public VrServiceInstance withLastOperation(LastOperation lastOperation) {
         this.lastOperation = lastOperation;
         return this;
     }
@@ -92,26 +84,20 @@ public class VrServiceInstance {
         this.organizationGuid = request.getOrganizationGuid();
         this.spaceGuid = request.getSpaceGuid();
         this.id = request.getServiceInstanceId();
-        this.lastOperation = new GetLastServiceOperationResponse()
-                .withOperationState(OperationState.IN_PROGRESS)
-                .withDescription("Provisioning");
+        this.lastOperation = new LastOperation(OperationState.IN_PROGRESS, "Provisioning", false);
     }
 
     public VrServiceInstance(DeleteServiceInstanceRequest request) {
         this.id = request.getServiceInstanceId();
         this.planId = request.getPlanId();
         this.serviceDefinitionId = request.getServiceDefinitionId();
-        this.lastOperation = new GetLastServiceOperationResponse()
-                .withOperationState(OperationState.IN_PROGRESS)
-                .withDescription("Deprovisioning");
+        this.lastOperation = new LastOperation(OperationState.IN_PROGRESS, "Deprovisioning", true);
     }
 
     public VrServiceInstance(UpdateServiceInstanceRequest request) {
         this.id = request.getServiceInstanceId();
         this.planId = request.getPlanId();
-        this.lastOperation = new GetLastServiceOperationResponse()
-                .withOperationState(OperationState.IN_PROGRESS)
-                .withDescription("Updating");
+        this.lastOperation = new LastOperation(OperationState.IN_PROGRESS, "Updating", false);
     }
 
     public Map<String, Object> getParameters() {

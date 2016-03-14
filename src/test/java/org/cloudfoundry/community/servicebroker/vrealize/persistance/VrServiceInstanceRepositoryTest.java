@@ -2,16 +2,18 @@ package org.cloudfoundry.community.servicebroker.vrealize.persistance;
 
 import org.cloudfoundry.community.servicebroker.vrealize.Application;
 import org.cloudfoundry.community.servicebroker.vrealize.TestConfig;
+import org.cloudfoundry.community.servicebroker.vrealize.service.VrServiceInstanceService;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.cloud.servicebroker.model.OperationState;
+import org.springframework.data.redis.core.HashOperations;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import java.util.List;
+import javax.annotation.Resource;
+import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -20,44 +22,47 @@ import static org.junit.Assert.assertNotNull;
 @SpringApplicationConfiguration(classes = {Application.class})
 public class VrServiceInstanceRepositoryTest {
 
-    @Autowired
-    VrServiceInstanceRepository repository;
+    @Resource(name = "siTemplate")
+    private HashOperations<String, String, VrServiceInstance> repository;
 
     @Before
     public void setup() {
-        repository.deleteAll();
+        Set<String> keys = repository.keys(VrServiceInstanceService.OBJECT_ID);
+        for (String key : keys) {
+            repository.delete(VrServiceInstanceService.OBJECT_ID, key);
+        }
     }
 
     @After
     public void teardown() {
-        repository.deleteAll();
+        Set<String> keys = repository.keys(VrServiceInstanceService.OBJECT_ID);
+        for (String key : keys) {
+            repository.delete(VrServiceInstanceService.OBJECT_ID, key);
+        }
     }
 
     @Test
     public void instanceInsertedSuccessfully() throws Exception {
         VrServiceInstance si = getInstance();
-        assertEquals(0, repository.count());
+        assertEquals(0, repository.entries(VrServiceInstanceService.OBJECT_ID).size());
 
-        repository.save(si);
-        assertEquals(1, repository.count());
+        repository.put(VrServiceInstanceService.OBJECT_ID, si.getId(), si);
+        assertEquals(1, repository.entries(VrServiceInstanceService.OBJECT_ID).size());
     }
 
     @Test
     public void instanceDeletedSuccessfully() throws Exception {
         VrServiceInstance si = getInstance();
-        assertEquals(0, repository.count());
+        assertEquals(0, repository.entries(VrServiceInstanceService.OBJECT_ID).size());
 
-        si = repository.save(si);
-        assertEquals(1, repository.count());
+        repository.put(VrServiceInstanceService.OBJECT_ID, si.getId(), si);
+        assertEquals(1, repository.entries(VrServiceInstanceService.OBJECT_ID).size());
 
-        List<VrServiceInstance> l = repository.findAll();
-        assertEquals(1, l.size());
-
-        VrServiceInstance si2 = repository.findOne(si.getId());
+        VrServiceInstance si2 = repository.get(VrServiceInstanceService.OBJECT_ID, si.getId());
         assertNotNull(si2);
         assertEquals("anID", si2.getId());
 
-        VrServiceInstance si3 = repository.findOne("anID");
+        VrServiceInstance si3 = repository.get(VrServiceInstanceService.OBJECT_ID, "anID");
         assertNotNull(si3);
         assertEquals("anID", si3.getId());
         assertEquals(TestConfig.SD_ID, si3.getServiceDefinitionId());
@@ -67,9 +72,9 @@ public class VrServiceInstanceRepositoryTest {
 
         //System.out.println(gson.toJson(si3));
 
-        repository.delete(si3.getId());
+        repository.delete(VrServiceInstanceService.OBJECT_ID, si3.getId());
 
-        assertEquals(0, repository.count());
+        assertEquals(0, repository.entries(VrServiceInstanceService.OBJECT_ID).size());
     }
 
     private VrServiceInstance getInstance() {

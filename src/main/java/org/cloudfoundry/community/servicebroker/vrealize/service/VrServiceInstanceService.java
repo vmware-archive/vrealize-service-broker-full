@@ -2,8 +2,8 @@ package org.cloudfoundry.community.servicebroker.vrealize.service;
 
 import org.apache.log4j.Logger;
 import org.cloudfoundry.community.servicebroker.vrealize.VraClient;
+import org.cloudfoundry.community.servicebroker.vrealize.persistance.LastOperation;
 import org.cloudfoundry.community.servicebroker.vrealize.persistance.VrServiceInstance;
-import org.cloudfoundry.community.servicebroker.vrealize.persistance.VrServiceInstanceRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.servicebroker.exception.ServiceBrokerException;
 import org.springframework.cloud.servicebroker.exception.ServiceInstanceDoesNotExistException;
@@ -11,7 +11,10 @@ import org.springframework.cloud.servicebroker.exception.ServiceInstanceExistsEx
 import org.springframework.cloud.servicebroker.exception.ServiceInstanceUpdateNotSupportedException;
 import org.springframework.cloud.servicebroker.model.*;
 import org.springframework.cloud.servicebroker.service.ServiceInstanceService;
+import org.springframework.data.redis.core.HashOperations;
 import org.springframework.stereotype.Service;
+
+import javax.annotation.Resource;
 
 @Service
 public class VrServiceInstanceService implements ServiceInstanceService {
@@ -19,25 +22,16 @@ public class VrServiceInstanceService implements ServiceInstanceService {
     private static final Logger LOG = Logger
             .getLogger(VrServiceInstanceService.class);
 
+    public static final String OBJECT_ID = "VrServiceInstance";
+
     @Autowired
     VraClient vraClient;
 
     @Autowired
     CatalogService catalogService;
 
-    @Autowired
-    VrServiceInstanceRepository repository;
-
-    private GetLastServiceOperationResponse lastOperation;
-
-    public GetLastServiceOperationResponse getServiceInstanceLastOperation() {
-        return lastOperation;
-    }
-
-    public VrServiceInstanceService withLastOperation(GetLastServiceOperationResponse lastOperation) {
-        this.lastOperation = lastOperation;
-        return this;
-    }
+    @Resource(name = "siTemplate")
+    private HashOperations<String, String, VrServiceInstance> repository;
 
     public VrServiceInstance getServiceInstance(String id) {
 
@@ -49,9 +43,9 @@ public class VrServiceInstanceService implements ServiceInstanceService {
         VrServiceInstance instance = getInstance(id);
 
         // check the last operation
-        GetLastServiceOperationResponse silo = instance
+        LastOperation lo = instance
                 .getServiceInstanceLastOperation();
-        if (silo == null || silo.getState() == null) {
+        if (lo == null || lo.getState() == null) {
             LOG.error("ServiceInstance: " + id + " has no last operation.");
             deleteInstance(instance);
             return null;
@@ -63,7 +57,7 @@ public class VrServiceInstanceService implements ServiceInstanceService {
         }
 
         // if still in progress, let's check up on things...
-        String currentRequestId = silo.getDescription();
+        String currentRequestId = lo.getDescription();
         if (currentRequestId == null) {
             LOG.error("ServiceInstance: " + id + " last operation has no id.");
             deleteInstance(instance);
@@ -84,7 +78,7 @@ public class VrServiceInstanceService implements ServiceInstanceService {
             return null;
         }
 
-        instance.withLastOperation(status);
+        instance.withLastOperation(LastOperation.fromResponse(status));
 
         // if this is a delete request and was successful, remove the instance
         if (instance.isCurrentOperationSuccessful()
@@ -136,7 +130,7 @@ public class VrServiceInstanceService implements ServiceInstanceService {
             throw new ServiceInstanceDoesNotExistException(request.getServiceInstanceId());
         }
 
-        return si.getServiceInstanceLastOperation();
+        return si.getServiceInstanceLastOperation().toResponse();
     }
 
     @Override
@@ -173,15 +167,16 @@ public class VrServiceInstanceService implements ServiceInstanceService {
         if (id == null) {
             return null;
         }
-        return repository.findOne(id);
+        return repository.get(OBJECT_ID, id);
     }
 
     VrServiceInstance deleteInstance(VrServiceInstance instance) {
-        repository.delete(instance.getId());
+        repository.delete(OBJECT_ID, instance.getId());
         return instance;
     }
 
     VrServiceInstance saveInstance(VrServiceInstance instance) {
-        return repository.save(instance);
+        repository.put(OBJECT_ID, instance.getId(), instance);
+        return instance;
     }
 }

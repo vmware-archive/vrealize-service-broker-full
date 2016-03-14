@@ -2,15 +2,20 @@ package org.cloudfoundry.community.servicebroker.vrealize.service;
 
 import org.apache.log4j.Logger;
 import org.cloudfoundry.community.servicebroker.vrealize.VraClient;
-import org.cloudfoundry.community.servicebroker.vrealize.persistance.ServiceInstanceBindingRepository;
 import org.cloudfoundry.community.servicebroker.vrealize.persistance.VrServiceInstance;
 import org.cloudfoundry.community.servicebroker.vrealize.persistance.VrServiceInstanceBinding;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.servicebroker.exception.ServiceBrokerException;
 import org.springframework.cloud.servicebroker.exception.ServiceInstanceBindingExistsException;
-import org.springframework.cloud.servicebroker.model.*;
+import org.springframework.cloud.servicebroker.model.CreateServiceInstanceAppBindingResponse;
+import org.springframework.cloud.servicebroker.model.CreateServiceInstanceBindingRequest;
+import org.springframework.cloud.servicebroker.model.CreateServiceInstanceBindingResponse;
+import org.springframework.cloud.servicebroker.model.DeleteServiceInstanceBindingRequest;
 import org.springframework.cloud.servicebroker.service.ServiceInstanceBindingService;
+import org.springframework.data.redis.core.HashOperations;
 import org.springframework.stereotype.Service;
+
+import javax.annotation.Resource;
 
 @Service
 public class VrServiceInstanceBindingService implements
@@ -19,14 +24,16 @@ public class VrServiceInstanceBindingService implements
     private static final Logger LOG = Logger
             .getLogger(VrServiceInstanceBindingService.class);
 
+    public static final String OBJECT_ID = "VrServiceInstanceBinding";
+
     @Autowired
     private VraClient vraClient;
 
     @Autowired
     VrServiceInstanceService serviceInstanceService;
 
-    @Autowired
-    ServiceInstanceBindingRepository repository;
+    @Resource(name = "sibTemplate")
+    private HashOperations<String, String, VrServiceInstanceBinding> repository;
 
     @Override
     public CreateServiceInstanceBindingResponse createServiceInstanceBinding(
@@ -36,7 +43,7 @@ public class VrServiceInstanceBindingService implements
 
         String bindingId = request.getBindingId();
 
-        VrServiceInstanceBinding sib = repository.findOne(bindingId);
+        VrServiceInstanceBinding sib = repository.get(OBJECT_ID, bindingId);
         if (sib != null) {
             throw new ServiceInstanceBindingExistsException(request.getServiceInstanceId(), bindingId);
         }
@@ -72,7 +79,7 @@ public class VrServiceInstanceBindingService implements
 
         LOG.info("saving binding: " + binding.getId());
 
-        repository.save(binding);
+        repository.put(OBJECT_ID, binding.getId(), binding);
 
         return new CreateServiceInstanceAppBindingResponse().withCredentials(si.getCredentials());
     }
@@ -82,7 +89,7 @@ public class VrServiceInstanceBindingService implements
             DeleteServiceInstanceBindingRequest request)
             throws ServiceBrokerException {
 
-        VrServiceInstanceBinding binding = repository.findOne(request
+        VrServiceInstanceBinding binding = repository.get(OBJECT_ID, request
                 .getBindingId());
 
         if (binding == null) {
@@ -94,6 +101,6 @@ public class VrServiceInstanceBindingService implements
                 + request.getBindingId() + " service instance: "
                 + request.getServiceInstanceId());
 
-        repository.delete(binding);
+        repository.delete(OBJECT_ID, binding.getId());
     }
 }

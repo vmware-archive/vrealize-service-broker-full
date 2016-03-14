@@ -2,15 +2,18 @@ package org.cloudfoundry.community.servicebroker.vrealize.persistance;
 
 import org.cloudfoundry.community.servicebroker.vrealize.Application;
 import org.cloudfoundry.community.servicebroker.vrealize.TestConfig;
+import org.cloudfoundry.community.servicebroker.vrealize.service.VrServiceInstanceBindingService;
+import org.cloudfoundry.community.servicebroker.vrealize.service.VrServiceInstanceService;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.data.redis.core.HashOperations;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import java.util.List;
+import javax.annotation.Resource;
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -19,55 +22,49 @@ import static org.junit.Assert.assertNotNull;
 @SpringApplicationConfiguration(classes = {Application.class})
 public class ServiceInstanceBindingRepositoryTest {
 
-    @Autowired
-    ServiceInstanceBindingRepository repository;
+    @Resource(name = "sibTemplate")
+    private HashOperations<String, String, VrServiceInstanceBinding> repository;
 
-    @Autowired
-    VrServiceInstanceRepository siRepository;
+    @Resource(name = "siTemplate")
+    private HashOperations<String, String, VrServiceInstance> siRepository;
 
     @Before
     public void setup() {
-        repository.deleteAll();
-        siRepository.deleteAll();
+        repository.delete(VrServiceInstanceBindingService.OBJECT_ID, repository.entries(VrServiceInstanceBindingService.OBJECT_ID));
+        repository.delete(VrServiceInstanceService.OBJECT_ID, repository.entries(VrServiceInstanceService.OBJECT_ID));
     }
 
     @After
     public void teardown() {
-        repository.deleteAll();
-        siRepository.deleteAll();
+        repository.delete(VrServiceInstanceBindingService.OBJECT_ID, repository.entries(VrServiceInstanceBindingService.OBJECT_ID));
+        repository.delete(VrServiceInstanceService.OBJECT_ID, repository.entries(VrServiceInstanceService.OBJECT_ID));
     }
 
     @Test
     public void instanceInsertedSuccessfully() throws Exception {
         VrServiceInstanceBinding sib = TestConfig.getServiceInstanceBinding();
-        assertEquals(0, repository.count());
+        assertEquals(0, repository.entries(VrServiceInstanceBindingService.OBJECT_ID).size());
 
-        repository.save(sib);
-        assertEquals(1, repository.count());
-
-        // are service instances in the same collection?
-        assertEquals(0, siRepository.count());
-        siRepository.save(TestConfig.getServiceInstance());
-        assertEquals(1, siRepository.count());
-        assertEquals(1, repository.count());
+        repository.put(VrServiceInstanceBindingService.OBJECT_ID, sib.getId(), sib);
+        assertEquals(1, repository.entries(VrServiceInstanceBindingService.OBJECT_ID).size());
     }
 
     @Test
     public void instanceDeletedSuccessfully() throws Exception {
         VrServiceInstanceBinding sib = TestConfig.getServiceInstanceBinding();
-        assertEquals(0, repository.count());
+        assertEquals(0, repository.entries(VrServiceInstanceBindingService.OBJECT_ID).size());
 
-        sib = repository.save(sib);
-        assertEquals(1, repository.count());
+        repository.put(VrServiceInstanceBindingService.OBJECT_ID, sib.getId(), sib);
+        assertEquals(1, repository.entries(VrServiceInstanceBindingService.OBJECT_ID).size());
 
-        List<VrServiceInstanceBinding> l = repository.findAll();
-        assertEquals(1, l.size());
+        Map<String, VrServiceInstanceBinding> m = repository.entries(VrServiceInstanceBindingService.OBJECT_ID);
+        assertEquals(1, m.size());
 
-        VrServiceInstanceBinding sib2 = repository.findOne(sib.getId());
+        VrServiceInstanceBinding sib2 = repository.get(VrServiceInstanceBindingService.OBJECT_ID, sib.getId());
         assertNotNull(sib2);
         assertEquals("anID", sib2.getServiceInstanceId());
 
-        VrServiceInstanceBinding sib3 = repository.findOne("98765");
+        VrServiceInstanceBinding sib3 = repository.get(VrServiceInstanceBindingService.OBJECT_ID, "98765");
         assertNotNull(sib3);
         assertEquals("anID", sib3.getServiceInstanceId());
         assertEquals("98765", sib3.getId());
@@ -75,8 +72,8 @@ public class ServiceInstanceBindingRepositoryTest {
 
         // System.out.println(gson.toJson(sib3));
 
-        repository.delete(sib3.getId());
+        repository.delete(VrServiceInstanceBindingService.OBJECT_ID, sib3.getId());
 
-        assertEquals(0, repository.count());
+        assertEquals(0, repository.entries(VrServiceInstanceBindingService.OBJECT_ID).size());
     }
 }

@@ -1,6 +1,5 @@
 package org.cloudfoundry.community.servicebroker.vrealize;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.jayway.jsonpath.JsonPath;
@@ -8,7 +7,7 @@ import com.jayway.jsonpath.ReadContext;
 import net.minidev.json.JSONArray;
 import org.apache.log4j.Logger;
 import org.cloudfoundry.community.servicebroker.vrealize.adapter.Adaptors;
-import org.cloudfoundry.community.servicebroker.vrealize.domain.Creds;
+import org.cloudfoundry.community.servicebroker.vrealize.persistance.LastOperation;
 import org.cloudfoundry.community.servicebroker.vrealize.persistance.VrServiceInstance;
 import org.cloudfoundry.community.servicebroker.vrealize.service.TokenService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,12 +46,6 @@ public class VraClient {
     private VraRepository vraRepository;
 
     @Autowired
-    Gson gson;
-
-    @Autowired
-    Creds creds;
-
-    @Autowired
     String serviceUri;
 
     @Autowired
@@ -84,8 +77,8 @@ public class VraClient {
         instance.getMetadata().put(VrServiceInstance.CREATE_REQUEST_ID,
                 requestId);
 
-        GetLastServiceOperationResponse silo = new GetLastServiceOperationResponse().withDescription(requestId).withOperationState(OperationState.IN_PROGRESS);
-        instance.withLastOperation(silo);
+        LastOperation lo = new LastOperation(OperationState.IN_PROGRESS, requestId, false);
+        instance.withLastOperation(lo);
 
         return instance;
     }
@@ -143,8 +136,12 @@ public class VraClient {
 
         String requestId = getRequestId(response);
 
-        // update instance with new delete metadata
-        VrServiceInstance.delete(instance, requestId);
+        // update instance with new delete metadata VrServiceInstance.delete(instance, requestId);
+        instance.getMetadata().put(VrServiceInstance.DELETE_REQUEST_ID, requestId);
+        LastOperation lo = new LastOperation(OperationState.IN_PROGRESS, requestId, true);
+
+        instance.withLastOperation(lo);
+
         return instance;
     }
 

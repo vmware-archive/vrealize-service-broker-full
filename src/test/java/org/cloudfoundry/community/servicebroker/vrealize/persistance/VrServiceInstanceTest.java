@@ -5,7 +5,6 @@ import org.cloudfoundry.community.servicebroker.vrealize.TestConfig;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.cloud.servicebroker.model.GetLastServiceOperationResponse;
 import org.springframework.cloud.servicebroker.model.OperationState;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -47,7 +46,7 @@ public class VrServiceInstanceTest {
                 .getDescription());
 
         // new delete request added to existing si
-        si = VrServiceInstance.delete(si, "23456");
+        si = delete(si, "23456");
 
         assertFalse(si.isCurrentOperationCreate());
         assertTrue(si.isCurrentOperationDelete());
@@ -93,9 +92,17 @@ public class VrServiceInstanceTest {
 
     private VrServiceInstance update(VrServiceInstance instance,
                                      OperationState state) {
-        GetLastServiceOperationResponse silo = new GetLastServiceOperationResponse().withDescription(instance.getServiceInstanceLastOperation().getDescription()).
-                withOperationState(state).withDeleteOperation(false);
-        instance.withLastOperation(silo);
+        LastOperation lo = new LastOperation(state, instance.getServiceInstanceLastOperation().getDescription(), false);
+        instance.withLastOperation(lo);
+        return instance;
+    }
+
+    private VrServiceInstance delete(VrServiceInstance instance,
+                                     String deleteRequestId) {
+        instance.getMetadata().put(VrServiceInstance.DELETE_REQUEST_ID, deleteRequestId);
+        LastOperation lo = new LastOperation(OperationState.IN_PROGRESS, deleteRequestId, true);
+        instance.withLastOperation(lo);
+
         return instance;
     }
 }

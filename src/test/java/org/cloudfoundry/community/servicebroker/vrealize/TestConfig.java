@@ -1,12 +1,12 @@
 package org.cloudfoundry.community.servicebroker.vrealize;
 
-import com.mongodb.Mongo;
-import com.mongodb.MongoClient;
 import org.cloudfoundry.community.servicebroker.vrealize.domain.Creds;
+import org.cloudfoundry.community.servicebroker.vrealize.persistance.LastOperation;
 import org.cloudfoundry.community.servicebroker.vrealize.persistance.VrServiceInstance;
 import org.cloudfoundry.community.servicebroker.vrealize.persistance.VrServiceInstanceBinding;
 import org.cloudfoundry.community.servicebroker.vrealize.service.CatalogService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cloud.servicebroker.exception.ServiceBrokerException;
 import org.springframework.cloud.servicebroker.model.*;
 import org.springframework.context.annotation.Bean;
@@ -14,10 +14,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
+import org.springframework.data.redis.core.RedisTemplate;
 
 import java.net.URI;
-import java.net.UnknownHostException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
@@ -44,17 +44,30 @@ public class TestConfig {
         return env.getProperty("vRserviceUri");
     }
 
-    public
     @Bean
-    MongoTemplate mongoTemplate(Mongo mongo)
-            throws UnknownHostException {
-        return new MongoTemplate(mongo, "test-mongo-db");
+    JedisConnectionFactory jedisConnectionFactory() {
+        JedisConnectionFactory factory = new JedisConnectionFactory();
+        factory.setHostName("localhost");
+        factory.setPort(6379);
+        factory.setUsePool(true);
+        return factory;
     }
 
-    public
+
     @Bean
-    MongoClient mongoClient() throws UnknownHostException {
-        return new MongoClient("localhost");
+    @Qualifier("siTemplate")
+    RedisTemplate<String, VrServiceInstance> siTemplate() {
+        RedisTemplate<String, VrServiceInstance> template = new RedisTemplate<String, VrServiceInstance>();
+        template.setConnectionFactory(jedisConnectionFactory());
+        return template;
+    }
+
+    @Bean
+    @Qualifier("sibTemplate")
+    RedisTemplate<String, VrServiceInstanceBinding> sibTemplate() {
+        RedisTemplate<String, VrServiceInstanceBinding> template = new RedisTemplate<String, VrServiceInstanceBinding>();
+        template.setConnectionFactory(jedisConnectionFactory());
+        return template;
     }
 
     public static String getContents(String fileName) throws Exception {
@@ -95,8 +108,8 @@ public class TestConfig {
         si.getParameters().put(VrServiceInstance.PORT, "1234");
         si.getParameters().put(VrServiceInstance.USER_ID, "aUser");
 
-        GetLastServiceOperationResponse silo = new GetLastServiceOperationResponse().withDescription("aRequestId").withOperationState(OperationState.IN_PROGRESS);
-        si.withLastOperation(silo);
+        LastOperation lo = new LastOperation(OperationState.IN_PROGRESS, "aRequestId", false);
+        si.withLastOperation(lo);
 
         si.getMetadata().put(VrServiceInstance.CREATE_REQUEST_ID, "aRequestId");
         return si;

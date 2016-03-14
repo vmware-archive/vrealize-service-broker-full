@@ -3,6 +3,7 @@ package org.cloudfoundry.community.servicebroker.vrealize;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import org.apache.log4j.Logger;
+import org.cloudfoundry.community.servicebroker.vrealize.persistance.LastOperation;
 import org.cloudfoundry.community.servicebroker.vrealize.persistance.VrServiceInstance;
 import org.cloudfoundry.community.servicebroker.vrealize.service.CatalogService;
 import org.cloudfoundry.community.servicebroker.vrealize.service.TokenService;
@@ -87,8 +88,8 @@ public class LifecycleTest {
     @Test
     public void testGetStatus() throws ServiceBrokerException {
         VrServiceInstance instance = TestConfig.getServiceInstance();
-        GetLastServiceOperationResponse silo = new GetLastServiceOperationResponse().withDescription(R_ID).withOperationState(OperationState.IN_PROGRESS);
-        instance.withLastOperation(silo);
+        LastOperation lo = new LastOperation(OperationState.IN_PROGRESS, R_ID, false);
+        instance.withLastOperation(lo);
         GetLastServiceOperationResponse status = client.getRequestStatus(instance);
         assertNotNull(status);
         assertEquals(OperationState.SUCCEEDED, status.getState());
