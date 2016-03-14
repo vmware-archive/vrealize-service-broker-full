@@ -5,10 +5,10 @@ A service broker POC that exposes vRealize blueprint services for use within Clo
 ##Prerequisites
 ###Environment
 * The vrealize-service-broker requires a PCF that supports the 2.7 service broker API (PCF 1.6 and above). More information on this can be found [here](https://docs.pivotal.io/pivotalcf/services).
-* vrealize-service-broker makes use of a mongodb datastore to hold metadata and binding information. This can be provided by installing the [mongodb tile](https://network.pivotal.io/products/p-mongodb).
+* vrealize-service-broker makes use of a redis datastore to hold metadata and binding information. This can be provided by installing the [redis tile](https://network.pivotal.io/products/p-redis).
 * The vrealize-service-broker has been developed against the vR 7.0 beta, current as of the time of this writing (Nov. 11, 2015). The vRAutomation REST API end-points must be accessible to the broker.
 * A MariaDB blueprint should be created and made available to a vR user, and the vR user credentials will be used to communicate with the vR REST API by the broker.
-* A local mongodb service should be installed and run on the development environment. Tips on how to set this up can be found [here](https://spring.io/guides/gs/accessing-data-mongodb/).
+* A local redis service should be installed and run on the development environment. Tips on how to set this up can be found [here](http://redis.io/topics/quickstart).
 
 ###Certificates
 The vRA API requires SSL: if you are using a self-signed certificate you will need to install it into your local JDK certificate vault. Information on how to do this can be found [here](http://alvinalexander.com/java/java-keytool-keystore-certificates).
@@ -45,7 +45,7 @@ $ mvn clean install -DskipTests=true
 ```
 
 ##Testing
-Provided the tasks above have been completed, tests are configured by editing the test.properties file in the src/main/resources directory. Ensure that a local mongodb is installed and running (as per prerequisits, above).
+Provided the tasks above have been completed, tests are configured by editing the test.properties file in the src/main/resources directory. Ensure that a local redis is installed and running (as per prerequisits, above).
 
 Tests are run in the usual maven manner:
 ```bash
@@ -53,9 +53,9 @@ $ mvn clean install
 ```
 
 ##Deploying to PCF
-Create a mongodb service in your PCF environment:
+Create a redis service in your PCF environment:
 ```bash
-$ cf create-service p-mongodb development vra-broker-repo
+$ cf create-service p-redis dedicated-vm vra-broker-repo
 ```
 Edit the manifest.yml file:
 ```
@@ -112,7 +112,7 @@ $ cf service-brokers
 Getting service brokers as admin...
 
 name                      url   
-p-mongodb                 https://mongodb.host:443   
+p-redis                   https://redis-broker.pcfaas-slot9.pez.pivotal.io  
 vrealize-service-broker   http://vrealize-service-broker.host
 ```
 To enable service access:
@@ -120,8 +120,9 @@ To enable service access:
 $ cf service-access
 Getting service access as admin...
 broker: p-mongodb
-   service     plan          access   orgs   
-   p-mongodb   development   all         
+   service   plan           access   orgs   
+   p-redis   dedicated-vm   all         
+   p-redis   shared-vm      all         
 
 broker: vrealize-service-broker
    service      plan         access   orgs   
