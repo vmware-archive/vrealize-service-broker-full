@@ -33,7 +33,7 @@ public class VrServiceInstanceService implements ServiceInstanceService {
     @Resource(name = "siTemplate")
     private HashOperations<String, String, VrServiceInstance> repository;
 
-    public VrServiceInstance getServiceInstance(String id) {
+    VrServiceInstance getServiceInstance(String id) {
 
         if (id == null || getInstance(id) == null) {
             LOG.warn("service instance with id: " + id + " not found!");
@@ -125,7 +125,7 @@ public class VrServiceInstanceService implements ServiceInstanceService {
 
     @Override
     public GetLastServiceOperationResponse getLastOperation(GetLastServiceOperationRequest request) {
-        VrServiceInstance si = getInstance(request.getServiceInstanceId());
+        VrServiceInstance si = getServiceInstance(request.getServiceInstanceId());
         if (si == null) {
             throw new ServiceInstanceDoesNotExistException(request.getServiceInstanceId());
         }
