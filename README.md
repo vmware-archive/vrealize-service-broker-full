@@ -6,8 +6,8 @@ A service broker POC that exposes vRealize blueprint services for use within Clo
 ###Environment
 * The vrealize-service-broker requires a PCF that supports the 2.7 service broker API (PCF 1.6 and above). More information on this can be found [here](https://docs.pivotal.io/pivotalcf/services).
 * vrealize-service-broker makes use of a redis datastore to hold metadata and binding information. This can be provided by installing the [redis tile](https://network.pivotal.io/products/p-redis).
-* The vrealize-service-broker has been developed against the vR 7.0 beta, current as of the time of this writing (Nov. 11, 2015). The vRAutomation REST API end-points must be accessible to the broker.
-* A MariaDB blueprint should be created and made available to a vR user, and the vR user credentials will be used to communicate with the vR REST API by the broker.
+* The vrealize-service-broker has been developed against the vR 7.0. The vRAutomation REST API end-points must be accessible to the broker.
+* A MySQL blueprint should be created and made available to a vR user, and the vR user credentials will be used to communicate with the vR REST API by the broker.
 * A local redis service should be installed and run on the development environment. Tips on how to set this up can be found [here](http://redis.io/topics/quickstart).
 
 ###Certificates
