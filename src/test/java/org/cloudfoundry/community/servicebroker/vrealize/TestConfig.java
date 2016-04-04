@@ -25,7 +25,7 @@ import java.nio.file.Paths;
 @PropertySource("classpath:test.properties")
 public class TestConfig {
 
-    public static final String SD_ID = "71d3235c-f5f9-4140-94a4-64d375cbd783";
+    public static final String SD_ID = "a3d19350-c15e-4d81-878a-38f4868a4c95";
 
     @Autowired
     Environment env;
