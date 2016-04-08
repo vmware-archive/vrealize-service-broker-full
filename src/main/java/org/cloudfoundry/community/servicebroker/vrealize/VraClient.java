@@ -110,15 +110,13 @@ public class VraClient {
                 getParametersFromResourceResponse(resourcesResponse));
     }
 
-    public VrServiceInstance loadDataFromResourceResponse(String token,
+    public void loadDataFromResourceResponse(String token,
                                                           VrServiceInstance instance) {
         JsonElement resources = getRequestResources(token, instance
                 .getCreateRequestId().toString());
 
         Map<String, String> links = getDeleteLinks(resources);
         instance.getMetadata().putAll(links);
-
-        return instance;
     }
 
     public VrServiceInstance deleteInstance(VrServiceInstance instance) {
@@ -198,8 +196,8 @@ public class VraClient {
         return fullUri.substring(serviceUri.length() + 1);
     }
 
-    ResponseEntity<JsonElement> postCreateRequest(String token,
-                                                  JsonElement body, ServiceDefinition sd) {
+    private ResponseEntity<JsonElement> postCreateRequest(String token,
+                                                          JsonElement body, ServiceDefinition sd) {
 
         if (token == null || body == null || sd == null) {
             return null;
@@ -224,8 +222,8 @@ public class VraClient {
         return jo;
     }
 
-    JsonObject prepareDeleteRequestTemplate(JsonElement template,
-                                            String serviceInstanceId) {//throws ServiceBrokerException {
+    private JsonObject prepareDeleteRequestTemplate(JsonElement template,
+                                                    String serviceInstanceId) {//throws ServiceBrokerException {
 
         JsonObject jo = template.getAsJsonObject();
         jo.addProperty("description", serviceInstanceId);
@@ -330,7 +328,7 @@ public class VraClient {
 
     }
 
-    String getRequestId(ResponseEntity<JsonElement> requestResponse) {
+    private String getRequestId(ResponseEntity<JsonElement> requestResponse) {
         if (requestResponse == null) {
             return null;
         }

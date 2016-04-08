@@ -27,7 +27,7 @@ public class LastOperation implements Serializable {
         return state;
     }
 
-    public void setState(OperationState state) {
+    private void setState(OperationState state) {
         this.state = state;
     }
 
@@ -35,15 +35,15 @@ public class LastOperation implements Serializable {
         return description;
     }
 
-    public void setDescription(String description) {
+    private void setDescription(String description) {
         this.description = description;
     }
 
-    public boolean isDelete() {
+    private boolean isDelete() {
         return isDelete;
     }
 
-    public void setDelete(boolean delete) {
+    private void setDelete(boolean delete) {
         isDelete = delete;
     }
 

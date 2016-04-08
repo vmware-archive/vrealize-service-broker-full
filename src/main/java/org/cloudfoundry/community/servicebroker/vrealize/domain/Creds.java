@@ -2,9 +2,9 @@ package org.cloudfoundry.community.servicebroker.vrealize.domain;
 
 public class Creds {
 
-    String username;
-    String password;
-    String tenant;
+    private final String username;
+    private final String password;
+    private final String tenant;
 
     public Creds(String username, String password, String tenant) {
         super();

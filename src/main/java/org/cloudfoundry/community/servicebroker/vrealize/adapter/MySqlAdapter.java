@@ -47,11 +47,10 @@ class MySqlAdapter implements Adaptor {
             Map<String, Object> vrCustomKeyValues) {
         Map<String, Object> m = new HashMap<String, Object>();
 
-        m.put(VrServiceInstance.USER_ID, vrCustomKeyValues.get("mysql_user"));
-        m.put(VrServiceInstance.PASSWORD, vrCustomKeyValues.get("mysql_passwd"));
-        m.put(VrServiceInstance.DB_ID, vrCustomKeyValues.get("mysql_dbname"));
-        m.put(VrServiceInstance.HOST, vrCustomKeyValues.get("foo"));
-        m.put(VrServiceInstance.PORT, vrCustomKeyValues.get("mysql_port"));
+        m.put(VrServiceInstance.USER_ID, vrCustomKeyValues.get("USER_ID"));
+        m.put(VrServiceInstance.PASSWORD, vrCustomKeyValues.get("PASSWORD"));
+        m.put(VrServiceInstance.DB_ID, vrCustomKeyValues.get("DB_NAME"));
+        m.put(VrServiceInstance.PORT, vrCustomKeyValues.get("DB_PORT"));
         m.put(VrServiceInstance.SERVICE_TYPE, getServiceType());
 
         return m;

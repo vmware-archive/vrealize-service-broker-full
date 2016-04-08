@@ -47,14 +47,14 @@
                         }
                      },
                      {
-                        "key":"mysql_port",
+                        "key":"DB_PORT",
                         "value":{
                            "type":"string",
                            "value":"3306"
                         }
                      },
                      {
-                        "key":"mysql_passwd",
+                        "key":"PASSWORD",
                         "value":{
                            "type":"string",
                            "value":"P1v0t4l!"
@@ -144,14 +144,14 @@
                         }
                      },
                      {
-                        "key":"mysql_user",
+                        "key":"USER_ID",
                         "value":{
                            "type":"string",
                            "value":"mysqluser"
                         }
                      },
                      {
-                        "key":"mysql_dbname",
+                        "key":"DB_NAME",
                         "value":{
                            "type":"string",
                            "value":"db01"

@@ -3,7 +3,6 @@ package org.cloudfoundry.community.servicebroker.vrealize.persistance;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.cloudfoundry.community.servicebroker.vrealize.adapter.Adaptors;
-import org.springframework.cloud.servicebroker.exception.ServiceBrokerException;
 import org.springframework.cloud.servicebroker.model.CreateServiceInstanceRequest;
 import org.springframework.cloud.servicebroker.model.DeleteServiceInstanceRequest;
 import org.springframework.cloud.servicebroker.model.OperationState;
@@ -69,9 +68,8 @@ public class VrServiceInstance implements Serializable {
         return lastOperation;
     }
 
-    public VrServiceInstance withLastOperation(LastOperation lastOperation) {
+    public void withLastOperation(LastOperation lastOperation) {
         this.lastOperation = lastOperation;
-        return this;
     }
 
     public VrServiceInstance() {

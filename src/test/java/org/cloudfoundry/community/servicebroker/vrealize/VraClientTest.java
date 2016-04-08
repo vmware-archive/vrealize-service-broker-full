@@ -26,6 +26,8 @@ import static org.junit.Assert.*;
 @SpringApplicationConfiguration(classes = {Application.class})
 public class VraClientTest {
 
+    private static final String REQ_ID = "e3d90579-b7fa-40b1-bb0b-c068f565a0e3";
+
     @Autowired
     private VraClient client;
 
@@ -149,7 +151,7 @@ public class VraClientTest {
         Map<String, String> meta = client.getDeleteLinks(rvr);
 
         assertNotNull(parms1);
-        assertEquals(6, parms1.size());
+        assertEquals(5, parms1.size());
         assertEquals("3306", parms1.get(VrServiceInstance.PORT));
         assertEquals("P1v0t4l!", parms1.get(VrServiceInstance.PASSWORD));
         assertEquals("mysqluser", parms1.get(VrServiceInstance.USER_ID));
@@ -178,15 +180,14 @@ public class VraClientTest {
         assertNotNull(instance);
         instance.getMetadata()
                 .put(VrServiceInstance.LOCATION,
-                        "https://vra.vra.lab/catalog-service/api/consumer/requests/8720ac04-9910-4426-b8b3-758f6e02e3bc");
-        instance.getMetadata().put(VrServiceInstance.CREATE_REQUEST_ID,
-                "8720ac04-9910-4426-b8b3-758f6e02e3bc");
+                        "https://vra-cafe.vra.pcflab.net/catalog-service/api/consumer/requests/" + REQ_ID);
+        instance.getMetadata().put(VrServiceInstance.CREATE_REQUEST_ID, REQ_ID);
 
         assertFalse(instance.hasCredentials());
         client.loadCredentials(instance);
         assertTrue(instance.hasCredentials());
         assertNotNull(instance.getCredentials());
-        assertEquals("mysql://mysqluser:P1v0t4l!@192.168.201.17:3306/db01",
+        assertEquals("mysql://root:secret@192.168.200.240:3306/mydb",
                 instance.getCredentials().get(VrServiceInstance.URI));
     }
 
@@ -207,7 +208,11 @@ public class VraClientTest {
         assertEquals(OperationState.IN_PROGRESS,
                 client.vrStatusToOperationState(VraClient.POST_APPROVED));
         assertEquals(OperationState.IN_PROGRESS,
+                client.vrStatusToOperationState(VraClient.PRE_APPROVED));
+        assertEquals(OperationState.IN_PROGRESS,
                 client.vrStatusToOperationState(VraClient.SUBMITTED));
+        assertEquals(OperationState.IN_PROGRESS,
+                client.vrStatusToOperationState(VraClient.PROVIDER_COMPLETED));
         assertEquals(OperationState.IN_PROGRESS,
                 client.vrStatusToOperationState(VraClient.UNSUBMITTED));
         assertEquals(OperationState.SUCCEEDED,
