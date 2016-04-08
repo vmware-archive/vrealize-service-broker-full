@@ -30,6 +30,9 @@ public class VrServiceInstanceService implements ServiceInstanceService {
     @Autowired
     CatalogService catalogService;
 
+    @Autowired
+    TokenService tokenService;
+
     @Resource(name = "siTemplate")
     private HashOperations<String, String, VrServiceInstance> repository;
 
@@ -83,16 +86,20 @@ public class VrServiceInstanceService implements ServiceInstanceService {
         // if this is a delete request and was successful, remove the instance
         if (instance.isCurrentOperationSuccessful()
                 && instance.isCurrentOperationDelete()) {
-            deleteInstance(instance);
+            return deleteInstance(instance);
         }
 
-        // otherwise save the instance with the new last operation
+        // otherwise grab the rest of the metadata for the instance and
+        // save the instance with the new last operation
+        LOG.info("loading metadata onto instance from resource response.");
+        vraClient.loadDataFromResourceResponse(tokenService.getToken(), instance);
+
         return saveInstance(instance);
     }
 
     @Override
     public CreateServiceInstanceResponse createServiceInstance(CreateServiceInstanceRequest request)
-            throws ServiceInstanceExistsException, ServiceBrokerException {
+            throws ServiceInstanceExistsException {
 
         if (getInstance(request.getServiceInstanceId()) != null) {
             throw new ServiceInstanceExistsException(request.getServiceInstanceId(), request.getServiceDefinitionId());
@@ -134,7 +141,9 @@ public class VrServiceInstanceService implements ServiceInstanceService {
     }
 
     @Override
-    public DeleteServiceInstanceResponse deleteServiceInstance(DeleteServiceInstanceRequest request) throws ServiceBrokerException {
+    public DeleteServiceInstanceResponse deleteServiceInstance(DeleteServiceInstanceRequest request) {//throws ServiceBrokerException {
+
+        LOG.info("starting service instance delete: " + request.getServiceInstanceId());
 
         VrServiceInstance instance = getInstance(request.getServiceInstanceId());
         if (instance == null) {
@@ -142,22 +151,18 @@ public class VrServiceInstanceService implements ServiceInstanceService {
                     + request.getServiceInstanceId() + " not found.");
         }
 
-        LOG.info("deleting service instance: " + request.getServiceInstanceId());
+        LOG.info("requesting delete: " + request.getServiceInstanceId());
+        instance = vraClient.deleteInstance(instance);
 
-        instance = deleteInstance(instance);
+        LOG.info("updating repo with latest data: " + request.getServiceInstanceId());
+        saveInstance(instance);
 
-        LOG.info("unregistering service instance: "
-                + instance.getId()
-                + " requestId: "
-                + instance.getMetadata().get(
-                VrServiceInstance.DELETE_REQUEST_ID));
-
+        //let the cloud controller know this is an async request
         return new DeleteServiceInstanceResponse().withAsync(true);
     }
 
     @Override
-    public UpdateServiceInstanceResponse updateServiceInstance(UpdateServiceInstanceRequest request) throws ServiceInstanceUpdateNotSupportedException,
-            ServiceBrokerException, ServiceInstanceDoesNotExistException {
+    public UpdateServiceInstanceResponse updateServiceInstance(UpdateServiceInstanceRequest request) throws ServiceInstanceUpdateNotSupportedException {
 
         throw new ServiceInstanceUpdateNotSupportedException(
                 "vRealize services are not updatable.");
@@ -171,11 +176,13 @@ public class VrServiceInstanceService implements ServiceInstanceService {
     }
 
     VrServiceInstance deleteInstance(VrServiceInstance instance) {
+        LOG.info("deleting service instance from repo: " + instance.getId());
         repository.delete(OBJECT_ID, instance.getId());
         return instance;
     }
 
     VrServiceInstance saveInstance(VrServiceInstance instance) {
+        LOG.info("saving service instance to repo: " + instance.getId());
         repository.put(OBJECT_ID, instance.getId(), instance);
         return instance;
     }

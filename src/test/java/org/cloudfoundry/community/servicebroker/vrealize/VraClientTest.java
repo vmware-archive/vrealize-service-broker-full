@@ -158,15 +158,15 @@ public class VraClientTest {
 
         assertNotNull(parms2);
         assertEquals(1, parms2.size());
-        assertEquals("192.168.201.17", parms2.get(VrServiceInstance.HOST));
+        assertEquals("192.168.200.225", parms2.get(VrServiceInstance.HOST));
 
         assertNotNull(meta);
         assertEquals(2, meta.size());
         assertEquals(
-                "https://vra.vra.lab/catalog-service/api/consumer/resources/06852d93-466d-4d73-80bc-78764b3d768a/actions/051a18db-6bf5-4468-97e0-942330528c92/requests/template",
+                "https://vra-cafe.vra.pcflab.net/catalog-service/api/consumer/resources/c2f31ef4-dd53-4c7f-b522-9fe2de174533/actions/25e17ec5-e2fd-4bba-bb3b-25b69dd18bd7/requests/template",
                 meta.get(VrServiceInstance.DELETE_TEMPLATE_LINK));
         assertEquals(
-                "https://vra.vra.lab/catalog-service/api/consumer/resources/06852d93-466d-4d73-80bc-78764b3d768a/actions/051a18db-6bf5-4468-97e0-942330528c92/requests",
+                "https://vra-cafe.vra.pcflab.net/catalog-service/api/consumer/resources/c2f31ef4-dd53-4c7f-b522-9fe2de174533/actions/25e17ec5-e2fd-4bba-bb3b-25b69dd18bd7/requests",
                 meta.get(VrServiceInstance.DELETE_LINK));
     }
 

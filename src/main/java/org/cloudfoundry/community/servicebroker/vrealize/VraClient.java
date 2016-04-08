@@ -33,14 +33,15 @@ public class VraClient {
 
     private static final Logger LOG = Logger.getLogger(VraClient.class);
 
-    public static final String SUCCESSFUL = "SUCCESSFUL";
-    public static final String UNSUBMITTED = "UNSUBMITTED";
-    public static final String SUBMITTED = "SUBMITTED";
-    public static final String PENDING_PRE_APPROVAL = "PENDING_PRE_APPROVAL";
-    public static final String PRE_APPROVED = "PRE_APPROVED";
-    public static final String IN_PROGRESS = "IN_PROGRESS";
-    public static final String PENDING_POST_APPROVAL = "PENDING_POST_APPROVAL";
-    public static final String POST_APPROVED = "POST_APPROVED";
+    static final String SUCCESSFUL = "SUCCESSFUL";
+    static final String UNSUBMITTED = "UNSUBMITTED";
+    static final String SUBMITTED = "SUBMITTED";
+    static final String PENDING_PRE_APPROVAL = "PENDING_PRE_APPROVAL";
+    static final String PRE_APPROVED = "PRE_APPROVED";
+    static final String IN_PROGRESS = "IN_PROGRESS";
+    static final String PENDING_POST_APPROVAL = "PENDING_POST_APPROVAL";
+    static final String POST_APPROVED = "POST_APPROVED";
+    static final String PROVIDER_COMPLETED = "PROVIDER_COMPLETED";
 
     @Autowired
     private VraRepository vraRepository;
@@ -52,39 +53,47 @@ public class VraClient {
     TokenService tokenService;
 
     public VrServiceInstance createInstance(
-            CreateServiceInstanceRequest request, ServiceDefinition sd)
-            throws ServiceBrokerException {
-        String token = tokenService.getToken();
+            CreateServiceInstanceRequest request, ServiceDefinition sd) {
 
-        // get a template for the request
-        JsonElement template = getCreateRequestTemplate(token, sd);
+        try {
+            LOG.info("creating instance.");
 
-        // customize the template
-        JsonElement edited = prepareCreateRequestTemplate(template,
-                request.getServiceInstanceId());
+            String token = tokenService.getToken();
 
-        // request the request with the request
-        ResponseEntity<JsonElement> response = postCreateRequest(token, edited,
-                sd);
+            LOG.info("getting a template for the create request.");
+            JsonElement template = getCreateRequestTemplate(token, sd);
 
-        LOG.info("service request response: " + response.toString());
+            LOG.info("customizing the create template.");
+            JsonElement edited = prepareCreateRequestTemplate(template,
+                    request.getServiceInstanceId());
 
-        String location = getLocation(response);
-        String requestId = getRequestId(response);
+            LOG.info("posting the create request.");
+            ResponseEntity<JsonElement> response = postCreateRequest(token, edited,
+                    sd);
 
-        VrServiceInstance instance = new VrServiceInstance(request);
-        instance.getMetadata().put(VrServiceInstance.LOCATION, location);
-        instance.getMetadata().put(VrServiceInstance.CREATE_REQUEST_ID,
-                requestId);
+            LOG.info("service request response: " + response.toString());
 
-        LastOperation lo = new LastOperation(OperationState.IN_PROGRESS, requestId, false);
-        instance.withLastOperation(lo);
+            String location = getLocation(response);
+            String requestId = getRequestId(response);
 
-        return instance;
+            VrServiceInstance instance = new VrServiceInstance(request);
+
+            LOG.info("loading metadata onto instance from response.");
+            instance.getMetadata().put(VrServiceInstance.LOCATION, location);
+            instance.getMetadata().put(VrServiceInstance.CREATE_REQUEST_ID,
+                    requestId);
+
+            LastOperation lo = new LastOperation(OperationState.IN_PROGRESS, requestId, false);
+            instance.withLastOperation(lo);
+
+            return instance;
+        } catch (Throwable t) {
+            LOG.error("error processing create request.", t);
+            return null;
+        }
     }
 
-    public void loadCredentials(VrServiceInstance instance)
-            throws ServiceBrokerException {
+    public void loadCredentials(VrServiceInstance instance) {
         String token = tokenService.getToken();
 
         String locationPath = pathFromLink(instance.getLocation().toString());
@@ -101,8 +110,8 @@ public class VraClient {
                 getParametersFromResourceResponse(resourcesResponse));
     }
 
-    VrServiceInstance loadDataFromResourceResponse(String token,
-                                                   VrServiceInstance instance) throws ServiceBrokerException {
+    public VrServiceInstance loadDataFromResourceResponse(String token,
+                                                          VrServiceInstance instance) {
         JsonElement resources = getRequestResources(token, instance
                 .getCreateRequestId().toString());
 
@@ -112,37 +121,56 @@ public class VraClient {
         return instance;
     }
 
-    public VrServiceInstance deleteInstance(VrServiceInstance instance)
-            throws ServiceBrokerException {
-        String token = tokenService.getToken();
+    public VrServiceInstance deleteInstance(VrServiceInstance instance) {
 
-        String deleteTemplateLink = instance.getMetadata()
-                .get(VrServiceInstance.DELETE_TEMPLATE_LINK).toString();
-        String deleteTemplatePath = pathFromLink(deleteTemplateLink);
-        JsonElement template = vraRepository.getRequest("Bearer " + token,
-                deleteTemplatePath).getBody();
+        try {
+            String token = tokenService.getToken();
 
-        // customize the template
-        JsonElement edited = prepareDeleteRequestTemplate(template,
-                instance.getId());
+            LOG.info("getting delete template link from instance metadata.");
+            String deleteTemplateLink = instance.getMetadata()
+                    .get(VrServiceInstance.DELETE_TEMPLATE_LINK).toString();
+            String deleteTemplatePath = pathFromLink(deleteTemplateLink);
 
-        String deleteLink = instance.getMetadata()
-                .get(VrServiceInstance.DELETE_LINK).toString();
-        String deletePath = pathFromLink(deleteLink);
-        ResponseEntity<JsonElement> response = vraRepository.postRequest(
-                "Bearer " + token, deletePath, edited);
+            LOG.info("requesting delete template.");
+            JsonElement template = vraRepository.getRequest("Bearer " + token,
+                    deleteTemplatePath).getBody();
 
-        LOG.debug("service request response: " + response.toString());
+            LOG.info("customizing delete template.");
+            JsonElement edited = prepareDeleteRequestTemplate(template,
+                    instance.getId());
 
-        String requestId = getRequestId(response);
+            LOG.info("getting delete link from instance metadata.");
+            String deleteLink = instance.getMetadata()
+                    .get(VrServiceInstance.DELETE_LINK).toString();
+            String deletePath = pathFromLink(deleteLink);
 
-        // update instance with new delete metadata VrServiceInstance.delete(instance, requestId);
-        instance.getMetadata().put(VrServiceInstance.DELETE_REQUEST_ID, requestId);
-        LastOperation lo = new LastOperation(OperationState.IN_PROGRESS, requestId, true);
+            LOG.info("posting delete request.");
+            ResponseEntity<JsonElement> response = vraRepository.postRequest(
+                    "Bearer " + token, deletePath, edited);
 
-        instance.withLastOperation(lo);
+            LOG.info("delete request response: " + response.toString());
 
-        return instance;
+            String requestId = getRequestIdFromLocation(getLocation(response));
+
+            LOG.info("adding delete request metadata.");
+            instance.getMetadata().put(VrServiceInstance.DELETE_REQUEST_ID, requestId);
+
+            LastOperation lo = new LastOperation(OperationState.IN_PROGRESS, requestId, true);
+            instance.withLastOperation(lo);
+
+            return instance;
+        } catch (Throwable t) {
+            LOG.error("error processing delete request.", t);
+            return null;
+        }
+    }
+
+    private String getRequestIdFromLocation(String location) {
+        if (location == null) {
+            return null;
+        }
+
+        return location.substring(location.lastIndexOf('/') + 1);
     }
 
     private String getLocation(ResponseEntity<JsonElement> response) {
@@ -183,7 +211,7 @@ public class VraClient {
     }
 
     JsonObject prepareCreateRequestTemplate(JsonElement template,
-                                            String serviceInstanceId) throws ServiceBrokerException {
+                                            String serviceInstanceId) {
         JsonObject jo = removeFields(template.getAsJsonObject(),
                 getContents("fieldsToFilter.txt"));
 
@@ -197,7 +225,7 @@ public class VraClient {
     }
 
     JsonObject prepareDeleteRequestTemplate(JsonElement template,
-                                            String serviceInstanceId) throws ServiceBrokerException {
+                                            String serviceInstanceId) {//throws ServiceBrokerException {
 
         JsonObject jo = template.getAsJsonObject();
         jo.addProperty("description", serviceInstanceId);
@@ -224,18 +252,17 @@ public class VraClient {
         return json;
     }
 
-    private List<String> getContents(String fileName)
-            throws ServiceBrokerException {
+    private List<String> getContents(String fileName) {
         try {
             URI u = new ClassPathResource(fileName).getURI();
             return Files.readAllLines(Paths.get(u), Charset.defaultCharset());
         } catch (IOException e) {
+            LOG.error("error getting contents of file: " + fileName, e);
             throw new ServiceBrokerException("error reading template.", e);
         }
     }
 
-    public GetLastServiceOperationResponse getRequestStatus(VrServiceInstance si)
-            throws ServiceBrokerException {
+    public GetLastServiceOperationResponse getRequestStatus(VrServiceInstance si) {
         if (si == null || si.getServiceInstanceLastOperation() == null) {
             return new GetLastServiceOperationResponse().withDescription("Unable to get request status: invalid request.").withOperationState(OperationState.FAILED);
         }
@@ -255,8 +282,6 @@ public class VraClient {
         if (je == null) {
             return new GetLastServiceOperationResponse().withDescription("Unable to get request status: nothing returned from vR service.").withOperationState(OperationState.FAILED);
         }
-
-        // System.out.println("##########" + je.toString());
 
         return getLastOperation(je);
     }
@@ -296,7 +321,8 @@ public class VraClient {
                 || PRE_APPROVED.equals(vrStatus)
                 || IN_PROGRESS.equals(vrStatus)
                 || PENDING_POST_APPROVAL.equals(vrStatus)
-                || POST_APPROVED.equals(vrStatus)) {
+                || POST_APPROVED.equals(vrStatus)
+                || PROVIDER_COMPLETED.equals(vrStatus)) {
             return OperationState.IN_PROGRESS;
         }
 
@@ -332,8 +358,7 @@ public class VraClient {
         return o.get(0).toString();
     }
 
-    Map<String, Object> getParametersFromCreateResponse(JsonElement response)
-            throws ServiceBrokerException {
+    Map<String, Object> getParametersFromCreateResponse(JsonElement response) {
 
         // get the custom parameters from the request info
         return Adaptors
@@ -406,13 +431,21 @@ public class VraClient {
         Map<String, String> map = new HashMap<String, String>();
         ReadContext ctx = JsonPath.parse(resources.toString());
 
-        JSONArray o = ctx
-                .read("$.content.[0].links[?(@.rel == 'GET Template: {com.vmware.csp.component.cafe.composition@resource.action.deployment.destroy.name}')].href");
-        map.put(VrServiceInstance.DELETE_TEMPLATE_LINK, o.get(0).toString());
+        //seems to be no way to filter using json path where there is a '@' in the thing you are tyring to filter on?
+        JSONArray o = ctx.read("$.content[*].links[*]");
+        Iterator it = o.iterator();
+        while (it.hasNext()) {
+            LinkedHashMap ja = (LinkedHashMap) it.next();
+            Object rel = ja.get("rel");
 
-        o = ctx.read("$.content.[0].links[?(@.rel == 'POST: {com.vmware.csp.component.cafe.composition@resource.action.deployment.destroy.name}')].href");
-        map.put(VrServiceInstance.DELETE_LINK, o.get(0).toString());
+            if (rel.toString().equals("GET Template: {com.vmware.csp.component.cafe.composition@resource.action.deployment.destroy.name}")) {
+                map.put(VrServiceInstance.DELETE_TEMPLATE_LINK, ja.get("href").toString());
+            }
 
+            if (rel.toString().equals("POST: {com.vmware.csp.component.cafe.composition@resource.action.deployment.destroy.name}")) {
+                map.put(VrServiceInstance.DELETE_LINK, ja.get("href").toString());
+            }
+        }
         return map;
     }
 }

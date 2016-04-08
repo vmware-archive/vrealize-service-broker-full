@@ -6,9 +6,9 @@ import org.springframework.cloud.servicebroker.exception.ServiceBrokerException;
 import java.util.HashMap;
 import java.util.Map;
 
-public class MySqlAdapter implements Adaptor {
+class MySqlAdapter implements Adaptor {
 
-    public static final String SERVICE_TYPE = "mysql";
+    private static final String SERVICE_TYPE = "mysql";
 
     /**
      * Creates a uri based on metadata in the specified service instance
@@ -19,8 +19,7 @@ public class MySqlAdapter implements Adaptor {
      * @throws ServiceBrokerException
      */
     @Override
-    public Map<String, Object> getCredentials(VrServiceInstance instance)
-            throws ServiceBrokerException {
+    public Map<String, Object> getCredentials(VrServiceInstance instance) {
 
         Object dbType = instance.getParameters().get(
                 VrServiceInstance.SERVICE_TYPE);
@@ -36,21 +35,10 @@ public class MySqlAdapter implements Adaptor {
                     "unable to construct connection uri from ServiceInstance.");
         }
 
-        StringBuffer sb = new StringBuffer();
-        sb.append(dbType);
-        sb.append("://");
-        sb.append(userId);
-        sb.append(":");
-        sb.append(pw);
-        sb.append("@");
-        sb.append(host);
-        sb.append(":");
-        sb.append(port);
-        sb.append("/");
-        sb.append(dbId);
+        String s = dbType + "://" + userId + ":" + pw + "@" + host + ":" + port + "/" + dbId;
 
         Map<String, Object> credentials = new HashMap<String, Object>();
-        credentials.put("uri", sb.toString());
+        credentials.put("uri", s);
 
         return credentials;
     }

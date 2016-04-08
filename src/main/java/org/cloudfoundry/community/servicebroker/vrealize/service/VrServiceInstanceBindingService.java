@@ -86,8 +86,7 @@ public class VrServiceInstanceBindingService implements
 
     @Override
     public void deleteServiceInstanceBinding(
-            DeleteServiceInstanceBindingRequest request)
-            throws ServiceBrokerException {
+            DeleteServiceInstanceBindingRequest request) {
 
         VrServiceInstanceBinding binding = repository.get(OBJECT_ID, request
                 .getBindingId());

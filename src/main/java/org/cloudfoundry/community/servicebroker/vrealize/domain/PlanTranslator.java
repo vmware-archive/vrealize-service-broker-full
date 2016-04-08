@@ -31,11 +31,8 @@ public class PlanTranslator implements JsonDeserializer<Plan> {
         amount.put("usd", 0.0D);
         costsMap.put("amount", amount);
         costsMap.put("unit", "MONTHLY");
-        List<Object> costs = new ArrayList<Object>();
-        costs.add(costsMap);
 
         return costsMap;
-
     }
 
     private List<String> getBullets(String name) {

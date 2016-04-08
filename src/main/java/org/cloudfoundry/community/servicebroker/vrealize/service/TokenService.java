@@ -24,7 +24,7 @@ public class TokenService {
 	@Autowired
 	private VraRepository vraRepository;
 
-	public String getToken() throws ServiceBrokerException {
+	public String getToken() {//throws ServiceBrokerException {
 		try {
 			ResponseEntity<Map<String, String>> m = vraRepository
 					.getToken(creds);

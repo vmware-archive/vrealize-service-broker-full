@@ -121,7 +121,7 @@ public class VrServiceInstance implements Serializable {
         return getMetadata().containsKey(DELETE_REQUEST_ID);
     }
 
-    public boolean isCurrentOperationCreate() {
+    boolean isCurrentOperationCreate() {
         return getMetadata().containsKey(CREATE_REQUEST_ID)
                 && !isCurrentOperationDelete();
     }
@@ -157,7 +157,7 @@ public class VrServiceInstance implements Serializable {
         this.id = id;
     }
 
-    public Map<String, Object> getCredentials() throws ServiceBrokerException {
+    public Map<String, Object> getCredentials() {
         return Adaptors.getCredentials(this);
     }
 

@@ -5,9 +5,6 @@ import org.springframework.cloud.servicebroker.model.OperationState;
 
 import java.io.Serializable;
 
-/**
- * Created by jgordon on 3/14/16.
- */
 public class LastOperation implements Serializable {
 
     private OperationState state;

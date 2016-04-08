@@ -11,14 +11,12 @@ public class Adaptors {
 
     private static final List<Adaptor> ADAPTORS = new ArrayList<Adaptor>();
 
-    public static Map<String, Object> getCredentials(VrServiceInstance instance)
-            throws ServiceBrokerException {
+    public static Map<String, Object> getCredentials(VrServiceInstance instance) {
         return getAdaptor(instance).getCredentials(instance);
     }
 
     public static Map<String, Object> getParameters(
-            Map<String, Object> vrCustomKeyValues)
-            throws ServiceBrokerException {
+            Map<String, Object> vrCustomKeyValues) {
         Object serviceType = vrCustomKeyValues
                 .get(VrServiceInstance.SERVICE_TYPE);
 
@@ -36,9 +34,7 @@ public class Adaptors {
         return adaptor.toParameters(vrCustomKeyValues);
     }
 
-    private static Adaptor getAdaptor(VrServiceInstance instance)
-            throws ServiceBrokerException {
-
+    private static Adaptor getAdaptor(VrServiceInstance instance) {
         if (instance == null || instance.getParameters() == null) {
             throw new ServiceBrokerException("invalid service instance.");
         }
