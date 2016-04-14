@@ -7,7 +7,6 @@ import com.google.gson.JsonParser;
 import org.cloudfoundry.community.servicebroker.vrealize.persistance.VrServiceInstance;
 import org.cloudfoundry.community.servicebroker.vrealize.service.CatalogService;
 import org.cloudfoundry.community.servicebroker.vrealize.service.TokenService;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,13 +19,12 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.Map;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = {Application.class})
 public class VraClientTest {
-
-    private static final String REQ_ID = "e3d90579-b7fa-40b1-bb0b-c068f565a0e3";
 
     @Autowired
     private VraClient client;
@@ -42,6 +40,11 @@ public class VraClientTest {
 
     @Autowired
     VraRepository repo;
+
+    @Test
+    public void testGetRequestResources() {
+        repo.getRequestResources("Bearer " + tokenService.getToken(), TestConfig.REQ_ID);
+    }
 
     @Test
     public void testGetRequestTemplate() throws ServiceBrokerException {
@@ -61,7 +64,7 @@ public class VraClientTest {
         JsonParser parser = new JsonParser();
         JsonObject o = (JsonObject) parser.parse(TestConfig
                 .getContents("requestTemplate.json"));
-        String s = client.prepareCreateRequestTemplate(o, "abc123").toString();
+        String s = client.prepareCreateRequestTemplate(o, TestConfig.getServiceInstance()).toString();
         assertEquals(TestConfig.getContents("filteredRequestTemplate.json"), s);
     }
 
@@ -133,62 +136,40 @@ public class VraClientTest {
         silo = client.getLastOperation(je);
         assertNotNull(silo);
         assertEquals(OperationState.FAILED, silo.getState());
-
     }
 
     @Test
     public void testGetParmsAndMeta() throws Exception {
         JsonParser parser = new JsonParser();
-        JsonElement cr = parser.parse(TestConfig
-                .getContents("requestResponse.json"));
 
-        JsonElement rvr = parser.parse(TestConfig
-                .getContents("resourceViewResponse.json"));
+        JsonElement crtemplate = parser.parse(TestConfig
+                .getContents("requestTemplate.json"));
 
-        Map<String, Object> parms1 = client.getParametersFromCreateResponse(cr);
-        Map<String, Object> parms2 = client
-                .getParametersFromResourceResponse(rvr);
-        Map<String, String> meta = client.getDeleteLinks(rvr);
+        VrServiceInstance instance = new VrServiceInstance(TestConfig.getCreateServiceInstanceRequest());
 
-        assertNotNull(parms1);
-        assertEquals(5, parms1.size());
-        assertEquals("3306", parms1.get(VrServiceInstance.PORT));
-        assertEquals("P1v0t4l!", parms1.get(VrServiceInstance.PASSWORD));
-        assertEquals("mysqluser", parms1.get(VrServiceInstance.USER_ID));
-        assertEquals("db01", parms1.get(VrServiceInstance.DB_ID));
-        assertEquals("mysql", parms1.get(VrServiceInstance.SERVICE_TYPE));
+        JsonElement rr = parser.parse(TestConfig
+                .getContents("requestResources.json"));
 
-        assertNotNull(parms2);
-        assertEquals(1, parms2.size());
-        assertEquals("192.168.200.225", parms2.get(VrServiceInstance.HOST));
+        Map<String, Object> meta = client
+                .getMetadataFromResourceResponse(rr);
+
+        meta.put(VrServiceInstance.HOST, client.getHostIP(rr));
+
+        String serviceType = client.getServiceType(crtemplate);
+        meta.put(VrServiceInstance.SERVICE_TYPE, serviceType);
+
+        instance.getMetadata().putAll(meta);
 
         assertNotNull(meta);
-        assertEquals(2, meta.size());
-        assertEquals(
-                "https://vra-cafe.vra.pcflab.net/catalog-service/api/consumer/resources/c2f31ef4-dd53-4c7f-b522-9fe2de174533/actions/25e17ec5-e2fd-4bba-bb3b-25b69dd18bd7/requests/template",
+        assertEquals(4, meta.size());
+        assertEquals("mysql", meta.get(VrServiceInstance.SERVICE_TYPE));
+        assertEquals("192.168.200.214", meta.get(VrServiceInstance.HOST));
+        assertEquals("https://vra-cafe.vra.pcflab.net/catalog-service/api/consumer/resources/9450b691-4b5a-43b4-8cd1-a54912c4ba85/actions/25e17ec5-e2fd-4bba-bb3b-25b69dd18bd7/requests/template",
                 meta.get(VrServiceInstance.DELETE_TEMPLATE_LINK));
-        assertEquals(
-                "https://vra-cafe.vra.pcflab.net/catalog-service/api/consumer/resources/c2f31ef4-dd53-4c7f-b522-9fe2de174533/actions/25e17ec5-e2fd-4bba-bb3b-25b69dd18bd7/requests",
+        assertEquals("https://vra-cafe.vra.pcflab.net/catalog-service/api/consumer/resources/9450b691-4b5a-43b4-8cd1-a54912c4ba85/actions/25e17ec5-e2fd-4bba-bb3b-25b69dd18bd7/requests",
                 meta.get(VrServiceInstance.DELETE_LINK));
-    }
 
-    @Test
-    @Ignore
-    public void testLoadCredentials() throws ServiceBrokerException {
-        VrServiceInstance instance = new VrServiceInstance(TestConfig
-                .getCreateServiceInstanceRequest());
-        assertNotNull(instance);
-        instance.getMetadata()
-                .put(VrServiceInstance.LOCATION,
-                        "https://vra-cafe.vra.pcflab.net/catalog-service/api/consumer/requests/" + REQ_ID);
-        instance.getMetadata().put(VrServiceInstance.CREATE_REQUEST_ID, REQ_ID);
-
-        assertFalse(instance.hasCredentials());
-        client.loadCredentials(instance);
-        assertTrue(instance.hasCredentials());
-        assertNotNull(instance.getCredentials());
-        assertEquals("mysql://root:secret@192.168.200.240:3306/mydb",
-                instance.getCredentials().get(VrServiceInstance.URI));
+        assertEquals("mysql://root:secret@192.168.200.214:1234/aDB", instance.getCredentials().get(VrServiceInstance.URI));
     }
 
     @Test

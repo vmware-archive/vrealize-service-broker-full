@@ -3,24 +3,32 @@
 #curl --insecure -H "Accept: application/json" -H 'Content-Type: application/json' --data '{"username":"vdude1@vra.lab","password":"P1v0t4l!","tenant":"lab"}' https://vra.vra.lab/identity/api/tokens
 
 host=vra-cafe.vra.pcflab.net
-resourceId=c2f31ef4-dd53-4c7f-b522-9fe2de174533
-requestId=561c7d9c-a97a-40cb-8487-7c03636e841c
-token=MTQ2MDEyMTk3NzIwNzo1NTViZjBhNzMyY2I4MzU4N2I3Yjp0ZW5hbnQ6dnJhbGFidXNlcm5hbWU6YWRtaW5pc3RyYXRvckB2cmEucGNmbGFiLm5ldGV4cGlyYXRpb246MTQ2MDE1MDc3NzAwMDo2ZmRlMzU5OWI4NDYyNDI1NDYxOWU0NGU5YjU1Mzc4NzUzZWM4ZjM3M2RjZWQyYmM5YjgyNDNmNmEzOTBjODVjNTdlMjNiNjljNjU4NDE5NWZmYjU4NjlkNWNkNjQ2ZDRkZTJjMTQ0MGZiMTcwNzJhNGM5ZTZjYTZmNDRkY2E1OA==
+resourceId=199af6df-9702-44ab-acc8-7b7c41d06881
+requestId=f04910e6-6e3e-47dd-9e0b-f363d8ef89c0
+catalogId=a3d19350-c15e-4d81-878a-38f4868a4c95
+token=MTQ2MDY1NjkxNTExMTo5MWQyNTUyZWQ3MmE1MjU1ZTZkYzp0ZW5hbnQ6dnJhbGFidXNlcm5hbWU6YWRtaW5pc3RyYXRvckB2cmEucGNmbGFiLm5ldGV4cGlyYXRpb246MTQ2MDY4NTcxNTAwMDo1YjFkNzViNWM3Nzk3ZWZmYTRhNTY5NDZkOTk1NzE2NjZiNDBkYjYzMjQ0YzlmZGU1MjY4Zjg1NWJhMzUzYTM2MTU0MjY1ZTNjOTE4OGM1OTQ1NjU2MWQ5YzdiNDlmYjUyMDJjMzdjZWVlNzNlNjBiOTJlZDE2ZTg4NTNhNTE2Yg==
 
 #curl --insecure -H "Content-Type: application/json" -H "Authorization: Bearer $token" https://vra.vra.lab/identity/api/authorization/tenants/lab/principals/vdude01@vra.lab/roles
 
+#curl --insecure -H "Content-Type: application/json" -H "Authorization: Bearer ${token}" https://${host}/catalog-service/api/catalogItems/a3d19350-c15e-4d81-878a-38f4868a4c95
+
+#curl --insecure -H "Content-Type: application/json" -H "Authorization: Bearer ${token}" https://${host}/api/consumer/catalogItems
+
 #curl --insecure -H "Content-Type: application/json" -H "Authorization: Bearer $token" https://vra.vra.lab/catalog-service/api/consumer/requests
 
-#curl --insecure -H "Content-Type: application/json" -H "Authorization: Bearer $token" https://vra.vra.lab/catalog-service/api/catalogItems
+#all catalog items
+#curl --insecure -H "Content-Type: application/json" -H "Authorization: Bearer ${token}" https://${host}/catalog-service/api/catalogItems?withExtendedData=true
 
-#curl --insecure -H "Content-Type: application/json" -H "Authorization: Bearer $token" https://vra.vra.lab/catalog-service/api/consumer/entitledCatalogItemViews
+#entitled catalog items
+#curl --insecure -H "Content-Type: application/json" -H "Authorization: Bearer ${token}" https://${host}/catalog-service/api/consumer/entitledCatalogItems?withExtendedData=true
 
 #curl --insecure -H "Content-Type: application/json" -H "Authorization: Bearer $token" https://vra.vra.lab/identity/api/tenants/lab
 
-#curl --insecure -X GET -H "Content-Type: application/json" -D headers.out -H "Authorization: Bearer $token" https://vra.vra.lab/catalog-service/api/consumer/entitledCatalogItems/e06ff060-dc7a-4f46-a7a7-c32c031fa31e/requests/template
+#request a catalog item request template
+#curl --insecure -X GET -H "Content-Type: application/json" -D headers.out -H "Authorization: Bearer ${token}" https://${host}/catalog-service/api/consumer/entitledCatalogItems/${catalogId}/requests/template
 
 # resource details for a request
-#curl --insecure -X GET -H "Content-Type: application/json" -D headers.out -H "Authorization: Bearer ${token}" https://${host}/catalog-service/api/consumer/requests/${requestId}/resourceViews
+curl --insecure -X GET -H "Content-Type: application/json" -D headers.out -H "Authorization: Bearer ${token}" https://${host}/catalog-service/api/consumer/requests/${requestId}/resourceViews
 
 # a delete template
 #curl --insecure -X GET -H "Content-Type: application/json" -D headers.out -H "Authorization: Bearer $token" \
@@ -33,22 +41,25 @@ token=MTQ2MDEyMTk3NzIwNzo1NTViZjBhNzMyY2I4MzU4N2I3Yjp0ZW5hbnQ6dnJhbGFidXNlcm5hbW
 #https://vra.vra.lab/catalog-service/api/consumer/resources/cedfe0cd-acc4-4de8-8c57-880e9c0c27d5/actions/051a18db-6bf5-4468-97e0-942330528c92/requests
 
 #all requests
-#curl --insecure -X GET -H "Content-Type: application/json" -D headers.out -H "Authorization: Bearer ${token}" https://${host}/catalog-service/api/consumer/requests&limit=500
+#curl --insecure -X GET -H "Content-Type: application/json" -D headers.out -H "Authorization: Bearer ${token}" https://${host}/catalog-service/api/consumer/requests&limit=10000
 
 #all resources
-curl --insecure -X GET -H "Content-Type: application/json" -D headers.out -H "Authorization: Bearer ${token}" https://${host}/catalog-service/api/consumer/resourceViews?limit=100
+#curl --insecure -X GET -H "Content-Type: application/json" -D headers.out -H "Authorization: Bearer ${token}" https://${host}/catalog-service/api/consumer/resourceViews?limit=100
 
 #details of a resource
 #curl --insecure -X GET -H "Content-Type: application/json" -D headers.out -H "Authorization: Bearer ${token}" https://${host}/catalog-service/api/consumer/resourceViews/${resourceId}?withExtendedData=true&withOperations=true&limit=100
 
 #details for a request
-#curl --insecure -X GET -H "Content-Type: application/json" -D headers.out -H "Authorization: Bearer ${token}" https://${host}/catalog-service/api/consumer/requests/a42ecb0f-75cb-4967-b108-3b2fb8beb100
-#426e4549-84e6-4c03-a6bf-1e7582ebc963
+#curl --insecure -X GET -H "Content-Type: application/json" -D headers.out -H "Authorization: Bearer ${token}" https://${host}/catalog-service/api/consumer/requests/${requestId}
 
 #curl --insecure -X GET -H "Content-Type: application/json" -D headers.out -H "Authorization: Bearer $token" https://vra.vra.lab/catalog-service/api/consumer/resources/d591e58d-b2cf-4061-aec1-7f41168b7a6d/actions/fe9af618-f21d-47a2-bebc-62d5914f6e6c/requests/template
 
 #child resources
-#curl --insecure -X GET -H "Content-Type: application/json" -D headers.out -H "Authorization: Bearer $token" https://vra.vra.lab/catalog-service/api/consumer/resourceViews?managedOnly=false&withExtendedData=true&withOperations=true&%24filter=parentResource%20eq%20%2787385b2f-a9c3-4a78-86dd-1202563c500f%27
+#curl --insecure -X GET -H "Content-Type: application/json" -D headers.out -H "Authorization: Bearer ${token}" https://${host}/catalog-service/api/consumer/resourceViews?managedOnly=false&withExtendedData=true&withOperations=true&%24filter=parentResource%20eq%20%${resourceId}%27
+#curl --insecure -X GET -H "Content-Type: application/json" -D headers.out -H "Authorization: Bearer ${token}" https://vra-cafe.vra.pcflab.net/catalog-service/api/consumer/resourceViews?managedOnly=false&withExtendedData=true&withOperations=true&%24filter=parentResource%20eq%20%27197d075a-8f92-430b-b954-60575af8f589%27
+#curl --insecure -X GET -H "Content-Type: application/json" -D headers.out -H "Authorization: Bearer ${token}" https://vra-cafe.vra.pcflab.net/catalog-service/api/consumer/resourceViews?managedOnly=false&withExtendedData=true&withOperations=true&%24filter=parentResource%20eq%20%27931b796e-7ea1-4b2d-a2a5-41f3eea5ef3a%27
+#curl --insecure -X GET -H "Content-Type: application/json" -D headers.out -H "Authorization: Bearer ${token}" https://vra-cafe.vra.pcflab.net/catalog-service/api/consumer/resourceViews?managedOnly=false&withExtendedData=true&withOperations=true&%24filter=parentResource%20eq%20%27199af6df-9702-44ab-acc8-7b7c41d06881%27
+
 
 #parent resource of vm
 #curl --insecure -X GET -H "Content-Type: application/json" -D headers.out -H "Authorization: Bearer $token" https://vra.vra.lab/catalog-service/api/consumer/resourceViews/df13aba9-278b-4fb9-beec-1e14f29a2337

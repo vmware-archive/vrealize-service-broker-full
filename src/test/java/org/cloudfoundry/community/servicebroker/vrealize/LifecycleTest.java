@@ -1,7 +1,5 @@
 package org.cloudfoundry.community.servicebroker.vrealize;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
 import org.apache.log4j.Logger;
 import org.cloudfoundry.community.servicebroker.vrealize.persistance.LastOperation;
 import org.cloudfoundry.community.servicebroker.vrealize.persistance.VrServiceInstance;
@@ -18,6 +16,7 @@ import org.springframework.cloud.servicebroker.model.OperationState;
 import org.springframework.cloud.servicebroker.model.ServiceDefinition;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertEquals;
@@ -61,6 +60,7 @@ public class LifecycleTest {
 
         Object requestId = instance.getCreateRequestId();
         assertNotNull(requestId);
+        LOG.info("requestId: " + requestId);
 
         OperationState status = instance.getServiceInstanceLastOperation().getState();
         assertNotNull(status);
@@ -86,6 +86,14 @@ public class LifecycleTest {
 
         LOG.info("state is: "
                 + client.getRequestStatus(token, requestId.toString()).getState());
+
+        client.loadCredentials(instance);
+
+        Map creds = instance.getCredentials();
+        assertNotNull(creds);
+
+        LOG.info("credentials: " + instance.getCredentials().toString());
+        LOG.info("uri: " + instance.getCredentials().get(VrServiceInstance.URI));
     }
 
     @Test
@@ -143,16 +151,8 @@ public class LifecycleTest {
         instance.getMetadata().put(VrServiceInstance.CREATE_REQUEST_ID, REQ_ID);
         instance.getMetadata().put(VrServiceInstance.LOCATION, "foo" + REQ_ID);
 
-        JsonParser parser = new JsonParser();
-        JsonElement je = parser.parse(TestConfig
-                .getContents("requestResponse.json"));
-
-        instance.getParameters().putAll(
-                client.getParametersFromCreateResponse(je));
-
-        client.loadDataFromResourceResponse(tokenService.getToken(), instance);
+        client.loadCredentials(instance);
 
         return instance;
     }
-
 }

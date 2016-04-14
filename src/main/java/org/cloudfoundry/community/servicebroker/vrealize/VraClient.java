@@ -1,11 +1,14 @@
 package org.cloudfoundry.community.servicebroker.vrealize;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.ReadContext;
 import net.minidev.json.JSONArray;
 import org.apache.log4j.Logger;
+import org.cloudfoundry.community.servicebroker.vrealize.adapter.Adaptor;
 import org.cloudfoundry.community.servicebroker.vrealize.adapter.Adaptors;
 import org.cloudfoundry.community.servicebroker.vrealize.persistance.LastOperation;
 import org.cloudfoundry.community.servicebroker.vrealize.persistance.VrServiceInstance;
@@ -16,17 +19,13 @@ import org.springframework.cloud.servicebroker.model.CreateServiceInstanceReques
 import org.springframework.cloud.servicebroker.model.GetLastServiceOperationResponse;
 import org.springframework.cloud.servicebroker.model.OperationState;
 import org.springframework.cloud.servicebroker.model.ServiceDefinition;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
-import java.net.URI;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.*;
-import java.util.Map.Entry;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 @Service
 public class VraClient {
@@ -57,15 +56,20 @@ public class VraClient {
 
         try {
             LOG.info("creating instance.");
+            VrServiceInstance instance = new VrServiceInstance(request);
 
             String token = tokenService.getToken();
 
             LOG.info("getting a template for the create request.");
             JsonElement template = getCreateRequestTemplate(token, sd);
+            String serviceType = getServiceType(template);
+
+            LOG.info("template for create request: " + template.toString());
 
             LOG.info("customizing the create template.");
-            JsonElement edited = prepareCreateRequestTemplate(template,
-                    request.getServiceInstanceId());
+            JsonObject edited = prepareCreateRequestTemplate(template, instance);
+
+            LOG.info("customed create template: " + edited.toString());
 
             LOG.info("posting the create request.");
             ResponseEntity<JsonElement> response = postCreateRequest(token, edited,
@@ -74,14 +78,13 @@ public class VraClient {
             LOG.info("service request response: " + response.toString());
 
             String location = getLocation(response);
-            String requestId = getRequestId(response);
+            String requestId = getRequestId(response.getBody());
 
-            VrServiceInstance instance = new VrServiceInstance(request);
-
-            LOG.info("loading metadata onto instance from response.");
+            LOG.info("loading metadata onto instance from catalog item request response.");
             instance.getMetadata().put(VrServiceInstance.LOCATION, location);
             instance.getMetadata().put(VrServiceInstance.CREATE_REQUEST_ID,
                     requestId);
+            instance.setServiceType(serviceType);
 
             LastOperation lo = new LastOperation(OperationState.IN_PROGRESS, requestId, false);
             instance.withLastOperation(lo);
@@ -100,23 +103,18 @@ public class VraClient {
         JsonElement requestResponse = vraRepository.getRequest(
                 "Bearer " + token, locationPath).getBody();
 
-        instance.getParameters().putAll(
-                getParametersFromCreateResponse(requestResponse));
+        LOG.info("loading credentials: " + requestResponse.toString());
+        instance.getMetadata().putAll(getMetadataFromResourceResponse(requestResponse));
 
-        JsonElement resourcesResponse = getRequestResources(token, instance
-                .getCreateRequestId().toString());
+        JsonElement resourcesResponse = vraRepository.getRequestResources("Bearer " + token, instance.getCreateRequestId()).getBody();
 
-        instance.getParameters().putAll(
-                getParametersFromResourceResponse(resourcesResponse));
+        LOG.info("loading host: " + requestResponse.toString());
+        instance.getMetadata().put(VrServiceInstance.HOST, getHostIP(resourcesResponse));
     }
 
-    public void loadDataFromResourceResponse(String token,
-                                                          VrServiceInstance instance) {
-        JsonElement resources = getRequestResources(token, instance
-                .getCreateRequestId().toString());
-
-        Map<String, String> links = getDeleteLinks(resources);
-        instance.getMetadata().putAll(links);
+    Map<String, Object> getMetadataFromResourceResponse(
+            JsonElement requestResponse) {
+        return getDeleteLinks(requestResponse);
     }
 
     public VrServiceInstance deleteInstance(VrServiceInstance instance) {
@@ -209,55 +207,34 @@ public class VraClient {
     }
 
     JsonObject prepareCreateRequestTemplate(JsonElement template,
-                                            String serviceInstanceId) {
-        JsonObject jo = removeFields(template.getAsJsonObject(),
-                getContents("fieldsToFilter.txt"));
+                                            VrServiceInstance serviceInstance) {
+        DocumentContext ctx = JsonPath.parse(template.toString());
 
-        LOG.info("submitting request to vR for serviceInstance: "
-                + serviceInstanceId);
+        String serviceType = ctx.read("$.data.SERVICE_TYPE");
+        serviceInstance.setServiceType(serviceType);
 
-        jo.addProperty("description", serviceInstanceId);
-        jo.addProperty("reasons", "CF service broker request.");
+        Adaptor adaptor = Adaptors.getAdaptor(serviceType);
 
-        return jo;
+        if (adaptor == null) {
+            throw new ServiceBrokerException("service adaptor not found for SERVICE_TYPE: " + serviceType);
+        }
+
+        //add service specific information onto the request
+        adaptor.prepareRequest(ctx, serviceInstance);
+
+        //add some identifying information onto the request
+        ctx.set("$.description", serviceInstance.getId());
+        ctx.set("$.reasons", "CF vRA Service Broker request.");
+
+        return new Gson().fromJson(ctx.jsonString(), JsonElement.class).getAsJsonObject();
     }
 
     private JsonObject prepareDeleteRequestTemplate(JsonElement template,
-                                                    String serviceInstanceId) {//throws ServiceBrokerException {
+                                                    String serviceInstanceId) {
 
         JsonObject jo = template.getAsJsonObject();
         jo.addProperty("description", serviceInstanceId);
         return jo;
-    }
-
-    private JsonObject removeFields(JsonObject json, List<String> fields) {
-        if (json == null || fields == null) {
-            return null;
-        }
-        Set<Entry<String, JsonElement>> cs = new HashSet<Entry<String, JsonElement>>();
-        cs.addAll(json.entrySet());
-        Iterator<Entry<String, JsonElement>> i = cs.iterator();
-        while (i.hasNext()) {
-            Entry<String, JsonElement> entry = i.next();
-            if (fields.contains(entry.getKey())) {
-                json.remove(entry.getKey());
-            } else {
-                if (entry.getValue().isJsonObject()) {
-                    removeFields(entry.getValue().getAsJsonObject(), fields);
-                }
-            }
-        }
-        return json;
-    }
-
-    private List<String> getContents(String fileName) {
-        try {
-            URI u = new ClassPathResource(fileName).getURI();
-            return Files.readAllLines(Paths.get(u), Charset.defaultCharset());
-        } catch (IOException e) {
-            LOG.error("error getting contents of file: " + fileName, e);
-            throw new ServiceBrokerException("error reading template.", e);
-        }
     }
 
     public GetLastServiceOperationResponse getRequestStatus(VrServiceInstance si) {
@@ -328,12 +305,12 @@ public class VraClient {
 
     }
 
-    private String getRequestId(ResponseEntity<JsonElement> requestResponse) {
+    String getRequestId(JsonElement requestResponse) {
         if (requestResponse == null) {
             return null;
         }
 
-        JsonElement je = requestResponse.getBody().getAsJsonObject().get("id");
+        JsonElement je = requestResponse.getAsJsonObject().get("id");
         if (je == null) {
             return null;
         }
@@ -341,7 +318,16 @@ public class VraClient {
         return je.getAsString();
     }
 
-    private String getHostIP(JsonElement requestResponse) {
+    String getServiceType(JsonElement requestResponse) {
+        if (requestResponse == null) {
+            return null;
+        }
+
+        ReadContext ctx = JsonPath.parse(requestResponse.toString());
+        return ctx.read("$.data." + VrServiceInstance.SERVICE_TYPE);
+    }
+
+    String getHostIP(JsonElement requestResponse) {
         if (requestResponse == null) {
             return null;
         }
@@ -356,77 +342,12 @@ public class VraClient {
         return o.get(0).toString();
     }
 
-    Map<String, Object> getParametersFromCreateResponse(JsonElement response) {
-
-        // get the custom parameters from the request info
-        return Adaptors
-                .getParameters(getCustomValues(response));
-    }
-
-    Map<String, Object> getParametersFromResourceResponse(
-            JsonElement resourceViewResponse) throws ServiceBrokerException {
-
-        Map<String, Object> m = new HashMap<String, Object>();
-
-        // get the host from the resources view
-        String host = getHostIP(resourceViewResponse);
-        m.put(VrServiceInstance.HOST, host);
-
-        return m;
-    }
-
-    private Map<String, Object> getCustomValues(JsonElement requestResponse) {
-        Map<String, Object> parameters = new HashMap<String, Object>();
-        if (requestResponse == null) {
-            return parameters;
-        }
-
-        ReadContext ctx = JsonPath.parse(requestResponse.toString());
-        JSONArray ja = ctx
-                .read("$.requestData.entries[*].value.values.entries[*]");
-
-        if (ja == null) {
-            return parameters;
-        }
-
-        for (int i = 0; i < ja.size(); i++) {
-            JSONArray ka = ctx
-                    .read("$.requestData.entries[*].value.values.entries[" + i
-                            + "].key");
-
-            JSONArray va = ctx
-                    .read("$.requestData.entries[*].value.values.entries[" + i
-                            + "].value.value");
-
-            String key = null;
-            Object value = null;
-
-            if (ka != null && ka.size() > 0) {
-                key = ka.get(0).toString();
-            }
-
-            if (va != null && va.size() > 0) {
-                value = va.get(0).toString();
-            }
-
-            if (key != null) {
-                parameters.put(key, value);
-            }
-        }
-        return parameters;
-    }
-
-    private JsonElement getRequestResources(String token, String requestId) {
-        return vraRepository.getRequestResources("Bearer " + token, requestId)
-                .getBody();
-    }
-
     private String pathFromLink(String link) {
         return link.substring(serviceUri.length() + 1);
     }
 
-    Map<String, String> getDeleteLinks(JsonElement resources) {
-        Map<String, String> map = new HashMap<String, String>();
+    Map<String, Object> getDeleteLinks(JsonElement resources) {
+        Map<String, Object> map = new HashMap<String, Object>();
         ReadContext ctx = JsonPath.parse(resources.toString());
 
         //seems to be no way to filter using json path where there is a '@' in the thing you are tyring to filter on?

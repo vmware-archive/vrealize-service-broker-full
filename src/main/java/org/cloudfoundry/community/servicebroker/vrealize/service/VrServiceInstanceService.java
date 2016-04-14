@@ -30,9 +30,6 @@ public class VrServiceInstanceService implements ServiceInstanceService {
     @Autowired
     CatalogService catalogService;
 
-    @Autowired
-    TokenService tokenService;
-
     @Resource(name = "siTemplate")
     private HashOperations<String, String, VrServiceInstance> repository;
 
@@ -89,10 +86,10 @@ public class VrServiceInstanceService implements ServiceInstanceService {
             return deleteInstance(instance);
         }
 
-        // otherwise grab the rest of the metadata for the instance and
+        // we finally have all of the bits we need to create credentials at this point
         // save the instance with the new last operation
-        LOG.info("loading metadata onto instance from resource response.");
-        vraClient.loadDataFromResourceResponse(tokenService.getToken(), instance);
+        LOG.info("loading credentials onto instance.");
+        vraClient.loadCredentials(instance);
 
         return saveInstance(instance);
     }

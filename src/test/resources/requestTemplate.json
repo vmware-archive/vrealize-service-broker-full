@@ -1,109 +1,56 @@
 {
     "type": "com.vmware.vcac.catalog.domain.request.CatalogItemProvisioningRequest",
-    "catalogItemId": "e06ff060-dc7a-4f46-a7a7-c32c031fa31e",
-    "requestedFor": "vdude01@vra.lab",
-    "businessGroupId": "40d34c19-edfb-4c25-b291-0475b2a1d2d6",
+    "catalogItemId": "a3d19350-c15e-4d81-878a-38f4868a4c95",
+    "requestedFor": "Administrator@vra.pcflab.net",
+    "businessGroupId": "f57f9047-daee-47b2-aac9-3f53baa42cf3",
     "description": null,
     "reasons": null,
     "data": {
-        "Existing_Network_1": {
+        "DB_VM": {
             "componentTypeId": "com.vmware.csp.component.cafe.composition",
             "componentId": null,
             "classId": "Blueprint.Component.Declaration",
-            "typeFilter": "MySQL01*Existing_Network_1",
+            "typeFilter": "MariaDB*DB_VM",
             "data": {
-                "_cluster": 1,
-                "_hasChildren": false,
-                "description": null,
-                "gateway": "192.168.200.1",
-                "name": "vra-Lab-deployment-net",
-                "networkname": "vra-Lab-deployment-net",
-                "subnetmask": "255.255.254.0"
-            }
-        },
-        "maraidb-01": {
-            "componentTypeId": "com.vmware.csp.component.cafe.composition",
-            "componentId": null,
-            "classId": "Blueprint.Component.Declaration",
-            "typeFilter": "MySQL01*maraidb-01",
-            "data": {
-                "Cafe.Shim.VirtualMachine.MaxCost": 0,
-                "Cafe.Shim.VirtualMachine.MinCost": 0,
-                "_cluster": 1,
-                "_hasChildren": false,
-                "action": "FullClone",
-                "allow_storage_policies": false,
-                "archive_days": 0,
-                "blueprint_type": "1",
-                "cpu": 1,
-                "custom_properties": [
-                    {
-                        "componentTypeId": "com.vmware.csp.iaas.blueprint.service",
-                        "componentId": null,
-                        "classId": "Infrastructure.CustomProperty",
-                        "typeFilter": null,
-                        "data": {
-                            "id": "mysql_user",
-                            "isEncrypted": false,
-                            "isPromptUser": false,
-                            "propertyGroup": "",
-                            "value": "mysqluser"
-                        }
-                    },
-                    {
-                        "componentTypeId": "com.vmware.csp.iaas.blueprint.service",
-                        "componentId": null,
-                        "classId": "Infrastructure.CustomProperty",
-                        "typeFilter": null,
-                        "data": {
-                            "id": "mysql_passwd",
-                            "isEncrypted": true,
-                            "isPromptUser": false,
-                            "propertyGroup": "",
-                            "value": "P1v0t4l!"
-                        }
-                    },
-                    {
-                        "componentTypeId": "com.vmware.csp.iaas.blueprint.service",
-                        "componentId": null,
-                        "classId": "Infrastructure.CustomProperty",
-                        "typeFilter": null,
-                        "data": {
-                            "id": "mysql_dbname",
-                            "isEncrypted": false,
-                            "isPromptUser": false,
-                            "propertyGroup": "",
-                            "value": "db01"
-                        }
-                    },
-                    {
-                        "componentTypeId": "com.vmware.csp.iaas.blueprint.service",
-                        "componentId": null,
-                        "classId": "Infrastructure.CustomProperty",
-                        "typeFilter": null,
-                        "data": {
-                            "id": "mysql_port",
-                            "isEncrypted": false,
-                            "isPromptUser": false,
-                            "propertyGroup": "",
-                            "value": "3306"
-                        }
-                    },
-                    {
-                        "componentTypeId": "com.vmware.csp.iaas.blueprint.service",
-                        "componentId": null,
-                        "classId": "Infrastructure.CustomProperty",
-                        "typeFilter": null,
-                        "data": {
-                            "id": "VirtualMachine.Customize.WaitComplete",
-                            "isEncrypted": false,
-                            "isPromptUser": false,
-                            "propertyGroup": "",
-                            "value": "true"
-                        }
+                "_allocation": {
+                    "componentTypeId": "com.vmware.csp.iaas.blueprint.service",
+                    "componentId": null,
+                    "classId": "Infrastructure.Compute.Machine.Allocation",
+                    "typeFilter": null,
+                    "data": {
+                        "machines": [
+                            {
+                                "componentTypeId": "com.vmware.csp.iaas.blueprint.service",
+                                "componentId": null,
+                                "classId": "Infrastructure.Compute.Machine.Allocation.Machine",
+                                "typeFilter": null,
+                                "data": {
+                                    "machine_id": "",
+                                    "nics": [
+                                        {
+                                            "componentTypeId": "com.vmware.csp.iaas.blueprint.service",
+                                            "componentId": null,
+                                            "classId": "Infrastructure.Compute.Machine.Nic",
+                                            "typeFilter": null,
+                                            "data": {
+                                                "address": "",
+                                                "assignment_type": "Static",
+                                                "external_address": "",
+                                                "id": null,
+                                                "load_balancing": null,
+                                                "network": null,
+                                                "network_profile": null
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
                     }
-                ],
-                "daily_cost": 0,
+                },
+                "_cluster": 1,
+                "_hasChildren": true,
+                "cpu": 1,
                 "datacenter_location": null,
                 "description": null,
                 "disks": [
@@ -113,9 +60,9 @@
                         "classId": "Infrastructure.Compute.Machine.MachineDisk",
                         "typeFilter": null,
                         "data": {
-                            "capacity": 50,
+                            "capacity": 16,
                             "custom_properties": null,
-                            "id": -1,
+                            "id": 1459562569868,
                             "initial_location": "",
                             "is_clone": true,
                             "label": "Hard disk 1",
@@ -126,29 +73,8 @@
                     }
                 ],
                 "display_location": false,
-                "guest_customization_specification": "CentOS-Spec-01",
-                "lease_days": 0,
-                "machine_actions": [
-                    "DESTROY",
-                    "POWER_ON",
-                    "CONNECT_RDP_SSH",
-                    "REPROVISION",
-                    "POWER_CYCLE",
-                    "EXPIRE",
-                    "SUSPEND",
-                    "CONNECT_REMOTE_CONSOLE",
-                    "CONNECT_USING_VDI",
-                    "ALLOW_SNAPSHOT",
-                    "ALLOW_RECONFIGURE",
-                    "ENABLE_EXECUTION_SELECTOR",
-                    "ENABLE_POWER_ACTION_SELECTOR"
-                ],
-                "machine_prefix": {
-                    "componentId": null,
-                    "classId": "Infrastructure.Compute.MachinePrefix",
-                    "id": "Use group default"
-                },
-                "max_network_adapters": 0,
+                "guest_customization_specification": "centos7",
+                "max_network_adapters": -1,
                 "max_per_user": 0,
                 "max_volumes": 60,
                 "memory": 2048,
@@ -160,46 +86,53 @@
                         "typeFilter": null,
                         "data": {
                             "address": "",
-                            "assignment_type": "DHCP",
-                            "custom_properties": null,
-                            "id": 0,
-                            "load_balancing": "",
-                            "network_profile": "vra-Lab-deployment-net"
+                            "assignment_type": "Static",
+                            "external_address": "",
+                            "id": null,
+                            "load_balancing": null,
+                            "network": null,
+                            "network_profile": null
                         }
                     }
                 ],
-                "number_of_instances": 1,
                 "os_arch": "x86_64",
                 "os_distribution": null,
                 "os_type": "Linux",
                 "os_version": null,
-                "platform_name": "vsphere",
-                "platform_type": "virtual",
                 "property_groups": [
                     null
                 ],
-                "provisioning_workflow": {
-                    "componentId": null,
-                    "classId": "Infrastructure.Compute.ProvisioningWorkflow",
-                    "id": "CloneWorkflow"
-                },
-                "reservation_policy": {
-                    "componentId": null,
-                    "classId": "Infrastructure.Reservation.Policy.ComputeResource",
-                    "id": "None"
-                },
+                "reservation_policy": null,
                 "security_groups": [],
                 "security_tags": [],
-                "source_machine": {
-                    "componentId": null,
-                    "classId": "Infrastructure.Virtual.Schema",
-                    "id": "2a04a969-f690-479d-8620-0a27468b4bd1"
-                },
-                "source_machine_external_snapshot": null,
-                "source_machine_name": "centos-v1_1",
-                "source_machine_vmsnapshot": null,
-                "storage": 50
+                "storage": 16
             }
-        }
+        },
+        "MYSQL_DATABASE": {
+            "componentTypeId": "com.vmware.csp.component.cafe.composition",
+            "componentId": null,
+            "classId": "Blueprint.Component.Declaration",
+            "typeFilter": "MariaDB*MYSQL_DATABASE",
+            "data": {
+                "BIND_IP": "",
+                "DB_NAME": "mydb",
+                "DB_PORT": "3306",
+                "DB_ROOT_PASSWORD": "secret",
+                "MYSQL_DOWNLOAD_URL": {
+                    "componentTypeId": "com.vmware.csp.component.software.service",
+                    "componentId": null,
+                    "classId": "artifactDetail",
+                    "typeFilter": null,
+                    "data": {
+                        "url": "http://repo.mysql.com/mysql-community-release-el7-5.noarch.rpm"
+                    }
+                },
+                "_hasChildren": false
+            }
+        },
+        "SERVICE_TYPE": "mysql",
+        "_archiveDays": 3,
+        "_leaseDays": 1,
+        "_number_of_instances": 1
     }
 }

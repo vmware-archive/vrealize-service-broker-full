@@ -15,32 +15,12 @@ public class Adaptors {
         return getAdaptor(instance).getCredentials(instance);
     }
 
-    public static Map<String, Object> getParameters(
-            Map<String, Object> vrCustomKeyValues) {
-        Object serviceType = vrCustomKeyValues
-                .get(VrServiceInstance.SERVICE_TYPE);
-
-        if (serviceType == null) {
-            throw new ServiceBrokerException(
-                    "SERVICE_TYPE not found in vR response.");
-        }
-
-        Adaptor adaptor = getAdaptor(serviceType.toString());
-        if (adaptor == null) {
-            throw new ServiceBrokerException(
-                    "adaptor not found for service type: " + serviceType);
-        }
-
-        return adaptor.toParameters(vrCustomKeyValues);
-    }
-
     private static Adaptor getAdaptor(VrServiceInstance instance) {
         if (instance == null || instance.getParameters() == null) {
             throw new ServiceBrokerException("invalid service instance.");
         }
 
-        Object type = instance.getParameters().get(
-                VrServiceInstance.SERVICE_TYPE);
+        Object type = instance.getServiceType();
 
         if (type == null) {
             throw new ServiceBrokerException("service type not set.");
@@ -56,7 +36,7 @@ public class Adaptors {
         return adaptor;
     }
 
-    private static Adaptor getAdaptor(String type) {
+    public static Adaptor getAdaptor(String type) {
         if (ADAPTORS.isEmpty()) {
             initAdaptors();
         }
@@ -74,15 +54,4 @@ public class Adaptors {
         ADAPTORS.add(new MySqlAdapter());
     }
 
-    public static boolean hasCredentials(VrServiceInstance instance) {
-        if (instance == null
-                || instance.getParameters() == null
-                || instance.getParameters().get(VrServiceInstance.SERVICE_TYPE) == null) {
-            return false;
-        }
-        Adaptor adaptor = getAdaptor(instance.getParameters()
-                .get(VrServiceInstance.SERVICE_TYPE).toString());
-
-        return adaptor != null && adaptor.hasCredentials(instance);
-    }
 }

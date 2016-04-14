@@ -1,5 +1,7 @@
 package org.cloudfoundry.community.servicebroker.vrealize;
 
+import org.apache.commons.collections.map.HashedMap;
+import org.cloudfoundry.community.servicebroker.vrealize.adapter.MySqlAdapter;
 import org.cloudfoundry.community.servicebroker.vrealize.domain.Creds;
 import org.cloudfoundry.community.servicebroker.vrealize.persistance.LastOperation;
 import org.cloudfoundry.community.servicebroker.vrealize.persistance.VrServiceInstance;
@@ -20,12 +22,16 @@ import org.springframework.data.redis.core.RedisTemplate;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.Map;
 
 @Configuration
 @PropertySource("classpath:test.properties")
 public class TestConfig {
 
     public static final String SD_ID = "a3d19350-c15e-4d81-878a-38f4868a4c95";
+    public static final String REQ_ID = "e687dc4c-b8d6-44c9-af01-06665dce89fc";
+    public static final String LOCATION = "https://vra-cafe.vra.pcflab.net/catalog-service/api/consumer/requests/" + REQ_ID;
 
     @Autowired
     Environment env;
@@ -76,17 +82,28 @@ public class TestConfig {
     }
 
     public static CreateServiceInstanceRequest getCreateServiceInstanceRequest() {
+        Map<String, Object> parms = new HashMap<String, Object>();
+        parms.put(MySqlAdapter.DB_NAME, "aDB");
+        parms.put(MySqlAdapter.DB_ROOT_PASSWORD, "secret");
+        parms.put(MySqlAdapter.DB_PORT, "1234");
+
         CreateServiceInstanceRequest req = new CreateServiceInstanceRequest(
-                SD_ID, "pId", "orgId", "spaceId", null);
+                SD_ID, "pId", "orgId", "spaceId", parms);
         req.withServiceInstanceId("anID");
         return req;
     }
 
     public static CreateServiceInstanceRequest getCreateServiceInstanceRequest(
             ServiceDefinition sd) {
+
+        Map<String, Object> parms = new HashMap<String, Object>();
+        parms.put(MySqlAdapter.DB_NAME, "aDB");
+        parms.put(MySqlAdapter.DB_ROOT_PASSWORD, "secret");
+        parms.put(MySqlAdapter.DB_PORT, "1234");
+
         CreateServiceInstanceRequest req = new CreateServiceInstanceRequest(
                 sd.getId(), sd.getPlans().get(0).getId(), "testOrgId",
-                "testSpaceId", null);
+                "testSpaceId", parms);
         req.withServiceInstanceId("anID");
         return req;
     }
@@ -101,12 +118,9 @@ public class TestConfig {
 
     public static VrServiceInstance getServiceInstance() {
         VrServiceInstance si = new VrServiceInstance(getCreateServiceInstanceRequest());
-        si.getParameters().put(VrServiceInstance.SERVICE_TYPE, "mysql");
-        si.getParameters().put(VrServiceInstance.DB_ID, "aDB");
-        si.getParameters().put(VrServiceInstance.HOST, "aHost");
-        si.getParameters().put(VrServiceInstance.PASSWORD, "secret");
-        si.getParameters().put(VrServiceInstance.PORT, "1234");
-        si.getParameters().put(VrServiceInstance.USER_ID, "aUser");
+        si.getMetadata().put(VrServiceInstance.SERVICE_TYPE, "mysql");
+        si.getMetadata().put(VrServiceInstance.HOST, "aHost");
+        si.getMetadata().put(VrServiceInstance.LOCATION,LOCATION);
 
         LastOperation lo = new LastOperation(OperationState.IN_PROGRESS, "aRequestId", false);
         si.withLastOperation(lo);

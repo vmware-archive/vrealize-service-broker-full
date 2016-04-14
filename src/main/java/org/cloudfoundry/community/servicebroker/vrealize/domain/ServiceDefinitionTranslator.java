@@ -17,7 +17,6 @@ public class ServiceDefinitionTranslator implements
 
     public ServiceDefinition deserialize(JsonElement json, Type typeOfT,
                                          JsonDeserializationContext context) throws JsonParseException {
-
         return getSD(json);
     }
 

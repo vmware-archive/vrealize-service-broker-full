@@ -1,41 +1,43 @@
 package org.cloudfoundry.community.servicebroker.vrealize.adapter;
 
+import com.jayway.jsonpath.DocumentContext;
 import org.cloudfoundry.community.servicebroker.vrealize.persistance.VrServiceInstance;
 import org.springframework.cloud.servicebroker.exception.ServiceBrokerException;
 
 import java.util.HashMap;
 import java.util.Map;
 
-class MySqlAdapter implements Adaptor {
+public class MySqlAdapter implements Adaptor {
 
     private static final String SERVICE_TYPE = "mysql";
 
+    //username is hard-coded by the blueprint and can't be edited
+    private static final String DB_ROOT_USERNAME = "root";
+    public static final String DB_ROOT_PASSWORD = "DB_ROOT_PASSWORD";
+    public static final String DB_NAME = "DB_NAME";
+    public static final String DB_PORT = "DB_PORT";
+
     /**
      * Creates a uri based on metadata in the specified service instance
-     *
-     * @param instance the instance
-     * @return a uri in the format
-     * DB-TYPE://USERNAME:PASSWORD@HOSTNAME:PORT/NAME
-     * @throws ServiceBrokerException
+     * in the format DB-TYPE://USERNAME:PASSWORD@HOSTNAME:PORT/NAME
      */
     @Override
     public Map<String, Object> getCredentials(VrServiceInstance instance) {
 
-        Object dbType = instance.getParameters().get(
-                VrServiceInstance.SERVICE_TYPE);
-        Object userId = instance.getParameters().get(VrServiceInstance.USER_ID);
-        Object pw = instance.getParameters().get(VrServiceInstance.PASSWORD);
-        Object host = instance.getParameters().get(VrServiceInstance.HOST);
-        Object port = instance.getParameters().get(VrServiceInstance.PORT);
-        Object dbId = instance.getParameters().get(VrServiceInstance.DB_ID);
+        Object dbType = instance.getServiceType();
+        Object host = instance.getHost();
 
-        if (dbType == null || userId == null || pw == null || host == null
+        Object pw = instance.getParameters().get(DB_ROOT_PASSWORD);
+        Object port = instance.getParameters().get(DB_PORT);
+        Object dbId = instance.getParameters().get(DB_NAME);
+
+        String s = dbType + "://" + DB_ROOT_USERNAME + ":" + pw + "@" + host + ":" + port + "/" + dbId;
+
+        if (dbType == null || pw == null || host == null
                 || port == null || dbId == null) {
             throw new ServiceBrokerException(
-                    "unable to construct connection uri from ServiceInstance.");
+                    "unable to construct connection uri from ServiceInstance: " + s);
         }
-
-        String s = dbType + "://" + userId + ":" + pw + "@" + host + ":" + port + "/" + dbId;
 
         Map<String, Object> credentials = new HashMap<String, Object>();
         credentials.put("uri", s);
@@ -43,30 +45,13 @@ class MySqlAdapter implements Adaptor {
         return credentials;
     }
 
-    public Map<String, Object> toParameters(
-            Map<String, Object> vrCustomKeyValues) {
-        Map<String, Object> m = new HashMap<String, Object>();
-
-        m.put(VrServiceInstance.USER_ID, vrCustomKeyValues.get("USER_ID"));
-        m.put(VrServiceInstance.PASSWORD, vrCustomKeyValues.get("PASSWORD"));
-        m.put(VrServiceInstance.DB_ID, vrCustomKeyValues.get("DB_NAME"));
-        m.put(VrServiceInstance.PORT, vrCustomKeyValues.get("DB_PORT"));
-        m.put(VrServiceInstance.SERVICE_TYPE, getServiceType());
-
-        return m;
-    }
-
     public String getServiceType() {
         return SERVICE_TYPE;
     }
 
-    public boolean hasCredentials(VrServiceInstance instance) {
-        try {
-            getCredentials(instance);
-            return true;
-        } catch (ServiceBrokerException e) {
-            return false;
-        }
+    public void prepareRequest(DocumentContext ctx, VrServiceInstance instance) {
+        ctx.set("$.data.MYSQL_DATABASE.data." + DB_NAME, instance.getParameters().get(DB_NAME));
+        ctx.set("$.data.MYSQL_DATABASE.data." + DB_PORT, instance.getParameters().get(DB_PORT));
+        ctx.set("$.data.MYSQL_DATABASE.data." + DB_ROOT_PASSWORD, instance.getParameters().get(DB_ROOT_PASSWORD));
     }
-
 }

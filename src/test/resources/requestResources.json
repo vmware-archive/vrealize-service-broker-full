@@ -7,57 +7,326 @@
                 {
                     "@type": "link",
                     "rel": "GET: Catalog Item",
-                    "href": "https://vra.vra.lab/catalog-service/api/consumer/entitledCatalogItemViews/e06ff060-dc7a-4f46-a7a7-c32c031fa31e"
+                    "href": "https://vra-cafe.vra.pcflab.net/catalog-service/api/consumer/entitledCatalogItemViews/a3d19350-c15e-4d81-878a-38f4868a4c95"
                 },
                 {
                     "@type": "link",
                     "rel": "GET: Request",
-                    "href": "https://vra.vra.lab/catalog-service/api/consumer/requests/9ca10dee-730e-486a-9138-d8aade4913e2"
+                    "href": "https://vra-cafe.vra.pcflab.net/catalog-service/api/consumer/requests/f04910e6-6e3e-47dd-9e0b-f363d8ef89c0"
+                },
+                {
+                    "@type": "link",
+                    "rel": "GET Template: {com.vmware.csp.component.cafe.composition@resource.action.deployment.changelease.name}",
+                    "href": "https://vra-cafe.vra.pcflab.net/catalog-service/api/consumer/resources/9450b691-4b5a-43b4-8cd1-a54912c4ba85/actions/3ff3d824-7289-4aa3-ae71-c4c9d940698b/requests/template"
+                },
+                {
+                    "@type": "link",
+                    "rel": "POST: {com.vmware.csp.component.cafe.composition@resource.action.deployment.changelease.name}",
+                    "href": "https://vra-cafe.vra.pcflab.net/catalog-service/api/consumer/resources/9450b691-4b5a-43b4-8cd1-a54912c4ba85/actions/3ff3d824-7289-4aa3-ae71-c4c9d940698b/requests"
+                },
+                {
+                    "@type": "link",
+                    "rel": "GET Template: {com.vmware.csp.component.cafe.composition@resource.action.deployment.changeowner.name}",
+                    "href": "https://vra-cafe.vra.pcflab.net/catalog-service/api/consumer/resources/9450b691-4b5a-43b4-8cd1-a54912c4ba85/actions/2a560f17-bd1f-4249-9851-381e360b2672/requests/template"
+                },
+                {
+                    "@type": "link",
+                    "rel": "POST: {com.vmware.csp.component.cafe.composition@resource.action.deployment.changeowner.name}",
+                    "href": "https://vra-cafe.vra.pcflab.net/catalog-service/api/consumer/resources/9450b691-4b5a-43b4-8cd1-a54912c4ba85/actions/2a560f17-bd1f-4249-9851-381e360b2672/requests"
                 },
                 {
                     "@type": "link",
                     "rel": "GET Template: {com.vmware.csp.component.cafe.composition@resource.action.deployment.destroy.name}",
-                    "href": "https://vra.vra.lab/catalog-service/api/consumer/resources/d591e58d-b2cf-4061-aec1-7f41168b7a6d/actions/fe9af618-f21d-47a2-bebc-62d5914f6e6c/requests/template"
+                    "href": "https://vra-cafe.vra.pcflab.net/catalog-service/api/consumer/resources/9450b691-4b5a-43b4-8cd1-a54912c4ba85/actions/25e17ec5-e2fd-4bba-bb3b-25b69dd18bd7/requests/template"
                 },
                 {
                     "@type": "link",
                     "rel": "POST: {com.vmware.csp.component.cafe.composition@resource.action.deployment.destroy.name}",
-                    "href": "https://vra.vra.lab/catalog-service/api/consumer/resources/d591e58d-b2cf-4061-aec1-7f41168b7a6d/actions/fe9af618-f21d-47a2-bebc-62d5914f6e6c/requests"
+                    "href": "https://vra-cafe.vra.pcflab.net/catalog-service/api/consumer/resources/9450b691-4b5a-43b4-8cd1-a54912c4ba85/actions/25e17ec5-e2fd-4bba-bb3b-25b69dd18bd7/requests"
                 },
                 {
                     "@type": "link",
                     "rel": "GET: Child Resources",
-                    "href": "https://vra.vra.lab/catalog-service/api/consumer/resourceViews?managedOnly=false&withExtendedData=true&withOperations=true&%24filter=parentResource%20eq%20%27d591e58d-b2cf-4061-aec1-7f41168b7a6d%27"
+                    "href": "https://vra-cafe.vra.pcflab.net/catalog-service/api/consumer/resourceViews?managedOnly=false&withExtendedData=true&withOperations=true&%24filter=parentResource%20eq%20%279450b691-4b5a-43b4-8cd1-a54912c4ba85%27"
                 }
             ],
-            "resourceId": "d591e58d-b2cf-4061-aec1-7f41168b7a6d",
-            "iconId": "cafe_default_icon_genericCatalogItem",
-            "name": "vRA-MariaDB-Single-Instance-96168968",
-            "description": null,
+            "resourceId": "9450b691-4b5a-43b4-8cd1-a54912c4ba85",
+            "iconId": "a3d19350-c15e-4d81-878a-38f4868a4c95",
+            "name": "PCFMysql-47616410",
+            "description": "anID",
             "status": null,
-            "catalogItemId": "e06ff060-dc7a-4f46-a7a7-c32c031fa31e",
-            "catalogItemLabel": "vRA-MariaDB-Single-Instance",
-            "requestId": "9ca10dee-730e-486a-9138-d8aade4913e2",
-            "resourceType": "{com.vmware.csp.component.cafe.composition@resource.type.deployment.name}",
+            "catalogItemId": "a3d19350-c15e-4d81-878a-38f4868a4c95",
+            "catalogItemLabel": "PCFMysql",
+            "requestId": "f04910e6-6e3e-47dd-9e0b-f363d8ef89c0",
+            "resourceType": "composition.resource.type.deployment",
             "owners": [
-                "vmware dude1"
+                "Administrator@vra.pcflab.net"
             ],
-            "businessGroupId": "40d34c19-edfb-4c25-b291-0475b2a1d2d6",
-            "tenantId": "lab",
-            "dateCreated": "2015-10-16T19:36:19.764Z",
-            "lastUpdated": "2015-10-16T19:39:40.008Z",
-            "lease": null,
-            "costs": null,
-            "costToDate": null,
-            "totalCost": null,
+            "businessGroupId": "f57f9047-daee-47b2-aac9-3f53baa42cf3",
+            "tenantId": "vralab",
+            "dateCreated": "2016-04-14T18:52:18.860Z",
+            "lastUpdated": "2016-04-14T18:59:34.007Z",
+            "lease": {
+                "start": "2016-04-14T18:52:18.841Z",
+                "end": "2016-04-15T18:52:18.841Z"
+            },
+            "costs": {
+                "leaseRate": {
+                    "type": "moneyTimeRate",
+                    "cost": {
+                        "type": "money",
+                        "currencyCode": "USD",
+                        "amount": 0.0
+                    },
+                    "basis": {
+                        "type": "timeSpan",
+                        "unit": "DAYS",
+                        "amount": 1
+                    }
+                }
+            },
+            "costToDate": {
+                "type": "money",
+                "currencyCode": "USD",
+                "amount": 0.0
+            },
+            "totalCost": {
+                "type": "money",
+                "currencyCode": "USD",
+                "amount": 0.0
+            },
             "parentResourceId": null,
             "hasChildren": true,
             "data": {}
+        },
+        {
+            "@type": "CatalogResourceView",
+            "links": [
+                {
+                    "@type": "link",
+                    "rel": "GET: Request",
+                    "href": "https://vra-cafe.vra.pcflab.net/catalog-service/api/consumer/requests/f04910e6-6e3e-47dd-9e0b-f363d8ef89c0"
+                },
+                {
+                    "@type": "link",
+                    "rel": "GET: Parent Resource",
+                    "href": "https://vra-cafe.vra.pcflab.net/catalog-service/api/consumer/resourceViews/9450b691-4b5a-43b4-8cd1-a54912c4ba85"
+                },
+                {
+                    "@type": "link",
+                    "rel": "GET Template: {com.vmware.csp.component.iaas.proxy.provider@resource.action.name.virtual.CreateSnapshot}",
+                    "href": "https://vra-cafe.vra.pcflab.net/catalog-service/api/consumer/resources/9f0c035a-0068-43fd-91b0-ebb4aac89cd4/actions/ca7bab9b-94b2-4acd-87ce-cb34b09c2230/requests/template"
+                },
+                {
+                    "@type": "link",
+                    "rel": "POST: {com.vmware.csp.component.iaas.proxy.provider@resource.action.name.virtual.CreateSnapshot}",
+                    "href": "https://vra-cafe.vra.pcflab.net/catalog-service/api/consumer/resources/9f0c035a-0068-43fd-91b0-ebb4aac89cd4/actions/ca7bab9b-94b2-4acd-87ce-cb34b09c2230/requests"
+                },
+                {
+                    "@type": "link",
+                    "rel": "GET Template: {com.vmware.csp.component.iaas.proxy.provider@resource.action.name.virtual.Destroy}",
+                    "href": "https://vra-cafe.vra.pcflab.net/catalog-service/api/consumer/resources/9f0c035a-0068-43fd-91b0-ebb4aac89cd4/actions/0dc34db1-2f7c-4da2-9b44-ed5fa09ffcba/requests/template"
+                },
+                {
+                    "@type": "link",
+                    "rel": "POST: {com.vmware.csp.component.iaas.proxy.provider@resource.action.name.virtual.Destroy}",
+                    "href": "https://vra-cafe.vra.pcflab.net/catalog-service/api/consumer/resources/9f0c035a-0068-43fd-91b0-ebb4aac89cd4/actions/0dc34db1-2f7c-4da2-9b44-ed5fa09ffcba/requests"
+                },
+                {
+                    "@type": "link",
+                    "rel": "GET: Child Resources",
+                    "href": "https://vra-cafe.vra.pcflab.net/catalog-service/api/consumer/resourceViews?managedOnly=false&withExtendedData=true&withOperations=true&%24filter=parentResource%20eq%20%279f0c035a-0068-43fd-91b0-ebb4aac89cd4%27"
+                }
+            ],
+            "resourceId": "9f0c035a-0068-43fd-91b0-ebb4aac89cd4",
+            "iconId": "Infrastructure.CatalogItem.Machine.Virtual.vSphere",
+            "name": "pcf-vra061",
+            "description": null,
+            "status": "On",
+            "catalogItemId": null,
+            "catalogItemLabel": null,
+            "requestId": "f04910e6-6e3e-47dd-9e0b-f363d8ef89c0",
+            "resourceType": "Infrastructure.Virtual",
+            "owners": [
+                "Administrator@vra.pcflab.net"
+            ],
+            "businessGroupId": "f57f9047-daee-47b2-aac9-3f53baa42cf3",
+            "tenantId": "vralab",
+            "dateCreated": "2016-04-14T18:55:53.950Z",
+            "lastUpdated": "2016-04-14T18:59:34.007Z",
+            "lease": {
+                "start": "2016-04-14T18:52:18.841Z",
+                "end": "2016-04-15T18:52:18.841Z"
+            },
+            "costs": {
+                "leaseRate": {
+                    "type": "moneyTimeRate",
+                    "cost": {
+                        "type": "money",
+                        "currencyCode": "USD",
+                        "amount": 0.0
+                    },
+                    "basis": {
+                        "type": "timeSpan",
+                        "unit": "DAYS",
+                        "amount": 1
+                    }
+                }
+            },
+            "costToDate": {
+                "type": "money",
+                "currencyCode": "USD",
+                "amount": 0.0
+            },
+            "totalCost": {
+                "type": "money",
+                "currencyCode": "USD",
+                "amount": 0.0
+            },
+            "parentResourceId": "9450b691-4b5a-43b4-8cd1-a54912c4ba85",
+            "hasChildren": true,
+            "data": {
+                "ChangeLease": true,
+                "ChangeOwner": true,
+                "Component": "DB_VM",
+                "ConnectViaNativeVmrc": true,
+                "ConnectViaRdp": true,
+                "ConnectViaVmrc": true,
+                "CreateSnapshot": true,
+                "DISK_VOLUMES": [
+                    {
+                        "componentTypeId": "com.vmware.csp.component.iaas.proxy.provider",
+                        "componentId": null,
+                        "classId": "dynamicops.api.model.DiskInputModel",
+                        "typeFilter": null,
+                        "data": {
+                            "DISK_CAPACITY": 16,
+                            "DISK_INPUT_ID": "DISK_INPUT_ID1",
+                            "DISK_LABEL": "Hard disk 1"
+                        }
+                    }
+                ],
+                "Destroy": true,
+                "EXTERNAL_REFERENCE_ID": "vm-641",
+                "Expire": true,
+                "GetExpirationReminder": true,
+                "IS_COMPONENT_MACHINE": false,
+                "InstallTools": true,
+                "MachineBlueprintName": "PCFMysql",
+                "MachineCPU": 1,
+                "MachineDailyCost": 0.0,
+                "MachineDestructionDate": "2016-04-18T18:52:23.127Z",
+                "MachineExpirationDate": "2016-04-15T18:52:23.127Z",
+                "MachineGroupName": "busgrp-01",
+                "MachineGuestOperatingSystem": null,
+                "MachineInterfaceDisplayName": "vSphere (vCenter)",
+                "MachineInterfaceType": "vSphere",
+                "MachineMemory": 2048,
+                "MachineName": "pcf-vra061",
+                "MachineReservationName": "resgrp-01",
+                "MachineStorage": 16,
+                "MachineType": "Virtual",
+                "NETWORK_LIST": [
+                    {
+                        "componentTypeId": "com.vmware.csp.component.iaas.proxy.provider",
+                        "componentId": null,
+                        "classId": "dynamicops.api.model.NetworkViewModel",
+                        "typeFilter": null,
+                        "data": {
+                            "NETWORK_MAC_ADDRESS": "00:50:56:bb:c9:73",
+                            "NETWORK_NAME": "vxw-dvs-38-virtualwire-1-sid-5000-PCF Deployment Network"
+                        }
+                    }
+                ],
+                "PowerOff": true,
+                "Reboot": true,
+                "Reconfigure": true,
+                "Reprovision": true,
+                "Reset": true,
+                "SNAPSHOT_LIST": [],
+                "Shutdown": true,
+                "Suspend": true,
+                "VirtualMachine.Admin.UUID": "503bfd3f-3da0-6a63-4a55-3c6907193498",
+                "ip_address": "192.168.200.214",
+                "machineId": "ff516356-9894-444b-81d2-f3213e89ad58"
+            }
+        },
+        {
+            "@type": "CatalogResourceView",
+            "links": [
+                {
+                    "@type": "link",
+                    "rel": "GET: Request",
+                    "href": "https://vra-cafe.vra.pcflab.net/catalog-service/api/consumer/requests/f04910e6-6e3e-47dd-9e0b-f363d8ef89c0"
+                },
+                {
+                    "@type": "link",
+                    "rel": "GET: Parent Resource",
+                    "href": "https://vra-cafe.vra.pcflab.net/catalog-service/api/consumer/resourceViews/9f0c035a-0068-43fd-91b0-ebb4aac89cd4"
+                }
+            ],
+            "resourceId": "a0ccf090-7850-4d4c-be1f-f8d0a219475d",
+            "iconId": "cafe_default_icon_genericCatalogItem",
+            "name": "MYSQL DATABASE",
+            "description": null,
+            "status": null,
+            "catalogItemId": null,
+            "catalogItemLabel": null,
+            "requestId": "f04910e6-6e3e-47dd-9e0b-f363d8ef89c0",
+            "resourceType": "SW-vralab!::!Software.OOBMYSQLDATABASE",
+            "owners": [
+                "Administrator@vra.pcflab.net"
+            ],
+            "businessGroupId": "f57f9047-daee-47b2-aac9-3f53baa42cf3",
+            "tenantId": "vralab",
+            "dateCreated": "2016-04-14T18:58:03.032Z",
+            "lastUpdated": "2016-04-14T18:59:34.007Z",
+            "lease": {
+                "start": "2016-04-14T18:52:18.841Z",
+                "end": "2016-04-15T18:52:18.841Z"
+            },
+            "costs": null,
+            "costToDate": null,
+            "totalCost": null,
+            "parentResourceId": "9f0c035a-0068-43fd-91b0-ebb4aac89cd4",
+            "hasChildren": false,
+            "data": {
+                "BIND_IP": "",
+                "DB_NAME": "aDB",
+                "DB_PORT": "1234",
+                "DB_ROOT_PASSWORD": "secret",
+                "DB_ROOT_USERNAME": "root",
+                "MYSQL_DOWNLOAD_URL": {
+                    "componentTypeId": "com.vmware.csp.component.software.service",
+                    "componentId": null,
+                    "classId": "artifactDetail",
+                    "typeFilter": null,
+                    "data": {
+                        "url": "http://repo.mysql.com/mysql-community-release-el7-5.noarch.rpm"
+                    }
+                },
+                "SERVICE_TYPE": "mysql",
+                "__cluster_index": 0,
+                "_archiveDays": 3,
+                "_cluster": 1,
+                "_hasChildren": false,
+                "_leaseDays": 1,
+                "_number_of_instances": 1,
+                "host": {
+                    "componentId": "8cb3c6cd-9d0f-41e3-9ac8-5357e53662d3",
+                    "classId": "Infrastructure.Machine.Schema",
+                    "id": "9f0c035a-0068-43fd-91b0-ebb4aac89cd4",
+                    "label": "pcf-vra061"
+                },
+                "providerBindingId": "MariaDB",
+                "providerId": "85c9d811-b05f-4fdf-ad97-b36adc9baf98",
+                "subtenantId": "f57f9047-daee-47b2-aac9-3f53baa42cf3"
+            }
         }
     ],
     "metadata": {
         "size": 20,
-        "totalElements": 1,
+        "totalElements": 3,
         "totalPages": 1,
         "number": 1,
         "offset": 0

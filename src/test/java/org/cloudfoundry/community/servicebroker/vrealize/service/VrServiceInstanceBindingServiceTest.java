@@ -17,8 +17,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.cloud.servicebroker.exception.ServiceBrokerException;
 import org.springframework.cloud.servicebroker.exception.ServiceInstanceBindingExistsException;
-import org.springframework.cloud.servicebroker.model.CreateServiceInstanceBindingRequest;
-import org.springframework.cloud.servicebroker.model.CreateServiceInstanceBindingResponse;
 import org.springframework.cloud.servicebroker.model.OperationState;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -94,29 +92,9 @@ public class VrServiceInstanceBindingServiceTest {
         assertNotNull(b);
         Map<String, Object> m = b.getCredentials();
         assertNotNull(m);
-        assertEquals("mysql://aUser:secret@aHost:1234/aDB",
+        assertEquals("mysql://root:secret@aHost:1234/aDB",
                 m.get(VrServiceInstance.URI));
         assertNotNull(b.getId());
         assertEquals("anID", b.getServiceInstanceId());
-    }
-
-    @Test
-    public void testCreateAndDeleteBinding() throws ServiceBrokerException,
-            ServiceInstanceBindingExistsException {
-
-        CreateServiceInstanceBindingRequest req = TestConfig
-                .getCreateBindingRequest();
-
-        CreateServiceInstanceBindingResponse b = vrServiceInstanceBindingService
-                .createServiceInstanceBinding(req);
-        assertNotNull(b);
-
-        VrServiceInstance si = vrServiceInstanceService.getServiceInstance(req.getServiceInstanceId());
-        assertNotNull(si);
-
-        Map<String, Object> m = si.getCredentials();
-        assertNotNull(m);
-        assertEquals("mysql://aUser:secret@aHost:1234/aDB",
-                m.get(VrServiceInstance.URI));
     }
 }

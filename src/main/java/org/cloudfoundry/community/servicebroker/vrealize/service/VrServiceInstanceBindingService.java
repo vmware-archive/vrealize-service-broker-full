@@ -67,12 +67,6 @@ public class VrServiceInstanceBindingService implements
                 + request.getServiceInstanceId() + " service: "
                 + request.getServiceInstanceId());
 
-        // do we have all the info we need to create credentials?
-        if (!si.hasCredentials()) {
-            vraClient.loadCredentials(si);
-            serviceInstanceService.saveInstance(si);
-        }
-
         VrServiceInstanceBinding binding = new VrServiceInstanceBinding(bindingId,
                 serviceInstanceId, si.getCredentials(), null,
                 request.getBindResource());

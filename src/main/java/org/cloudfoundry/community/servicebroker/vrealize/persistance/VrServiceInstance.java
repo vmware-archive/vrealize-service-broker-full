@@ -14,22 +14,15 @@ import java.util.Map;
 
 public class VrServiceInstance implements Serializable {
 
-    // some "known" keys to store stuff under metatdata keys
+    // some "known" keys for metadata storage
     public static final String LOCATION = "LOCATION";
     public static final String CREATE_REQUEST_ID = "CREATE_REQUEST_ID";
     public static final String DELETE_REQUEST_ID = "DELETE_REQUEST_ID";
     public static final String DELETE_TEMPLATE_LINK = "DELETE_TEMPLATE_LINK";
     public static final String DELETE_LINK = "DELETE_LINK";
-
-    // parameter keys
-    public static final String USER_ID = "USER_ID";
-    public static final String PASSWORD = "PASSWORD";
-    public static final String DB_ID = "DB_ID";
-    public static final String HOST = "HOST";
-    public static final String PORT = "PORT";
     public static final String SERVICE_TYPE = "SERVICE_TYPE";
+    public static final String HOST = "HOST";
 
-    // other keys
     public static final String URI = "uri";
 
     @JsonSerialize
@@ -83,6 +76,10 @@ public class VrServiceInstance implements Serializable {
         this.spaceGuid = request.getSpaceGuid();
         this.id = request.getServiceInstanceId();
         this.lastOperation = new LastOperation(OperationState.IN_PROGRESS, "Provisioning", false);
+
+        if (request.getParameters() != null) {
+            getParameters().putAll(request.getParameters());
+        }
     }
 
     public VrServiceInstance(DeleteServiceInstanceRequest request) {
@@ -139,12 +136,33 @@ public class VrServiceInstance implements Serializable {
         return getServiceInstanceLastOperation().getDescription();
     }
 
-    public Object getCreateRequestId() {
-        return getMetadata().get(CREATE_REQUEST_ID);
+    public String getCreateRequestId() {
+        if (getMetadata().get(CREATE_REQUEST_ID) == null) {
+            return null;
+        }
+        return getMetadata().get(CREATE_REQUEST_ID).toString();
     }
 
     public Object getLocation() {
-        return getMetadata().get(VrServiceInstance.LOCATION);
+        return getMetadata().get(LOCATION);
+    }
+
+    public String getServiceType() {
+        if (getMetadata() == null || getMetadata().get(SERVICE_TYPE) == null) {
+            return null;
+        }
+        return getMetadata().get(SERVICE_TYPE).toString();
+    }
+
+    public void setServiceType(String serviceType) {
+        getMetadata().put(SERVICE_TYPE, serviceType);
+    }
+
+    public String getHost() {
+        if (getMetadata() == null || getMetadata().get(HOST) == null) {
+            return null;
+        }
+        return getMetadata().get(HOST).toString();
     }
 
     public String getId() {
@@ -157,10 +175,6 @@ public class VrServiceInstance implements Serializable {
 
     public Map<String, Object> getCredentials() {
         return Adaptors.getCredentials(this);
-    }
-
-    public boolean hasCredentials() {
-        return Adaptors.hasCredentials(this);
     }
 
     public String getServiceDefinitionId() {
@@ -178,5 +192,4 @@ public class VrServiceInstance implements Serializable {
     public String getSpaceGuid() {
         return spaceGuid;
     }
-
 }
