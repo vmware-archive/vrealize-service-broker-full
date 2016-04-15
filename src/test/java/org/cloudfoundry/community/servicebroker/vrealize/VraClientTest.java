@@ -15,6 +15,7 @@ import org.springframework.cloud.servicebroker.exception.ServiceBrokerException;
 import org.springframework.cloud.servicebroker.model.GetLastServiceOperationResponse;
 import org.springframework.cloud.servicebroker.model.OperationState;
 import org.springframework.cloud.servicebroker.model.ServiceDefinition;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.Map;
@@ -43,7 +44,8 @@ public class VraClientTest {
 
     @Test
     public void testGetRequestResources() {
-        repo.getRequestResources("Bearer " + tokenService.getToken(), TestConfig.REQ_ID);
+        ResponseEntity<JsonElement> re = repo.getRequestResources("Bearer " + tokenService.getToken(), TestConfig.REQ_ID);
+        assertNotNull(re.getBody());
     }
 
     @Test
@@ -148,7 +150,7 @@ public class VraClientTest {
         VrServiceInstance instance = new VrServiceInstance(TestConfig.getCreateServiceInstanceRequest());
 
         JsonElement rr = parser.parse(TestConfig
-                .getContents("requestResources.json"));
+                .getContents("resourcesResponse.json"));
 
         Map<String, Object> meta = client
                 .getMetadataFromResourceResponse(rr);

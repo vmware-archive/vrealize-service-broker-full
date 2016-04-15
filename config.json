@@ -1,0 +1,5 @@
+{
+  "DB_ROOT_PASSWORD": "thisIsASecret",
+  "DB_NAME": "thisIsAName",
+  "DB_PORT": "9091"
+}

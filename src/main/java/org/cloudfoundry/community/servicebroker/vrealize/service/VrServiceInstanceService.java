@@ -78,7 +78,8 @@ public class VrServiceInstanceService implements ServiceInstanceService {
             return null;
         }
 
-        instance.withLastOperation(LastOperation.fromResponse(status));
+        LastOperation newLastOperation = LastOperation.fromResponse(status);
+        instance.withLastOperation(newLastOperation);
 
         // if this is a delete request and was successful, remove the instance
         if (instance.isCurrentOperationSuccessful()
@@ -86,10 +87,15 @@ public class VrServiceInstanceService implements ServiceInstanceService {
             return deleteInstance(instance);
         }
 
-        // we finally have all of the bits we need to create credentials at this point
-        // save the instance with the new last operation
+        // attempt to load credentials
         LOG.info("loading credentials onto instance.");
         vraClient.loadCredentials(instance);
+
+        //TODO seems to be a race condition with getting the host ip
+        if(instance.getHost() == null) {
+            //reset last operation to incomplete, try again later?
+            newLastOperation.setState(OperationState.IN_PROGRESS);
+        }
 
         return saveInstance(instance);
     }

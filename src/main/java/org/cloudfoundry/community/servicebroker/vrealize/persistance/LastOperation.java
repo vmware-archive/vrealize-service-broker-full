@@ -27,7 +27,7 @@ public class LastOperation implements Serializable {
         return state;
     }
 
-    private void setState(OperationState state) {
+    public void setState(OperationState state) {
         this.state = state;
     }
 

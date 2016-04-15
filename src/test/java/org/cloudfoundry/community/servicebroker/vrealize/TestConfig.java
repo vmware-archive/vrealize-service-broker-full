@@ -30,7 +30,7 @@ import java.util.Map;
 public class TestConfig {
 
     public static final String SD_ID = "a3d19350-c15e-4d81-878a-38f4868a4c95";
-    public static final String REQ_ID = "e687dc4c-b8d6-44c9-af01-06665dce89fc";
+    public static final String REQ_ID = "673c7552-815e-41b4-8be2-c4af85c38ec0";
     public static final String LOCATION = "https://vra-cafe.vra.pcflab.net/catalog-service/api/consumer/requests/" + REQ_ID;
 
     @Autowired
@@ -94,12 +94,15 @@ public class TestConfig {
     }
 
     public static CreateServiceInstanceRequest getCreateServiceInstanceRequest(
-            ServiceDefinition sd) {
+            ServiceDefinition sd, boolean includeParms) {
 
         Map<String, Object> parms = new HashMap<String, Object>();
-        parms.put(MySqlAdapter.DB_NAME, "aDB");
-        parms.put(MySqlAdapter.DB_ROOT_PASSWORD, "secret");
-        parms.put(MySqlAdapter.DB_PORT, "1234");
+
+        if(includeParms) {
+            parms.put(MySqlAdapter.DB_NAME, "aDB");
+            parms.put(MySqlAdapter.DB_ROOT_PASSWORD, "secret");
+            parms.put(MySqlAdapter.DB_PORT, "1234");
+        }
 
         CreateServiceInstanceRequest req = new CreateServiceInstanceRequest(
                 sd.getId(), sd.getPlans().get(0).getId(), "testOrgId",

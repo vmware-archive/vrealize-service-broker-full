@@ -64,18 +64,18 @@ public class VraClient {
             JsonElement template = getCreateRequestTemplate(token, sd);
             String serviceType = getServiceType(template);
 
-            LOG.info("template for create request: " + template.toString());
+            LOG.debug("template for create request: " + template.toString());
 
             LOG.info("customizing the create template.");
             JsonObject edited = prepareCreateRequestTemplate(template, instance);
 
-            LOG.info("customed create template: " + edited.toString());
+            LOG.debug("customed create template: " + edited.toString());
 
             LOG.info("posting the create request.");
             ResponseEntity<JsonElement> response = postCreateRequest(token, edited,
                     sd);
 
-            LOG.info("service request response: " + response.toString());
+            LOG.debug("service request response: " + response.toString());
 
             String location = getLocation(response);
             String requestId = getRequestId(response.getBody());
@@ -103,12 +103,13 @@ public class VraClient {
         JsonElement requestResponse = vraRepository.getRequest(
                 "Bearer " + token, locationPath).getBody();
 
-        LOG.info("loading credentials: " + requestResponse.toString());
+        LOG.debug("loading credentials from: " + instance.getLocation().toString() + ": " + requestResponse.toString());
         instance.getMetadata().putAll(getMetadataFromResourceResponse(requestResponse));
 
+        LOG.info("loading host for request: " + instance.getCreateRequestId());
         JsonElement resourcesResponse = vraRepository.getRequestResources("Bearer " + token, instance.getCreateRequestId()).getBody();
 
-        LOG.info("loading host: " + requestResponse.toString());
+        LOG.debug("loading host from response: " + resourcesResponse.toString());
         instance.getMetadata().put(VrServiceInstance.HOST, getHostIP(resourcesResponse));
     }
 
@@ -144,7 +145,7 @@ public class VraClient {
             ResponseEntity<JsonElement> response = vraRepository.postRequest(
                     "Bearer " + token, deletePath, edited);
 
-            LOG.info("delete request response: " + response.toString());
+            LOG.debug("delete request response: " + response.toString());
 
             String requestId = getRequestIdFromLocation(getLocation(response));
 
@@ -335,7 +336,7 @@ public class VraClient {
         ReadContext ctx = JsonPath.parse(requestResponse.toString());
         JSONArray o = ctx.read("$.content[*].data.ip_address");
 
-        if (o == null || o.size() < 1) {
+        if (o == null || o.size() < 1 || o.get(0) == null) {
             return null;
         }
 

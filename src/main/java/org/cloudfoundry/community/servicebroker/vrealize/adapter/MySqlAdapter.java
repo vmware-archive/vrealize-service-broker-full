@@ -50,8 +50,26 @@ public class MySqlAdapter implements Adaptor {
     }
 
     public void prepareRequest(DocumentContext ctx, VrServiceInstance instance) {
-        ctx.set("$.data.MYSQL_DATABASE.data." + DB_NAME, instance.getParameters().get(DB_NAME));
-        ctx.set("$.data.MYSQL_DATABASE.data." + DB_PORT, instance.getParameters().get(DB_PORT));
-        ctx.set("$.data.MYSQL_DATABASE.data." + DB_ROOT_PASSWORD, instance.getParameters().get(DB_ROOT_PASSWORD));
+
+        //do not set parms if they were not passed in (just fall back on defaults per blueprint),
+        //but then make sure to load any default parms into the instance for later
+
+        if (instance.getParameters().get(DB_NAME) != null) {
+            ctx.set("$.data.MYSQL_DATABASE.data." + DB_NAME, instance.getParameters().get(DB_NAME));
+        } else {
+            instance.getParameters().put(DB_NAME, ctx.read("$.data.MYSQL_DATABASE.data." + DB_NAME));
+        }
+
+        if (instance.getParameters().get(DB_PORT) != null) {
+            ctx.set("$.data.MYSQL_DATABASE.data." + DB_PORT, instance.getParameters().get(DB_PORT));
+        } else {
+            instance.getParameters().put(DB_PORT, ctx.read("$.data.MYSQL_DATABASE.data." + DB_PORT));
+        }
+
+        if (instance.getParameters().get(DB_ROOT_PASSWORD) != null) {
+            ctx.set("$.data.MYSQL_DATABASE.data." + DB_ROOT_PASSWORD, instance.getParameters().get(DB_ROOT_PASSWORD));
+        } else {
+            instance.getParameters().put(DB_ROOT_PASSWORD, ctx.read("$.data.MYSQL_DATABASE.data." + DB_ROOT_PASSWORD));
+        }
     }
 }

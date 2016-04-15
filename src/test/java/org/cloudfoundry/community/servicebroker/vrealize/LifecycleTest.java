@@ -56,7 +56,7 @@ public class LifecycleTest {
 
         LOG.info("submitting create request.");
         VrServiceInstance instance = client.createInstance(
-                TestConfig.getCreateServiceInstanceRequest(sd), sd);
+                TestConfig.getCreateServiceInstanceRequest(sd, true), sd);
 
         Object requestId = instance.getCreateRequestId();
         assertNotNull(requestId);
@@ -87,7 +87,16 @@ public class LifecycleTest {
         LOG.info("state is: "
                 + client.getRequestStatus(token, requestId.toString()).getState());
 
-        client.loadCredentials(instance);
+        while (true) {
+            LOG.info("host is: " + instance.getHost());
+            client.loadCredentials(instance);
+
+            if(instance.getHost() != null) {
+                break;
+            }
+
+            TimeUnit.SECONDS.sleep(10);
+        }
 
         Map creds = instance.getCredentials();
         assertNotNull(creds);
@@ -146,7 +155,7 @@ public class LifecycleTest {
                 .getServiceDefinition(TestConfig.SD_ID);
 
         VrServiceInstance instance = new VrServiceInstance(TestConfig
-                .getCreateServiceInstanceRequest(sd));
+                .getCreateServiceInstanceRequest(sd, true));
 
         instance.getMetadata().put(VrServiceInstance.CREATE_REQUEST_ID, REQ_ID);
         instance.getMetadata().put(VrServiceInstance.LOCATION, "foo" + REQ_ID);
