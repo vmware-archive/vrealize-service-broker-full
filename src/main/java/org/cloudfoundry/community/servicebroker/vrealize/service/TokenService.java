@@ -24,7 +24,7 @@ public class TokenService {
 	@Autowired
 	private VraRepository vraRepository;
 
-	public String getToken() {//throws ServiceBrokerException {
+	public String getToken() {
 		try {
 			ResponseEntity<Map<String, String>> m = vraRepository
 					.getToken(creds);
@@ -40,7 +40,7 @@ public class TokenService {
 			}
 		} catch (FeignException e) {
 			LOG.error(e);
-			throw new ServiceBrokerException(e);
+			throw new ServiceBrokerException("Unable to retrieve token.", e);
 		}
 	}
 }

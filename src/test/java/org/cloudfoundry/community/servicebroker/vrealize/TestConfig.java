@@ -1,6 +1,5 @@
 package org.cloudfoundry.community.servicebroker.vrealize;
 
-import org.apache.commons.collections.map.HashedMap;
 import org.cloudfoundry.community.servicebroker.vrealize.adapter.MySqlAdapter;
 import org.cloudfoundry.community.servicebroker.vrealize.domain.Creds;
 import org.cloudfoundry.community.servicebroker.vrealize.persistance.LastOperation;

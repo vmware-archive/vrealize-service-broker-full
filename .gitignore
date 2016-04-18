@@ -5,3 +5,6 @@ target
 release/
 product/
 credentials.yml
+dump.rdb
+headers.out
+out.json

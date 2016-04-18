@@ -1,6 +1,7 @@
 package org.cloudfoundry.community.servicebroker.vrealize.service;
 
 import org.apache.log4j.Logger;
+import org.springframework.cloud.servicebroker.exception.ServiceBrokerException;
 import org.springframework.cloud.servicebroker.model.Catalog;
 import org.springframework.cloud.servicebroker.model.ServiceDefinition;
 import org.cloudfoundry.community.servicebroker.vrealize.VraClient;
@@ -37,7 +38,7 @@ public class CatalogService implements
 					Catalog.class);
 		} catch (Exception e) {
 			LOG.error("Error retrieving catalog.", e);
-			return null;
+			throw new ServiceBrokerException("Unable to retrieve catalog.", e);
 		}
 	}
 

@@ -14,12 +14,14 @@ import java.util.Map;
 
 public class VrServiceInstance implements Serializable {
 
+    public static final long serialVersionUID = 1L;
+
     // some "known" keys for metadata storage
     public static final String LOCATION = "LOCATION";
     public static final String CREATE_REQUEST_ID = "CREATE_REQUEST_ID";
     public static final String DELETE_REQUEST_ID = "DELETE_REQUEST_ID";
-    public static final String DELETE_TEMPLATE_LINK = "DELETE_TEMPLATE_LINK";
-    public static final String DELETE_LINK = "DELETE_LINK";
+    public static final String DELETE_TEMPLATE_LINK = "GET Template: {com.vmware.csp.component.cafe.composition@resource.action.deployment.destroy.name}";
+    public static final String DELETE_LINK = "POST: {com.vmware.csp.component.cafe.composition@resource.action.deployment.destroy.name}";
     public static final String SERVICE_TYPE = "SERVICE_TYPE";
     public static final String HOST = "HOST";
 

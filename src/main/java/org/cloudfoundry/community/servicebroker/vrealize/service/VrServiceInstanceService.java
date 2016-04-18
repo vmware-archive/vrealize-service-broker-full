@@ -75,7 +75,7 @@ public class VrServiceInstanceService implements ServiceInstanceService {
             LOG.info("request: " + id + " status is: " + status.getState());
         } catch (ServiceBrokerException e) {
             LOG.error("unable to get status of request: " + id, e);
-            return null;
+            throw e;
         }
 
         LastOperation newLastOperation = LastOperation.fromResponse(status);

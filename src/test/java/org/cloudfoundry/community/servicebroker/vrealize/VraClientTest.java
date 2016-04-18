@@ -153,7 +153,7 @@ public class VraClientTest {
                 .getContents("resourcesResponse.json"));
 
         Map<String, Object> meta = client
-                .getMetadataFromResourceResponse(rr);
+                .getLinks(rr);
 
         meta.put(VrServiceInstance.HOST, client.getHostIP(rr));
 
@@ -163,7 +163,7 @@ public class VraClientTest {
         instance.getMetadata().putAll(meta);
 
         assertNotNull(meta);
-        assertEquals(4, meta.size());
+        assertEquals(16, meta.size());
         assertEquals("mysql", meta.get(VrServiceInstance.SERVICE_TYPE));
         assertEquals("192.168.200.214", meta.get(VrServiceInstance.HOST));
         assertEquals("https://vra-cafe.vra.pcflab.net/catalog-service/api/consumer/resources/9450b691-4b5a-43b4-8cd1-a54912c4ba85/actions/25e17ec5-e2fd-4bba-bb3b-25b69dd18bd7/requests/template",

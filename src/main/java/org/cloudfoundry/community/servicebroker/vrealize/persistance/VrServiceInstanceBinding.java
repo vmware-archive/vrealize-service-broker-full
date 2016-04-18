@@ -6,6 +6,8 @@ import java.util.Map;
 
 public class VrServiceInstanceBinding implements Serializable {
 
+    public static final long serialVersionUID = 1L;
+
     private String id;
 
     private String serviceInstanceId;

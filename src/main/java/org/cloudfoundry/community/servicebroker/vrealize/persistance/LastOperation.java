@@ -7,6 +7,8 @@ import java.io.Serializable;
 
 public class LastOperation implements Serializable {
 
+    public static final long serialVersionUID = 1L;
+
     private OperationState state;
 
     private String description;

@@ -92,30 +92,21 @@ public class VraClient {
             return instance;
         } catch (Throwable t) {
             LOG.error("error processing create request.", t);
-            return null;
+            throw new ServiceBrokerException("Unable to process create request.", t);
         }
     }
 
     public void loadCredentials(VrServiceInstance instance) {
         String token = tokenService.getToken();
 
-        String locationPath = pathFromLink(instance.getLocation().toString());
-        JsonElement requestResponse = vraRepository.getRequest(
-                "Bearer " + token, locationPath).getBody();
-
-        LOG.debug("loading credentials from: " + instance.getLocation().toString() + ": " + requestResponse.toString());
-        instance.getMetadata().putAll(getMetadataFromResourceResponse(requestResponse));
-
         LOG.info("loading host for request: " + instance.getCreateRequestId());
         JsonElement resourcesResponse = vraRepository.getRequestResources("Bearer " + token, instance.getCreateRequestId()).getBody();
 
+        LOG.debug("loading credentials from: " + instance.getLocation().toString() + ": " + resourcesResponse.toString());
+        instance.getMetadata().putAll(getLinks(resourcesResponse));
+
         LOG.debug("loading host from response: " + resourcesResponse.toString());
         instance.getMetadata().put(VrServiceInstance.HOST, getHostIP(resourcesResponse));
-    }
-
-    Map<String, Object> getMetadataFromResourceResponse(
-            JsonElement requestResponse) {
-        return getDeleteLinks(requestResponse);
     }
 
     public VrServiceInstance deleteInstance(VrServiceInstance instance) {
@@ -158,7 +149,7 @@ public class VraClient {
             return instance;
         } catch (Throwable t) {
             LOG.error("error processing delete request.", t);
-            return null;
+            throw new ServiceBrokerException("Unable to process delete request.", t);
         }
     }
 
@@ -347,24 +338,21 @@ public class VraClient {
         return link.substring(serviceUri.length() + 1);
     }
 
-    Map<String, Object> getDeleteLinks(JsonElement resources) {
+    Map<String, Object> getLinks(JsonElement resources) {
         Map<String, Object> map = new HashMap<String, Object>();
         ReadContext ctx = JsonPath.parse(resources.toString());
 
-        //seems to be no way to filter using json path where there is a '@' in the thing you are tyring to filter on?
         JSONArray o = ctx.read("$.content[*].links[*]");
         Iterator it = o.iterator();
         while (it.hasNext()) {
             LinkedHashMap ja = (LinkedHashMap) it.next();
-            Object rel = ja.get("rel");
+            Object key = ja.get("rel");
+            Object val = ja.get("href");
 
-            if (rel.toString().equals("GET Template: {com.vmware.csp.component.cafe.composition@resource.action.deployment.destroy.name}")) {
-                map.put(VrServiceInstance.DELETE_TEMPLATE_LINK, ja.get("href").toString());
+            if (key != null && val != null) {
+                map.put(key.toString(), val);
             }
 
-            if (rel.toString().equals("POST: {com.vmware.csp.component.cafe.composition@resource.action.deployment.destroy.name}")) {
-                map.put(VrServiceInstance.DELETE_LINK, ja.get("href").toString());
-            }
         }
         return map;
     }
