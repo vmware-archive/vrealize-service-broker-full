@@ -1,6 +1,7 @@
 groups:
 - name: all
   jobs:
+  - spring-cloud-broker
   - build-tile
   - claim-pcf
   - deploy-tile
@@ -12,6 +13,11 @@ groups:
   - claim-pcf
   - manual-cleanup-and-release
 resources:
+- name: spring-cloud-cloudfoundry-service-broker-repo
+   type: git
+   source:
+   branch: master
+   uri: https://github.com/spring-cloud/spring-cloud-cloudfoundry-service-broker.git
 - name: vra-tile-repo
   type: git
   source:
@@ -47,9 +53,27 @@ resources:
     private_key: {{pcf-key}} 
     uri: git@github.com:cf-platform-eng/pipeline-resource-pool
 jobs:
+ name: spring-cloud-broker
+  plan:
+  - aggregate:
+    - get: spring-cloud-cloudfoundry-service-broker-repo
+      trigger: true
+  - task: build
+    config:
+      platform: linux
+      image: docker:///qlik/gradle
+      run:
+        path: ci/build-cloud-lib.sh
+      outputs:
+      - name: cloud-broker
+        path: ""
+  - put: cloud-lib
+    params:
+      from: build/libs/spring-cloud-cloudfoundry-service-broker-1.0.0.RC2.jar
 - name: build-tile
   plan:
   - aggregate:
+    - get: cloud-lib
     - get: tile-generator-repo
     - get: vra-tile-repo
       trigger: true
