@@ -12,15 +12,12 @@ gem install bosh_cli --no-ri --no-rdoc
 wget "https://bootstrap.pypa.io/get-pip.py" -O /dev/stdout | python
 pip install mkdocs
 
-
 TILE_GEN_DIR=$1
 SOURCE_DIR=$2
 HISTORY_DIR=$3
 TARGET_DIR=$4
 
-cd TILE_GEN_DIR
-pip install -r requirements.txt
-
+(cd ${TILE_GEN_DIR}; pip install -r requirements.txt)
 
 BIN_DIR="$( cd "${TILE_GEN_DIR}/bin" && pwd )"
 
