@@ -43,7 +43,7 @@ resources:
   source:
     branch: master
     pool: pcf
-    private_key: {{pcf-key}} 
+    private_key: {{github-pool-private-key}}
     uri: git@github.com:cf-platform-eng/pipeline-resource-pool
 jobs:
 - name: build-tile
