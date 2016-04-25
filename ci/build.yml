@@ -1,0 +1,21 @@
+---
+platform: linux
+
+image: docker:///ruby#2.3.0
+
+inputs:
+- name: cloud-lib
+- name: source
+
+outputs:
+- name: cloud-lib-jar
+
+- put: cloud-lib-jar
+  params:
+      from: cloud-lib/build/cloud.jar
+
+run:
+  path:  source/ci/build-cloudlib.sh
+  args:
+  - cloud-lib
+  - source
