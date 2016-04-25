@@ -58,30 +58,9 @@ jobs:
   - aggregate:
     - get: tile-generator-repo
     - get: vra-tile-repo
-      passed:
-      - build-broker
     - get: tile-history
   - task: build-tile
-    config:
-      platform: linux
-      image: docker:///guidowb/tile-pipeline
-      run:
-        path: vra-tile-repo/ci/scripts/tile-build.sh
-        args:
-        - tile-generator-repo
-        - vra-tile-repo
-        - tile-history
-        - vra-tile
-      inputs:
-      - name: tile-generator-repo
-        path: ""
-      - name: vra-tile-repo
-        path: ""
-      - name: tile-history
-        path: ""
-      outputs:
-      - name: vra-tile
-        path: ""
+    file: build-tile.yml
   - put: tile-history
     params:
       from: vra-tile/tile-history-.*\.yml

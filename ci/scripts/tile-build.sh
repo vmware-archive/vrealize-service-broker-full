@@ -1,4 +1,10 @@
-#!/bin/sh -e
+#!/bin/sh
+
+set -e -x
+
+apt-get update
+apt install maven -y --fix-missing
+
 
 TILE_GEN_DIR=$1
 SOURCE_DIR=$2
@@ -14,7 +20,7 @@ if [ -n "${HISTORY}" ]; then
 	cp ${HISTORY} ${SOURCE_DIR}/tile-history.yml
 fi
 
-(cd ${SOURCE_DIR}; mvn package; ${TILE} build)
+(cd ${SOURCE_DIR}; mvn package -DskipTests=true; ${TILE} build)
 
 VERSION=`grep '^version:' ${SOURCE_DIR}/tile-history.yml | sed 's/^version: //'`
 HISTORY="tile-history-${VERSION}.yml"
