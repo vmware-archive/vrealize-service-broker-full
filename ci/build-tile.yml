@@ -1,7 +1,7 @@
 ---
 platform: linux
 
-image: docker:///guidowb/tile-pipeline
+image: docker:///java#8-jdk
 
 inputs:
 - name: tile-generator-repo

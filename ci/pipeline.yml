@@ -60,7 +60,7 @@ jobs:
     - get: vra-tile-repo
     - get: tile-history
   - task: build-tile
-    file: build-tile.yml
+    file: vra-tile-repo/ci/build-tile.yml
   - put: tile-history
     params:
       from: vra-tile/tile-history-.*\.yml
