@@ -1,7 +1,6 @@
 groups:
 - name: all
   jobs:
-  - build-broker
   - build-tile
   - claim-pcf
   - deploy-tile
@@ -47,17 +46,12 @@ resources:
     private_key: {{pcf-key}} 
     uri: git@github.com:cf-platform-eng/pipeline-resource-pool
 jobs:
-- name: build-broker
-  plan:
-    - get: vra-tile-repo
-      trigger: true
-    - task: build
-      file: vra-tile-repo/ci/build.yml
 - name: build-tile
   plan:
   - aggregate:
     - get: tile-generator-repo
     - get: vra-tile-repo
+      trigger: true
     - get: tile-history
   - task: build-tile
     file: vra-tile-repo/ci/build-tile.yml
