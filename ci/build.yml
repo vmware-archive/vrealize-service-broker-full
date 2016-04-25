@@ -4,7 +4,7 @@ platform: linux
 image: docker:///java#8-jdk
 
 inputs:
-- name: source
+- name: vra-tile-repo
 
 run:
-  path:  source/ci/scripts/build.sh
+  path:  vra-tile-repo/ci/scripts/build.sh
