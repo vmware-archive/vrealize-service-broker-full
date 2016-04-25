@@ -2,7 +2,11 @@
 
 set -e -x
 
-which bash
+apt-get update
+apt install maven -y --fix-missing
 
-mvn package
-#./gradlew package
+cd source
+
+mvn package -DskipTests=true
+pwd
+ls
