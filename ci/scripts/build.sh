@@ -5,8 +5,6 @@ set -e -x
 apt-get update
 apt install maven -y --fix-missing
 
-cd source
+cd "$1"
 
 mvn package -DskipTests=true
-pwd
-ls
