@@ -1,0 +1,13 @@
+---
+applications:
+- name: vrealize-service-broker
+  memory: 512M
+  instances: 1
+  path: target/vrealize-service-broker-0.2.0.jar
+  buildpack: <url to your forked buildpack>
+  services: [ vra-broker-repo ]
+  env:
+    SERVICE_URI: <url to vra admin server>
+    VRA_USER_ID: <vra admin user>
+    VRA_USER_PASSWORD: <vra admin password>
+    VRA_TENANT: <vra tenant name>
