@@ -1,3 +1,5 @@
+# vrealize-service-broker-full is no longer actively maintained by VMware.
+
 #vrealize-service-broker
 
 A service broker POC that exposes vRealize blueprint services for use within Cloud Foundry.
